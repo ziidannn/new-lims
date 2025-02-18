@@ -3,131 +3,78 @@
 namespace App\Http\Controllers;
 
 use App\Models\AmbientAir;
+use App\Models\Location;
+use App\Models\Sampling;
+use App\Models\SampleDescription;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
 class AmbientAirController extends Controller
 {
-    //ADD COA
     public function index(Request $request)
     {
-        $data = AmbientAir::all();
-        // $auditee = User::with(['roles' => function ($query) {
-        //     $query->select('id', 'name');
-        // }])
-        //     ->whereHas('roles', function ($q) use ($request) {
-        //         $q->where('name', 'auditee');
-        //     })
-        //     ->orderBy('name')->get();
-        return view('ambient_air.index', compact('data'));
+        $data = Sampling::all();
+        $description = SampleDescription::all();
+        return view('ambient_air.index', compact('data', 'description'));
     }
 
-    public function add(Request $request)
-    {
-    if ($request->isMethod('POST')) {
-        $this->validate($request, [
-            'auditee_id'      => ['required'],
-            'date_start'      => ['required'],
-            'date_end'        => ['required'],
-            'location_id'     => ['required'],
-            'department_id'   => ['required'],
-            'type_audit'      => ['required'],
-            'periode'         => ['required'],
-            'head_major'      => ['required'],
-            'upm_major'       => ['required'],
-        ]);
+    public function add(Request $request) {
+        if ($request->isMethod('POST')) {
+            $this->validate($request, [
+                'no_sample' => ['required'],
+                'sampling_location' => ['required'],
+                'sample_description_id' => ['required'],
+                'date' => ['required'],
+                'time' => ['required'],
+                'method' => ['required'],
+                'date_received' => ['required'],
+                'itd_start' => ['required'],
+                'itd_end' => ['required'],
+            ]);
 
-        $auditee = User::find($request->auditee_id);
+            $data = Sampling::create([
+                'no_sample' => $request->no_sample,
+                'sampling_location' => $request->sampling_location,
+                'sample_description_id' => $request->sample_description_id,
+                'date' => $request->date,
+                'time' => $request->time,
+                'method' => $request->method,
+                'date_received' => $request->date_received,
+                'itd_start' => $request->itd_start,
+                'itd_end' => $request->itd_end,
+            ]);
 
-        $data = AuditPlan::create([
-            'auditee_id'      => $request->auditee_id,
-            'date_start'      => $request->date_start,
-            'date_end'        => $request->date_end,
-            'audit_status_id' => '1',
-            'location_id'     => $request->location_id,
-            'department_id'   => $request->department_id,
-            'type_audit'      => $request->type_audit,
-            'periode'         => $request->periode,
-            'head_major'      => $request->head_major,
-            'upm_major'       => $request->upm_major,
-        ]);
-
-        if ($request->auditor_id) {
-            foreach ($request->auditor_id as $auditorId) {
-                AuditPlanAuditor::create([
-                    'audit_plan_id' => $data->id,
-                    'auditor_id'    => $auditorId,
-                ]);
+            if ($data) {
+                return redirect()->route('ambient_air.index')->with('msg', 'Data ('.$request->no_sample.') added successfully');
             }
         }
-        $audit_plan = AuditPlan::with('auditstatus')->get();
-        $locations = Location::orderBy('title')->get();
-        $departments = Department::orderBy('name')->get();
-        $auditStatus = AuditStatus::orderBy('title')->get();
-        $category = StandardCategory::where('status', true)->get();
-        $criterias = StandardCriteria::where('status', true)->get();
-        $auditee = User::with(['roles' => function ($query) {
-            $query->select('id', 'name');
-        }])
-            ->whereHas('roles', function ($q) use ($request) {
-                $q->where('name', 'auditee');
-            })
-            ->orderBy('name')->get();
 
-        $auditor = User::with(['roles' => function ($query) {
-            $query->select('id', 'name');
-        }])
-            ->whereHas('roles', function ($q) use ($request) {
-                $q->where('name', 'auditor');
-            })
-            ->orderBy('name')->get();
-
-        $data = AuditPlan::all();
-        $prd = Carbon::now()->subYears(5)->year;
-        return view("audit_plan.add", compact("data", "category", "criterias", "auditee",
-        "auditor", "locations", "auditStatus", "departments", "audit_plan", 'prd'));
+        $data = Sampling::all();
+        $description = SampleDescription::orderBy('name')->get();
+        return view('ambient_air.add', compact('data', 'description'));
     }
-}
 
     //Data AmbientAir
     public function data(Request $request)
     {
-        $data = AmbientAir::with([
-            // 'auditee' => function ($query) {
-            //     $query->select('id', 'name', 'no_phone');
-            // },
-            // 'auditstatus' => function ($query) {
-            //     $query->select('id', 'title', 'color');
-            // },
-            // 'auditorId' => function ($query) {
-            //     $query->select('id', 'name', 'no_phone');
-            // },
-            // 'category' => function ($query) {
-            //     $query->select('id', 'description', 'status');
-            // },
-            // 'criteria' => function ($query) {
-            //     $query->select('id', 'title', 'status');
-            // },
-            // 'departments' => function ($query) {
-            //     $query->select('id', 'name');
-            // },
-        ])->orderBy("ambient_airs.id", "desc");
+        $data = Sampling::with([
+            'description' => function ($query) {
+                $query->select('name');
+            },
+        ])->orderBy("id","desc" );
         return DataTables::of($data)
             ->filter(function ($instance) use ($request) {
-                if (!empty($request->get('select_auditee'))) {
-                    $instance->whereHas('auditee', function ($q) use ($request) {
-                        $q->where('auditee_id', $request->get('select_auditee'));
+                if (!empty($request->get('select_description'))) {
+                    $instance->whereHas('description', function ($q) use ($request) {
+                        $q->where('sample_description_id', $request->get('select_description'));
                     });
                 }
                 if (!empty($request->get('search'))) {
                     $instance->where(function ($w) use ($request) {
                         $search = $request->get('search');
-                        $w->orWhere('date_start', 'LIKE', "%$search%")
-                        ->orWhere('date_end', 'LIKE', "%$search%")
-                        ->orWhere('locations.title', 'LIKE', "%$search%")
-                        ->orWhereHas('auditee', function ($query) use ($search) {
-                            $query->where('name', 'LIKE', "%$search%");
-                        });
+                        $w->orWhere('no_sample', 'LIKE', "%$search%")
+                        ->orWhere('date', 'LIKE', "%$search%")
+                        ->orWhere('description.name', 'LIKE', "%$search%");
                     });
                 }
             })->make(true);
@@ -135,7 +82,7 @@ class AmbientAirController extends Controller
 
     public function datatables()
     {
-        $data = AmbientAir::select('*');
+        $data = Sampling::select('*');
         return DataTables::of($data)->make(true);
     }
 }
