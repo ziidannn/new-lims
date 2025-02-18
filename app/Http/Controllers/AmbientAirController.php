@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\COA;
+use App\Models\AmbientAir;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
-class COAController extends Controller
+class AmbientAirController extends Controller
 {
     //ADD COA
     public function index(Request $request)
     {
-        $data = COA::all();
+        $data = AmbientAir::all();
         // $auditee = User::with(['roles' => function ($query) {
         //     $query->select('id', 'name');
         // }])
@@ -22,10 +22,10 @@ class COAController extends Controller
         return view('COA.index', compact('data'));
     }
 
-    //Data COA
+    //Data AmbientAir
     public function data(Request $request)
     {
-        $data = COA::with([
+        $data = AmbientAir::with([
             // 'auditee' => function ($query) {
             //     $query->select('id', 'name', 'no_phone');
             // },

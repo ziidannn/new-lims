@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\COAController;
+use App\Http\Controllers\AmbientAirController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
@@ -29,10 +29,10 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::group(['prefix' => 'ambient_air'], function () {
-    Route::any('/', [COAController::class, 'index'])->name('ambient_air.index')->middleware('auth');
-    Route::get('/data', [COAController::class, 'data'])->name('ambient_air.data');
-    Route::delete('/delete', [COAController::class, 'delete'])->name('ambient_air.delete');
-    Route::any('/add', [COAController::class, 'add'])->name('ambient_air.add');
+    Route::any('/', [AmbientAirController::class, 'index'])->name('ambient_air.index')->middleware('auth');
+    Route::get('/data', [AmbientAirController::class, 'data'])->name('ambient_air.data');
+    Route::delete('/delete', [AmbientAirController::class, 'delete'])->name('ambient_air.delete');
+    Route::any('/add', [AmbientAirController::class, 'add'])->name('ambient_air.add');
 });
 
 
