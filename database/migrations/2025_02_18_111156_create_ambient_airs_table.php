@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ambient_air', function (Blueprint $table) {
+        Schema::create('ambient_airs', function (Blueprint $table) {
             $table->id();
             $table->string('testing_result');
             $table->unsignedBigInteger('parameter_id');
