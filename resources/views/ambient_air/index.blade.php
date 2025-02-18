@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'COA')
+@section('title', 'Ambient Air')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -33,29 +33,29 @@
         <div class="card-header">
                 <div class="row">
                     <div class="col-md-3">
-                        <select id="select_description" class="form-control input-sm select2" data-placeholder="description">
+                        <select id="select_description" class="form-control input-sm select2" data-placeholder="Description">
                             <option value="">Select Description</option>
-                            <!-- @foreach($description as $d)
-                            <option value="{{ $d->id }}">{{ $d->name }}</option>
-                            @endforeach -->
+
                         </select>
                     </div>
                     <div class="col-md d-flex justify-content-center justify-content-md-end">
                         <a class="btn btn-primary btn-block btn-mail" title="Add Audit Plan"
-                            href="{{ route('audit_plan.add')}}">
+                            href="{{ route('ambient_air.add') }}">
                             <i data-feather="plus"></i>+ Add
                         </a>
                     </div>
                     <table class="table" id="datatable">
                         <thead>
                             <tr>
-                                <th><b>No</b></th>
-                                <th width="20%"><b>Parameter</b></th>
-                                <th width="35%"><b>Sampling Time</b></th>
-                                <th width="10%"><b>Regulatory Standard</b></th>
-                                <th width="20%"><b>Unit</b></th>
-                                <th width="20%"><b>Method</b></th>
-                                <th width="15%"><b>Action</b></th>
+                                <th><b>No Sample</b></th>
+                                <th><b>Location</b></th>
+                                <th><b>Time</b></th>
+                                <th><b>Description</b></th>
+                                <th><b>Datetime</b></th>
+                                <th><b>Method</b></th>
+                                <th><b>Date Received</b></th>
+                                <th><b>ITD</b></th>
+                                <th><b>Action</b></th>
                             </tr>
                         </thead>
                     </table>
@@ -118,7 +118,7 @@
                 searchPlaceholder: 'Search data..'
             },
             ajax: {
-                url: "{{ route('audit_plan.data') }}",
+                url: "{{ route('ambient_air.data') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
                         d.select_description = $('#select_description').val()
@@ -139,58 +139,13 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        var html = `<a class="text-primary" title="` + row.auditee.name +
-                            `" href="{{ url('setting/manage_account/users/edit/` +
-                            row.idd + `') }}">` + row.auditee.name + `</a>`;
-
-                        if (row.auditee.no_phone) {
-                            html += `<br><a href="tel:` + row.auditee.no_phone +
-                                `" class="text-muted" style="font-size: 0.8em;">` +
-                                `<i class="fas fa-phone-alt"></i> ` + row.auditee.no_phone +
-                                `</a>`;
-                        }
-                        return html;
-                    },
-                },
-                {
-                    data: null, // Kita akan menggabungkan date_start dan date_end, jadi tidak ada sumber data spesifik
-                    render: function (data, type, row, meta) {
-                        // Menggunakan moment.js untuk memformat tanggal
-                        var formattedStartDate = moment(row.date_start).format(
-                            'DD MMMM YYYY, HH:mm');
-                        var formattedEndDate = moment(row.date_end).format(
-                            'DD MMMM YYYY, HH:mm');
-                        return formattedStartDate + ' - ' + formattedEndDate;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        var html =
-                            `<span class="badge bg-${row.auditstatus.color}">${row.auditstatus.title}</span>`;
-                        return html;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        return row.location;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
                         var html = '';
                         if (row.auditstatus.id === 1 || row.auditstatus.id === 2 || row.auditstatus.id === 13 || row.auditstatus.id === 5) {
-                            html = `<a class="badge bg-dark badge-icon" title="Edit Auditor Standard" href="{{ url('audit_plan/standard/edit/') }}/${row.id}">
+                            html = `<a class="badge bg-dark badge-icon" title="Edit Auditor Standard" href="/${row.id}">
                                     <i class="bx bx-show-alt icon-white"></i></a>
-                                    <a class="badge bg-warning badge-icon" title="Edit Audit Plan" href="{{ url('edit_audit/') }}/${row.id}">
+                                    <a class="badge bg-warning badge-icon" title="Edit Audit Plan" href="/${row.id}">
                                     <i class="bx bx-pencil"></i></a>
-                                    <a class="badge bg-danger badge-icon" title="Delete Audit Plan" style="cursor:pointer" onclick="DeleteId('${row.id}', '${row.auditee.name}')">
-                                    <i class="bx bx-trash icon-white"></i></a>`;
-                        } else if (row.auditstatus.id === 1 || row.auditstatus.id === 2 || row
-                            .auditstatus.id === 6 || row.auditstatus.id === 14) {
-                            html = `<a class="badge bg-danger badge-icon" title="Delete Audit Plan" style="cursor:pointer" onclick="DeleteId('${row.id}', '${row.auditee.name}')">
+                                    <a class="badge bg-danger badge-icon" title="Delete Audit Plan" style="cursor:pointer" onclick="DeleteId('${row.id}')">
                                     <i class="bx bx-trash icon-white"></i></a>`;
                         }
                         return html;
@@ -216,7 +171,7 @@
             .then((willDelete) => {
                 if (willDelete) {
                     $.ajax({
-                        url: "{{ route('audit_plan.delete') }}",
+                        url: "",
                         type: "DELETE",
                         data: {
                             "id": id,
