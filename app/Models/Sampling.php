@@ -12,14 +12,20 @@ class Sampling extends Model
     public $timestamps = true;
     public $incrementing = true;
     protected $fillable = [
-        'id',
         'no_sample',
+        'sampling_location',
+        'sample_description_id',
         'date',
         'time',
         'method',
         'date_received',
-        'interval_testing_date',
-        'sample_description_id'
+        'itd_start',
+        'itd_end'
     ];
+
+    public function description()
+    {
+        return $this->belongsTo(SampleDescription::class, 'sample_description_id');
+    }
 }
 

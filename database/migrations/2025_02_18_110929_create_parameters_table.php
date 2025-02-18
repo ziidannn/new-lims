@@ -22,7 +22,8 @@ return new class extends Migration
             $table->foreign('unit_id')->references('id')->on('units');
             $table->unsignedBigInteger('method_id');
             $table->foreign('method_id')->references('id')->on('methods');
-        });
+            $table->timestamp('updated_at')->nullable();
+            $table->timestamp('created_at')->nullable();        });
     }
 
     /**

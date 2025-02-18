@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/sweetalert2.css')}}">
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 @endsection
 
 @section('style')
@@ -39,8 +38,8 @@
                         </select>
                     </div>
                     <div class="col-md d-flex justify-content-center justify-content-md-end">
-                        <a class="btn btn-primary btn-block btn-mail" title="Add Audit Plan"
-                            href="{{ route('ambient_air.add') }}">
+                        <a class="btn btn-primary btn-block btn-mail" title="Add new"
+                            href="{{ route('ambient_air.add')}}">
                             <i data-feather="plus"></i>+ Add
                         </a>
                     </div>
@@ -49,9 +48,9 @@
                             <tr>
                                 <th><b>No Sample</b></th>
                                 <th><b>Location</b></th>
-                                <th><b>Time</b></th>
                                 <th><b>Description</b></th>
-                                <th><b>Datetime</b></th>
+                                <th><b>Date</b></th>
+                                <th><b>Time</b></th>
                                 <th><b>Method</b></th>
                                 <th><b>Date Received</b></th>
                                 <th><b>ITD</b></th>
@@ -76,9 +75,6 @@
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/moment/moment.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/moment/id.js')}}"></script>
-{{-- <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-<script src="https://cdn.jsdelivr.net/momentjs/latest/locale/id.js"></script> --}}
-<!-- Memuat lokal Indonesia untuk moment.js -->
 
 @if(session('msg'))
 <script type="text/javascript">
@@ -121,7 +117,7 @@
                 url: "{{ route('ambient_air.data') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
-                        d.select_description = $('#select_description').val()
+                    d.select_description = $('#select_description').val()
                 },
             },
             columnDefs: [{
@@ -139,8 +135,67 @@
                 },
                 {
                     render: function (data, type, row, meta) {
+                        return row.no_sample;
+                    },
+                    orderable: false
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        return row.sampling_location;
+                    },
+                    orderable: false
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        // Check if row.category exists and has an id
+                        if (row.description) {
+                            var html =
+                                `<a class="text-info" title="${row.description.name}"</a>`;
+                            return html;
+                        }
+                    },
+                    className: "text-center"
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        return row.date;
+                    },
+                    orderable: false
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        return row.time;
+                    },
+                    orderable: false
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        return row.method;
+                    },
+                    orderable: false
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        return row.date_received;
+                    },
+                    orderable: false
+                },
+                {
+                    data: null, // Kita akan menggabungkan date_start dan date_end, jadi tidak ada sumber data spesifik
+                    render: function (data, type, row, meta) {
+                        // Menggunakan moment.js untuk memformat tanggal
+                        var formattedStartDate = moment(row.itd_start).format(
+                            'DD MMMM YYYY');
+                        var formattedEndDate = moment(row.itd_end).format(
+                            'DD MMMM YYYY');
+                        return formattedStartDate + ' - ' + formattedEndDate;
+                    },
+                    orderable: false
+                },
+                {
+                    render: function (data, type, row, meta) {
                         var html = '';
-                        if (row.auditstatus.id === 1 || row.auditstatus.id === 2 || row.auditstatus.id === 13 || row.auditstatus.id === 5) {
+                        {
                             html = `<a class="badge bg-dark badge-icon" title="Edit Auditor Standard" href="/${row.id}">
                                     <i class="bx bx-show-alt icon-white"></i></a>
                                     <a class="badge bg-warning badge-icon" title="Edit Audit Plan" href="/${row.id}">
@@ -155,7 +210,7 @@
                 }
             ]
         });
-        $('#select_auditee').change(function () {
+        $('#select_description').change(function () {
             table.draw();
         });
     });

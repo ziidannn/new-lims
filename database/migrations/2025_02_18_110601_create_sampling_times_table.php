@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('sampling_times', function (Blueprint $table) {
             $table->id();
             $table->time('time');
-        });
+            $table->timestamp('updated_at')->nullable();
+            $table->timestamp('created_at')->nullable();        });
     }
 
     /**

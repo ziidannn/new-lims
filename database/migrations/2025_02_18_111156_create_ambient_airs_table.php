@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreign('parameter_id')->references('id')->on('parameters');
             $table->unsignedBigInteger('note_id');
             $table->foreign('note_id')->references('id')->on('notes');
-        });
+            $table->timestamp('updated_at')->nullable();
+            $table->timestamp('created_at')->nullable();        });
     }
 
     /**
