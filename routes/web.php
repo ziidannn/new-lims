@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AmbientAirController;
+use App\Http\Controllers\ResumeController;
+use App\Http\Controllers\Resume;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
@@ -35,7 +37,12 @@ Route::group(['prefix' => 'ambient_air'], function () {
     Route::any('/add', [AmbientAirController::class, 'add'])->name('ambient_air.add');
 });
 
-
+Route::group(['prefix' => 'resume'], function () {
+    Route::any('/', [ResumeController::class, 'index'])->name('resume.index')->middleware('auth');
+    Route::get('/data', [ResumeController::class, 'data'])->name('resum.data');
+    Route::delete('/delete', [ResumeController::class, 'delete'])->name('resum.delete');
+    Route::get('/resume', [ResumeController::class, 'create'])->name('resume.create');
+});
 
 // -----------------------------------------------------------------------------------------------
 Route::middleware('auth')->group(function () {
