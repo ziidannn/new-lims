@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\COAController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
@@ -27,6 +28,16 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::group(['prefix' => 'COA'], function () {
+    Route::any('/', [COAController::class, 'index'])->name('COA.index')->middleware('auth');
+    Route::get('/data', [COAController::class, 'data'])->name('COA.data');
+    Route::delete('/delete', [COAController::class, 'delete'])->name('COA.delete');
+    Route::any('/add', [COAController::class, 'add'])->name('COA.add');
+});
+
+
+
+// -----------------------------------------------------------------------------------------------
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -22,6 +22,12 @@
                 <div data-i18n="Dashboards">Dashboard</div>
             </a>
         </li>
+        <li class="menu-item {{ request()->segment(1) == 'COA' ? 'active' : '' }}">
+            <a href="{{ route('COA.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-book-add"></i>
+                <div data-i18n="COA">COA</div>
+            </a>
+        </li>
         @can('control panel.read')
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text">Control Panel</span>
