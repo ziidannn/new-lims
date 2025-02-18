@@ -28,11 +28,11 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::group(['prefix' => 'COA'], function () {
-    Route::any('/', [COAController::class, 'index'])->name('COA.index')->middleware('auth');
-    Route::get('/data', [COAController::class, 'data'])->name('COA.data');
-    Route::delete('/delete', [COAController::class, 'delete'])->name('COA.delete');
-    Route::any('/add', [COAController::class, 'add'])->name('COA.add');
+Route::group(['prefix' => 'ambient_air'], function () {
+    Route::any('/', [COAController::class, 'index'])->name('ambient_air.index')->middleware('auth');
+    Route::get('/data', [COAController::class, 'data'])->name('ambient_air.data');
+    Route::delete('/delete', [COAController::class, 'delete'])->name('ambient_air.delete');
+    Route::any('/add', [COAController::class, 'add'])->name('ambient_air.add');
 });
 
 
