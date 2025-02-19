@@ -23,7 +23,6 @@ class AmbientAirController extends Controller
             $this->validate($request, [
                 'no_sample' => ['required'],
                 'sampling_location' => ['required'],
-                'sample_description_id' => ['required'],
                 'date' => ['required'],
                 'time' => ['required'],
                 'method' => ['required'],
@@ -35,7 +34,7 @@ class AmbientAirController extends Controller
             $data = Sampling::create([
                 'no_sample' => $request->no_sample,
                 'sampling_location' => $request->sampling_location,
-                'sample_description_id' => $request->sample_description_id,
+                'sample_description_id' => 1, // Master Data dengan ID 1
                 'date' => $request->date,
                 'time' => $request->time,
                 'method' => $request->method,
@@ -50,8 +49,30 @@ class AmbientAirController extends Controller
         }
 
         $data = Sampling::all();
-        $description = SampleDescription::orderBy('name')->get();
-        return view('ambient_air.add', compact('data', 'description'));
+        return view('ambient_air.add', compact('data'));
+    }
+
+    public function create(Request $request) {
+        if ($request->isMethod('POST')) {
+            $this->validate($request, [
+                'testing_result' => ['required'],
+                'parameter_id' => ['required'],
+                'note_id' => ['required'],
+            ]);
+
+            $data = AmbientAir::create([
+                'testing_result' => $request->testing_result,
+                'parameter_id' => $request->parameter_id,
+                'note_id' => $request->note_id,
+            ]);
+
+            if ($data) {
+                return redirect()->route('ambient_air.index')->with('msg', 'Data ('.$request->no_sample.') added successfully');
+            }
+        }
+
+        $data = Sampling::all();
+        return view('ambient_air.create', compact('data'));
     }
 
     //Data AmbientAir
@@ -61,7 +82,7 @@ class AmbientAirController extends Controller
             'description' => function ($query) {
                 $query->select('name');
             },
-        ])->orderBy("id","desc" );
+        ])->orderBy("id" )->get;
         return DataTables::of($data)
             ->filter(function ($instance) use ($request) {
                 if (!empty($request->get('select_description'))) {

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('parameters', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedBigInteger('sampling_time_id');
-            $table->foreign('sampling_time_id')->references('id')->on('sampling_times');
+            $table->unsignedBigInteger('sampling_id');
+            $table->foreign('sampling_id')->references('id')->on('samplings');
             $table->unsignedBigInteger('regulation_id');
             $table->foreign('regulation_id')->references('id')->on('regulations');
             $table->unsignedBigInteger('unit_id');
@@ -23,7 +23,8 @@ return new class extends Migration
             $table->unsignedBigInteger('method_id');
             $table->foreign('method_id')->references('id')->on('methods');
             $table->timestamp('updated_at')->nullable();
-            $table->timestamp('created_at')->nullable();        });
+            $table->timestamp('created_at')->nullable();
+        });
     }
 
     /**

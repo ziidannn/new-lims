@@ -25,7 +25,7 @@ class Sampling extends Model
 
     public function description()
     {
-        return $this->belongsTo(SampleDescription::class, 'sample_description_id');
+        return $this->belongsTo(SampleDescription::class, 'sample_description_id', 'id');
     }
 }
 

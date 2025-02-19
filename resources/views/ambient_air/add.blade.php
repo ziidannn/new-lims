@@ -30,7 +30,7 @@
                             data-bs-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a><a
                             class="card-options-remove" href="#" data-bs-toggle="card-remove"><i
                                 class="fe fe-x"></i></a>
-                            </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -65,21 +65,9 @@
                             <label class="form-label" for="basicDate">Sampling Description<i
                                     class="text-danger">*</i></label>
                             <div class="input-group input-group-merge has-validation">
-                                <select
-                                    class="form-select @error('sample_description_id') is-invalid @enderror input-sm select2-modal"
-                                    name="sample_description_id" id="sample_description_id"
-                                    placeholder="Input Sampling Description">
-                                    @foreach($description as $p)
-                                    <option value="{{ $p->id }}"
-                                        {{ ($p->id==old('sample_description_id') ? "selected": "") }}>
-                                        {{ $p->id }} - {{ $p->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('sample_description_id')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
+                                <input type="text" class="form-control"
+                                    value="1 - {{ \App\Models\SampleDescription::find(1)->name }}" readonly>
+                                <input type="hidden" name="sample_description_id" value="1">
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-12">
@@ -112,9 +100,8 @@
                             <label class="form-label" for="basicDate">Sampling Method<i
                                     class="text-danger">*</i></label>
                             <div class="input-group input-group-merge has-validation">
-                                <input type="text" class="form-control @error('method')  is-invalid @enderror"
-                                    maxlength="120" name="method" placeholder="Input Sampling Method"
-                                    value="{{ old('method') }}">
+                                <input type="text" class="form-control @error('method') is-invalid @enderror"
+                                    maxlength="120" name="method" value="Grab/24 Hours" readonly>
                                 @error('method')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>

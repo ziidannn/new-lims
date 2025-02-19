@@ -13,7 +13,6 @@
 
 @section('style')
 <style>
-
     .badge-icon {
         display: inline-block;
         font-size: 1em;
@@ -30,38 +29,43 @@
 <div class="card">
     <div class="card-datatable table-responsive">
         <div class="card-header">
-                <div class="row">
-                    <div class="col-md-3">
-                        <select id="select_description" class="form-control input-sm select2" data-placeholder="Description">
-                            <option value="">Select Description</option>
+            <div class="row">
+                <div class="col-md-3">
+                    <select id="select_description" class="form-control input-sm select2"
+                        data-placeholder="Description">
+                        <option value="">Select Description</option>
 
-                        </select>
-                    </div>
-                    <div class="col-md d-flex justify-content-center justify-content-md-end">
-                        <a class="btn btn-primary btn-block btn-mail" title="Add new"
-                            href="{{ route('ambient_air.add')}}">
-                            <i data-feather="plus"></i>+ Add
-                        </a>
-                    </div>
-                    <table class="table" id="datatable">
-                        <thead>
-                            <tr>
-                                <th><b>No Sample</b></th>
-                                <th><b>Location</b></th>
-                                <th><b>Description</b></th>
-                                <th><b>Date</b></th>
-                                <th><b>Time</b></th>
-                                <th><b>Method</b></th>
-                                <th><b>Date Received</b></th>
-                                <th><b>ITD</b></th>
-                                <th><b>Action</b></th>
-                            </tr>
-                        </thead>
-                    </table>
+                    </select>
                 </div>
+                <div class="col-md d-flex justify-content-center justify-content-md-end">
+                    <a class="btn btn-primary btn-block btn-mail" title="Add new" href="{{ route('ambient_air.add')}}">
+                        <i data-feather="plus"></i>+ Add Sampling
+                    </a>
+                </div>
+                <div class="col-md d-flex justify-content-center justify-content-md-end">
+                    <a class="btn btn-warning btn-block btn-mail" title="Add new" href="{{ route('ambient_air.create')}}">
+                        <i data-feather="plus"></i>+ Add Parameter
+                    </a>
+                </div>
+                <table class="table" id="datatable">
+                    <thead>
+                        <tr>
+                            <th><b>No Sample</b></th>
+                            <th><b>Location</b></th>
+                            <th><b>Description</b></th>
+                            <th><b>Date</b></th>
+                            <th><b>Time</b></th>
+                            <th><b>Method</b></th>
+                            <th><b>Date Received</b></th>
+                            <th><b>ITD</b></th>
+                            <th><b>Action</b></th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
+</div>
 @endsection
 
 @section('script')
@@ -117,7 +121,7 @@
                 url: "{{ route('ambient_air.data') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
-                    d.select_description = $('#select_description').val()
+                        d.select_description = $('#select_description').val()
                 },
             },
             columnDefs: [{
@@ -147,14 +151,15 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        // Check if row.category exists and has an id
                         if (row.description) {
                             var html =
-                                `<a class="text-info" title="${row.description.name}"</a>`;
+                                `<a class="text-info" title="${row.description.name}">${row.description.name}</a>`;
                             return html;
                         }
+                        return "-"; // Jika description null
                     },
-                    className: "text-center"
+                    className: "text-center",
+                    orderable: false
                 },
                 {
                     render: function (data, type, row, meta) {
@@ -194,8 +199,7 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        var html = '';
-                        {
+                        var html = ''; {
                             html = `<a class="badge bg-dark badge-icon" title="Edit Auditor Standard" href="/${row.id}">
                                     <i class="bx bx-show-alt icon-white"></i></a>
                                     <a class="badge bg-warning badge-icon" title="Edit Audit Plan" href="/${row.id}">
