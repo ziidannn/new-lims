@@ -37,17 +37,14 @@ Route::group(['prefix' => 'ambient_air'], function () {
     Route::any('/add', [AmbientAirController::class, 'add'])->name('ambient_air.add');
 });
 
-<<<<<<< HEAD
+
 Route::group(['prefix' => 'resume'], function () {
     Route::any('/', [ResumeController::class, 'index'])->name('resume.index')->middleware('auth');
-    Route::get('/data', [ResumeController::class, 'data'])->name('resum.data');
-    Route::delete('/delete', [ResumeController::class, 'delete'])->name('resum.delete');
-    Route::get('/resume', [ResumeController::class, 'create'])->name('resume.create');
+    Route::get('/data', [ResumeController::class, 'data'])->name('resume.data');
+    Route::delete('/delete', [ResumeController::class, 'delete'])->name('resume.delete');
+    Route::any('/resume', [ResumeController::class, 'create'])->name('resume.create');
 });
-=======
->>>>>>> 9b103c8a69d451f4aedfe0c9e2e8a1d9167d0648
 
-// -----------------------------------------------------------------------------------------------
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

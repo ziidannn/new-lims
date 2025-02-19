@@ -19,7 +19,8 @@ return new class extends Migration
             $table->unsignedBigInteger('note_id');
             $table->foreign('note_id')->references('id')->on('notes');
             $table->timestamp('updated_at')->nullable();
-            $table->timestamp('created_at')->nullable();        });
+            $table->timestamp('created_at')->nullable();        
+        });
     }
 
     /**

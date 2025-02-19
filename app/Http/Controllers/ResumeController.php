@@ -3,20 +3,53 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Resume; // Assuming you have a Resume model
+use App\Models\Resume; 
+use App\Models\Sampling;
+use App\Models\SampleDescription;
 
 class ResumeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('resume.index'); // Return the view for the resume list
+        $data = Sampling::all();
+        $description = SampleDescription::all();
+        return view('resume.index', compact('data', 'description'));
     }
 
-    public function data(Request $request)
+    public function create(Request $request)
     {
-        // Handle DataTables or similar AJAX requests for data
-        $resumes = Resume::all(); // Or apply filters, sorting, pagination based on request
-        return response()->json($resumes); // Return data as JSON
+        if ($request->isMethod('POST')) {
+            $this->validate($request, [
+                'customer' => ['required'],
+                'contact_name' => ['required'],
+                'email' => ['required', 'email'],
+                'phone' => ['required'],
+                'sample_description_id' => ['required'],
+                'sample_taken_by' => ['required'],
+                'sample_receive_date' => ['required'],
+                'sample_analysis_date' => ['required'],
+                'report_date' => ['required']
+            ]);
+
+            $data = Resume::create([
+                'customer' => $request->customer,
+                'contact_name' => $request->contact_name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'sample_description_id' => $request->sample_description_id,
+                'sample_taken_by' => $request->sample_taken_by,
+                'sample_receive_date' => $request->sample_receive_date,
+                'sample_analysis_date' => $request->sample_analysis_date,
+                'report_date' => $request->report_date,
+            ]);
+
+            if ($data) {
+                return redirect()->route('resume.index')->with('msg', 'Data customer (' . $request->Resume . ') added successfully');
+            }
+        }
+        $data = Resume::all();
+        $description = SampleDescription::orderBy('name')->get();
+        return view('resume.create', compact('data', 'description'));
     }
 
     public function delete(Request $request)
@@ -30,32 +63,5 @@ class ResumeController extends Controller
         } else {
             return response()->json(['message' => 'Resume not found'], 404);
         }
-    }
-
-    public function create()
-    {
-        return view('resume.create'); // Return the form for creating a new resume
-    }
-
-    public function store(Request $request)
-    {
-        // Validate the form data
-        $validatedData = $request->validate([
-            'customer' => 'required|string|max:255',
-            'contact_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'sample_description_id' => 'required|exists:sample_descriptions,id', // Assuming you have a sample_descriptions table
-            'sample_taken_by' => 'required|string|max:255',
-            'sample_receive_date' => 'required|date',
-            'sample_analysis_date' => 'required|date',
-            'report_date' => 'required|date',
-            // Add other fields as needed
-        ]);
-
-        // Create the Resume record
-        $resume = Resume::create($validatedData);
-
-        return redirect()->route('resume.index')->with('success', 'Resume created successfully!');
     }
 }

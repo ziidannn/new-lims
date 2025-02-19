@@ -1,155 +1,194 @@
 @extends('layouts.master')
+@section('content')
 @section('title', 'Create Resume')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
+<link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
 @endsection
 
 @section('style')
 <style>
-    .img {
-        height: 100px;
-        width: 100px;
-        border-radius: 50%;
-        object-fit: cover;
-        background: #dfdfdf
+    .checkbox label::before {
+        border: 1px solid #333;
     }
 
 </style>
 @endsection
 
-
+@section('breadcrumb-title')
+<!-- <h3>User Profile</h3> -->
+@endsection
 @section('content')
-
-@if(session('msg'))
-<div class="alert alert-primary alert-dismissible" role="alert">
-    {{session('msg')}}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-@endif
-<div class="card">
-    <form action="" method="POST" enctype="multipart/form-data" id="form-add-new-record">
-        
-        <!-- Account -->
-        <hr class="my-0">
-        <div class="card-body">
-            <div class="row">
-                <div class="mb-3 col-md-6 fv-plugins-icon-container">
-                    <label class="form-label">Customer</label>
-                    <input class="form-control" type="text" maxlength="40" name="customer" value="">
+<div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
+    <div class="row">
+        <div class="col-xl-12">
+            <form class="card" method="POST" action="">
+                @csrf
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Add @yield('title')</h4>
+                    <div class="card-options"><a class="card-options-collapse" href="#"
+                            data-bs-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a><a
+                            class="card-options-remove" href="#" data-bs-toggle="card-remove"><i
+                                class="fe fe-x"></i></a>
+                            </div>
                 </div>
-                <div class="mb-3 col-md-6 fv-plugins-icon-container">
-                    <label class="form-label">Address</label>
-                    <input class="form-control" type="text" maxlength="7" name="address"
-                        value="">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-12">
+                            <label class="form-label" for="basicDate">Customer<i class="text-danger">*</i></label>
+                            <div class="input-group input-group-merge has-validation">
+                                <input type="text" class="form-control @error('customer')  is-invalid @enderror"
+                                    maxlength="120" name="customer" placeholder="Input Name customer"
+                                    value="{{ old('customer') }}">
+                                @error('customer')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <label class="form-label" for="basicDate">Contact Name<i
+                                    class="text-danger">*</i></label>
+                            <div class="input-group input-group-merge has-validation">
+                                <input type="text" class="form-control @error('contact_name') is-invalid @enderror"
+                                    maxlength="120" name="contact_name" placeholder="Input Contact Name"
+                                    value="{{ old('contact_name') }}">
+                                @error('contact_name')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <label class="form-label" for="basicDate">Email<i
+                                    class="text-danger">*</i></label>
+                            <div class="input-group input-group-merge has-validation">
+                                <input type="text" class="form-control @error('email') is-invalid @enderror"
+                                    maxlength="120" name="email" placeholder="Input Contact Name"
+                                    value="{{ old('email') }}">
+                                @error('email')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <label class="form-label" for="basicDate">Phone<i
+                                    class="text-danger">*</i></label>
+                            <div class="input-group input-group-merge has-validation">
+                                <input type="text" class="form-control @error('phone') is-invalid @enderror"
+                                    maxlength="120" name="phone" placeholder="Input Contact Name"
+                                    value="{{ old('phone') }}">
+                                @error('phone')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <label class="form-label" for="basicDate">Sampling Description<i
+                                    class="text-danger">*</i></label>
+                            <div class="input-group input-group-merge has-validation">
+                                <select
+                                    class="form-select @error('sample_description_id') is-invalid @enderror input-sm select2-modal"
+                                    name="sample_description_id" id="sample_description_id"
+                                    placeholder="Input Sampling Description">
+                                    @foreach($description as $p)
+                                    <option value="{{ $p->id }}"
+                                        {{ ($p->id==old('sample_description_id') ? "selected": "") }}>
+                                        {{ $p->id }} - {{ $p->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('sample_description_id')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <label class="form-label" for="basicDate">SampelTaken By<i
+                                    class="text-danger">*</i></label>
+                            <div class="input-group input-group-merge has-validation">
+                                <input type="text" class="form-control @error('sample_taken_by') is-invalid @enderror"
+                                    maxlength="120" name="sample_taken_by" placeholder="Input Contact Name"
+                                    value="{{ old('sample_taken_by') }}">
+                                @error('sample_taken_by')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <label class="form-label" for="basicDate">Sample Receive Data<i 
+                                class="text-danger">*</i></label>
+                            <div class="input-group input-group-merge has-validation">
+                                <input type="date" class="form-control @error('sample_receive_date') is-invalid @enderror"
+                                    maxlength="120" name="sample_receive_date" placeholder="Input Sample Recive Data"
+                                    value="{{ old('sample_receive_date') }}">
+                                @error('sample_receive_date')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <label class="form-label" for="basicDate">Sample Analysis Date<i 
+                                class="text-danger">*</i></label>
+                            <div class="input-group input-group-merge has-validation">
+                                <input type="date" class="form-control @error('sample_analysis_date') is-invalid @enderror"
+                                    maxlength="120" name="sample_analysis_date" placeholder="Input Sample Analysis Date"
+                                    value="{{ old('sample_analysis_date') }}">
+                                @error('sample_analysis_date')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <label class="form-label" for="basicDate">Report Date<i 
+                                class="text-danger">*</i></label>
+                            <div class="input-group input-group-merge has-validation">
+                                <input type="date" class="form-control @error('report_date') is-invalid @enderror"
+                                    maxlength="120" name="report_date" placeholder="Input Sample Report Date"
+                                    value="{{ old('report_date') }}">
+                                @error('report_date')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3 col-md-6">
-                    <label class="form-label">Contact Nama</label>
-                    <input class="form-control" type="text" maxlength="20" name="contact_ama"
-                        value="">
+                <div class="card-footer text-end">
+                    <button class="btn btn-primary me-1" type="submit">Create</button>
+                    <a href="{{ url()->previous() }}">
+                        <span class="btn btn-outline-secondary">Back</span>
+                    </a>
                 </div>
-                <div class="mb-3 col-md-6">
-                    <label class="form-label">Email</label>
-                    <input class="form-control" type="text" maxlength="7" name="back_title"
-                        value="">
-                </div>
-                <div class="mb-3 col-md-6">
-                    <label class="form-label">Phone <i>(ex. 62xxxxxxxxx)</i></label>
-                    <input class="form-control" type="number" name="no_phone" id="phone"
-                        value="" placeholder="62xxxxxxxxxx">
-                </div>
-                <div class="mb-3 col-md-6">
-                    <label class="form-label">Subject</label>
-                    <select name="department_id" id="department_id" class="form-select select2">
-                    </select>
-                </div>
-                <div class="mb-3 col-md-6">
-                    <label class="form-label">Sample taken by</label>
-                    <input class="form-control" type="text" maxlength="20" name="nidn" id="nidn"
-                        value="">
-                </div>
-                <div class="mb-3 col-md-6">
-                    <label class="form-label">Sample Recive Data</label>
-                    <input class="form-control" type="text" maxlength="20" name="nidn" id="nidn"
-                        value="">
-                </div>
-                <div class="mb-3 col-md-6">
-                    <label class="form-label">Sample Analysis</label>
-                    <input class="form-control" type="text" maxlength="20" name="nidn" id="nidn"
-                        value="">
-                </div>
-                <div class="mb-3 col-md-6">
-                    <label class="form-label">Report Date</label>
-                    <input class="form-control" type="text" maxlength="20" name="nidn" id="nidn"
-                        value="">
-                </div>
-               
-            </div>
-            <div class="text-end mt-2">
-                <button type="submit" class="btn btn-primary me-1" onclick="return confirmSubmit(event)">Update</button>
-                <a class="btn btn-outline-secondary" href="">Back</a>
-            </div>
-            <input type="hidden">
+            </form>
         </div>
-        <!-- /Account -->
-    </form>
+    </div>
 </div>
 @endsection
 
 @section('script')
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
-
-@if(session('msg'))
-<script type="text/javascript">
-    //swall message notification
-    $(document).ready(function () {
-        swal(`{!! session('msg') !!}`, {
-            icon: 'success',
-            customClass: {
-                confirmButton: 'btn btn-success'
-            }
-        });
-    });
-
-</script>
-@endif
-
 <script>
-    "use strict";
-    setTimeout(function () {
-        (function ($) {
-            "use strict";
-            $(".select2").select2({
-                allowClear: true,
-                minimumResultsForSearch: 7
-            });
-        })(jQuery);
-    }, 350);
-
-    function remove_zero() {
-        var x = document.getElementById("phone").value;
-        let number = Number(x);
-        if (number == 0) {
-            document.getElementById("phone").value = null;
-        } else {
-            document.getElementById("phone").value = number;
-        }
-    }
-
-    document.getElementById('image').addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                document.getElementById('uploadedAvatar').src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-            // Display file info
-            const fileInfo = `Selected file: ${file.name} (${file.type})`;
-            document.getElementById('fileInfo').textContent = fileInfo;
-        }
+    $(document).ready(function () {
+        const selectElement = document.querySelector('#is_required');
+        selectElement.addEventListener('change', (event) => {
+            selectElement.value = selectElement.checked ? 1 : 0;
+            // alert(selectElement.value);
+        });
     });
 
 </script>
