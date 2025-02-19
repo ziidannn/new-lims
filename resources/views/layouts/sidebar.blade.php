@@ -62,6 +62,14 @@
             </ul>
         </li>
         @endcan
+        @can('setting/manage_account/users.read')
+        <li class="menu-item {{ request()->segment(1) == 'resume' ? 'active' : '' }}">
+            <a href="{{ route('resume.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                <div data-i18n="resume">Resume</div>
+            </a>
+        </li>
+        @endcan
         @can('control panel.read')
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text">Control Panel</span>

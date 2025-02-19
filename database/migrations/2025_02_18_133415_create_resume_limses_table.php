@@ -16,13 +16,15 @@ return new class extends Migration
             $table->string('customer');
             $table->string('contact_name');
             $table->string('email');
-            $table->integer('phone');
+            $table->string('phone');
             $table->string('sample_taken_by');
             $table->date('sample_receive_date');
             $table->date('sample_analysis_date');
             $table->date('report_date');
             $table->unsignedBigInteger('sample_description_id');
             $table->foreign('sample_description_id')->references('id')->on('sample_descriptions');
+            $table->timestamp('updated_at')->nullable();
+            $table->timestamp('created_at')->nullable();   
         });
     }
 
