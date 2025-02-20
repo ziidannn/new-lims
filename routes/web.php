@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\AmbientAirController;
+use App\Http\Controllers\CoaController;
+use App\Http\Controllers\InstituteController;
 use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\Resume;
 use App\Http\Controllers\ProfileController;
@@ -30,20 +31,29 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::group(['prefix' => 'ambient_air'], function () {
-    Route::any('/', [AmbientAirController::class, 'index'])->name('ambient_air.index')->middleware('auth');
-    Route::get('/data', [AmbientAirController::class, 'data'])->name('ambient_air.data');
-    Route::delete('/delete', [AmbientAirController::class, 'delete'])->name('ambient_air.delete');
-    Route::any('/add', [AmbientAirController::class, 'add'])->name('ambient_air.add');
-    Route::any('/create', [AmbientAirController::class, 'create'])->name('ambient_air.create');
+Route::group(['prefix' => 'institute'], function () {
+    Route::any('/', [InstituteController::class, 'index'])->name('institute.index')->middleware('auth');
+    Route::get('/data', [InstituteController::class, 'data'])->name('institute.data');
+    Route::delete('/delete', [InstituteController::class, 'delete'])->name('institute.delete');
+    Route::any('/add', [InstituteController::class, 'add'])->name('institute.add');
+    Route::any('/create', [InstituteController::class, 'create'])->name('institute.create');
+    Route::any('/add_sampling/{id}', [InstituteController::class, 'add_description'])->name('institute.add_sampling');
 });
-
 
 Route::group(['prefix' => 'resume'], function () {
     Route::any('/', [ResumeController::class, 'index'])->name('resume.index')->middleware('auth');
     Route::get('/data', [ResumeController::class, 'data'])->name('resume.data');
     Route::delete('/delete', [ResumeController::class, 'delete'])->name('resume.delete');
     Route::any('/resume/create', [ResumeController::class, 'create'])->name('resume.create');
+});
+
+Route::group(['prefix' => 'coa'], function () {
+    Route::get('/regulation', [CoaController::class, 'index'])->name('coa.regulation.index')->middleware('auth');
+    Route::get('/data_regulation', [CoaController::class, 'data_regulation'])->name('coa.regulation.data_regulation');
+    Route::any('/add', [CoaController::class, 'add'])->name('coa.add');
+    Route::any('/create', [CoaController::class, 'create'])->name('coa.create');
+    Route::any('/add_sampling/{id}', [CoaController::class, 'add_description'])->name('coa.add_sampling');
+    Route::get('/parameter', [CoaController::class, 'parameter'])->name('coa.parameter.index')->middleware('auth');
 });
 
 Route::middleware('auth')->group(function () {

@@ -20,7 +20,8 @@ class Sampling extends Model
         'method',
         'date_received',
         'itd_start',
-        'itd_end'
+        'itd_end',
+        're'
     ];
 
     public function description()

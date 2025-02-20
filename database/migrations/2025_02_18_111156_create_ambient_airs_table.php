@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('regulation');
             $table->string('unit');
             $table->string('method');
+            $table->unsignedBigInteger('sampling_id')->nullable();
+            $table->foreign('sampling_id')->references('id')->on('samplings');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
         });

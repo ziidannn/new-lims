@@ -206,7 +206,7 @@
 <script>
     $(document).ready(function() {
         $('#sample_description_id').select2({
-            placeholder: "Pilih Sampling Description",
+            placeholder: "Select Sampling Description",
             allowClear: true
         });
     });

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'Resume')
+@section('title', 'Regulation')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -27,6 +27,16 @@
 
 </style>
 @endsection
+<div class="col-md-12">
+    <ul class="nav nav-pills flex-column flex-sm-row mb-4">
+        <li class="nav-item"><a class="nav-link active" href=""><i
+                    class="bx bx-add-to-queue me-1"></i>
+                Regulation</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('coa.parameter.index') }}"><i
+                    class="bx bx-chart me-1"></i>
+                Parameter</a></li>
+    </ul>
+</div>
 <div class="card">
     <div class="card-datatable table-responsive">
         <div class="card-header">
@@ -47,11 +57,7 @@
                         <thead>
                             <tr>
                                 <th scope="col" width="20px"><b>No</b></th>
-                                <th scope="col" width="20px"><b>Customer</b></th>
-                                <th scope="col" width="20px"><b>Contact Name</b></th>
-                                <th scope="col" width="20px"><b>Phone</b></th>
-                                <th scope="col" width="20px"><b>Description</b></th>
-                                <th scope="col" width="20px"><b>Action</b></th>
+                                <th scope="col" width="20px"><b>Name</b></th>
                             </tr>
                         </thead>
                     </table>
@@ -111,7 +117,7 @@
                 searchPlaceholder: 'Search..',
             },
             ajax: {
-                url: "{{ route('resume.data') }}",
+                url: "{{ route('coa.regulation.data_regulation') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
                     d.select_description = $('#select_description').val()
@@ -130,62 +136,16 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.customer;
+                        return row.title;
                     },
                     orderable: false
                 },
-                {
-                    render: function (data, type, row, meta) {
-                        return row.contact_name;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        return row.phone;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        if (row.sample_descriptions && row.sample_descriptions.length > 0) {
-                            var html = row.sample_descriptions.map(function(desc, index) {
-                                return `<span class="badge bg-dark"
-                                            style="border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
-                                            ${desc.name}
-                                        </span>`;
-                            }).join('');
-                            return html;
-                        } else {
-                            return '-';
-                        }
-                    }
-                },
-                // {
-                //     render: function (data, type, row, meta) {
-                //         if (row.sample_descriptions && row.sample_descriptions.length > 0) {
-                //             // Gunakan list dengan bullet atau badge untuk membedakan setiap description
-                //             var html = '<ul style="padding-left: 15px;">';
-                //             row.sample_descriptions.forEach(function(desc) {
-                //                 html += `<li><span class="badge bg-primary">${desc.name}</span></li>`;
-                //             });
-                //             html += '</ul>';
-                //             return html;
-                //         } else {
-                //             return '-';
-                //         }
-                //     }
-                // },
                 {
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('resume/add_sampling/${row.id}') }}">
-                                    <i class="bx bx-plus icon-white"></i></a>
-                                    <a class="badge bg-warning badge-icon" title="Edit Sampling" href="/${row.id}">
-                                    <i class="bx bx-pencil"></i></a>
-                                    <a class="badge bg-danger badge-icon" title="Delete Sampling" style="cursor:pointer" onclick="DeleteId('${row.id}')">
-                                    <i class="bx bx-trash icon-white"></i></a>`;
+                            html = `<a class="badge bg-warning badge-icon" title="Add Resume COA" href="{{ url('coa/add_sampling/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
                         }
                         return html;
                     },
@@ -198,40 +158,5 @@
             table.draw();
         });
     });
-
-    function DeleteId(id, data) {
-        swal({
-                title: "Are you sure?",
-                text: "After deleting, the data (" + data + ") cannot be recovered!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then((willDelete) => {
-                if (willDelete) {
-                    $.ajax({
-                        url: "",
-                        type: "DELETE",
-                        data: {
-                            "id": id,
-                            "_token": $("meta[name='csrf-token']").attr("content"),
-                        },
-                        success: function (data) {
-                            if (data['success']) {
-                                swal(data['message'], {
-                                    icon: "success",
-                                });
-                                $('#datatable').DataTable().ajax.reload();
-                            } else {
-                                swal(data['message'], {
-                                    icon: "error",
-                                });
-                            }
-                        }
-                    })
-                }
-            })
-    }
-
 </script>
 @endsection

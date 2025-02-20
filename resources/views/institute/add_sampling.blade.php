@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'New Parameter')
+@section('title', 'Add Resume Description')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
@@ -11,24 +11,32 @@
     .checkbox label::before {
         border: 1px solid #333;
     }
+
     .form-group {
         display: flex;
         align-items: center;
-        gap: 10px; /* Jarak antara label dan input */
+        gap: 10px;
+        /* Jarak antara label dan input */
     }
+
     .form-label {
-        white-space: nowrap; /* Mencegah label turun ke bawah */
+        white-space: nowrap;
+        /* Mencegah label turun ke bawah */
         font-weight: bold;
     }
+
     .form-control {
-        flex: 1; /* Membuat input menyesuaikan lebar */
+        flex: 1;
+        /* Membuat input menyesuaikan lebar */
         padding: 5px;
         border: 1px solid #ccc;
         border-radius: 3px;
     }
+
     .text-danger {
         color: red;
     }
+
 </style>
 @endsection
 
@@ -36,24 +44,52 @@
 @endsection
 @section('content')
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-<form class="card" action="{{ route('ambient_air.create') }}" method="POST">
-@csrf
-    <div class="row">
+    <form class="card" action="{{ route('institute.add_sampling', $data->id) }}" method="POST">
+        @csrf
         <div class="col-xl-12">
-                <div class="card-body">
-                    <div class="row">
+            <div class="card-body">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th><b>Sample No.</b></th>
+                            <th><b>Sampling Location</b></th>
+                            <th><b>Sample Description</b></th>
+                            <th><b>Date & Time </b></th>
+                            <th><b>Sampling Method</b></th>
+                            <th><b>Date Received</b></th>
+                            <th><b>ITD</b></th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                <button class="btn btn-primary me-1" type="submit">Save</button>
+                <a href="{{ url()->previous() }}">
+                    <span class="btn btn-outline-secondary">Back</span>
+                </a>
+            </div>
+    </form>
+</div>
 
-                        <table class="table table-bordered">
-                            <tr>
-                                <th><b>No</b></th>
-                                <th><b>Parameters</b></th>
-                                <th><b>Sampling Time</b></th>
-                                <th><b>Testing Result</b></th>
-                                <th><b>Regulatory Standard</b></th>
-                                <th><b>Unit</b></th>
-                                <th><b>Methods</b></th>
-                            </tr>
-                            @foreach ($data as $index => $item)
+<br>
+
+<div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
+    <form class="card" action="{{ route('institute.add_sampling', $data->id) }}" method="POST">
+        @csrf
+        <div class="col-xl-12">
+            <div class="card-body">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th><b>No</b></th>
+                            <th><b>Parameters</b></th>
+                            <th><b>Sampling Time</b></th>
+                            <th><b>Testing Result</b></th>
+                            <th><b>Regulatory Standard</b></th>
+                            <th><b>Unit</b></th>
+                            <th><b>Methods</b></th>
+                        </tr>
+                            @foreach ($description as $index => $item)
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <input type="hidden" name="sample_description_id[{{ $item->id }}]" value="1">
@@ -68,8 +104,8 @@
                                     <td>{{ $item->method }}</td>
                                 </tr>
                             @endforeach
-                        </table>
-                        <!-- <table class="table table-bordered">
+                    </table>
+                    <!-- <table class="table table-bordered">
                             <tr>
                                 <td colspan="3">
                                     <label>
@@ -116,15 +152,16 @@
                             </tr>
                         </table> -->
                 </div>
-        </div>
-        <div class="card-footer text-end">
-            <button class="btn btn-primary me-1" type="submit">Save</button>
-            <a href="{{ url()->previous() }}">
-                <span class="btn btn-outline-secondary">Back</span>
-            </a>
-        </div>
-        </form>
-    </div>
+            </div>
+            <div class="card-footer text-end">
+                <button class="btn btn-primary me-1" type="submit">Save</button>
+                <a href="{{ url()->previous() }}">
+                    <span class="btn btn-outline-secondary">Back</span>
+                </a>
+            </div>
+    </form>
+</div>
+
 </div>
 </div>
 @endsection
