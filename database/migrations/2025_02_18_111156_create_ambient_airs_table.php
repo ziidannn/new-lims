@@ -13,13 +13,16 @@ return new class extends Migration
     {
         Schema::create('ambient_airs', function (Blueprint $table) {
             $table->id();
-            $table->string('testing_result');
-            $table->unsignedBigInteger('parameter_id');
-            $table->foreign('parameter_id')->references('id')->on('parameters');
-            $table->unsignedBigInteger('note_id');
-            $table->foreign('note_id')->references('id')->on('notes');
+            $table->unsignedBigInteger('sample_description_id');
+            $table->foreign('sample_description_id')->references('id')->on('sample_descriptions');
+            $table->string('name_parameter');
+            $table->string('sampling_time');
+            $table->string('testing_result')->nullable();
+            $table->string('regulation');
+            $table->string('unit');
+            $table->string('method');
+            $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
-            $table->timestamp('created_at')->nullable();        
         });
     }
 

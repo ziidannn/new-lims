@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\AmbientAir;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -23,6 +25,7 @@ class DatabaseSeeder extends Seeder
             UserRolePermissionSeeder::class,
             PermissionSeeder::class,
             SampleDescriptionSeeder::class,
+            AmbientAirSeeder::class,
         ]);
     }
 }

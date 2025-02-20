@@ -9,10 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('resumes', function (Blueprint $table) {
+        Schema::create('resume_sample_description', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('resume_id')->constrained('resume_limses')->onDelete('cascade');
+            $table->foreignId('sample_description_id')->constrained('sample_descriptions')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -22,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('resumes');
+        Schema::dropIfExists('resume_sample_description');
     }
 };

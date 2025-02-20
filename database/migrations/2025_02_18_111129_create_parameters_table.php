@@ -13,15 +13,13 @@ return new class extends Migration
     {
         Schema::create('parameters', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('sample_description_id');
+            $table->foreign('sample_description_id')->references('id')->on('sample_descriptions');
             $table->string('name');
-            $table->unsignedBigInteger('sampling_id');
-            $table->foreign('sampling_id')->references('id')->on('samplings');
-            $table->unsignedBigInteger('regulation_id');
-            $table->foreign('regulation_id')->references('id')->on('regulations');
-            $table->unsignedBigInteger('unit_id');
-            $table->foreign('unit_id')->references('id')->on('units');
-            $table->unsignedBigInteger('method_id');
-            $table->foreign('method_id')->references('id')->on('methods');
+            $table->string('sampling_time');
+            $table->string('regulation');
+            $table->string('unit');
+            $table->string('method');
             $table->timestamp('updated_at')->nullable();
             $table->timestamp('created_at')->nullable();
         });

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('resume_limses', function (Blueprint $table) {
             $table->id();
             $table->string('customer');
+            $table->string('address');
             $table->string('contact_name');
             $table->string('email');
             $table->string('phone');
@@ -21,10 +22,8 @@ return new class extends Migration
             $table->date('sample_receive_date');
             $table->date('sample_analysis_date');
             $table->date('report_date');
-            $table->unsignedBigInteger('sample_description_id');
-            $table->foreign('sample_description_id')->references('id')->on('sample_descriptions');
             $table->timestamp('updated_at')->nullable();
-            $table->timestamp('created_at')->nullable();   
+            $table->timestamp('created_at')->nullable();
         });
     }
 

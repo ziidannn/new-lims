@@ -55,34 +55,32 @@ class AmbientAirController extends Controller
     public function create(Request $request) {
         if ($request->isMethod('POST')) {
             $this->validate($request, [
-                'testing_result' => ['required'],
-                'parameter_id' => ['required'],
-                'note_id' => ['required'],
+                'testing_result.*' => ['required'], // Validasi array input
             ]);
 
-            $data = AmbientAir::create([
-                'testing_result' => $request->testing_result,
-                'parameter_id' => $request->parameter_id,
-                'note_id' => $request->note_id,
-            ]);
-
-            if ($data) {
-                return redirect()->route('ambient_air.index')->with('msg', 'Data ('.$request->no_sample.') added successfully');
+            foreach ($request->testing_result as $id => $result) {
+                AmbientAir::where('id', $id)->update([
+                    'testing_result' => $result,
+                    'sample_description_id' => $request->sample_description_id[$id] ?? 1,
+                ]);
             }
+
+            return redirect()->route('ambient_air.index')->with('msg', 'Data added successfully');
         }
 
-        $data = Sampling::all();
+        $data = AmbientAir::all();
         return view('ambient_air.create', compact('data'));
     }
 
     //Data AmbientAir
     public function data(Request $request)
     {
-        $data = Sampling::with([
-            'description' => function ($query) {
-                $query->select('name');
-            },
-        ])->orderBy("id" )->get;
+        $data = Sampling::with(['description' => function ($query) {
+            $query->select('id','name');
+        }])
+        ->select('*')
+        ->orderBy("id")
+        ->get();
         return DataTables::of($data)
             ->filter(function ($instance) use ($request) {
                 if (!empty($request->get('select_description'))) {

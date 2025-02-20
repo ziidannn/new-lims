@@ -35,6 +35,7 @@ Route::group(['prefix' => 'ambient_air'], function () {
     Route::get('/data', [AmbientAirController::class, 'data'])->name('ambient_air.data');
     Route::delete('/delete', [AmbientAirController::class, 'delete'])->name('ambient_air.delete');
     Route::any('/add', [AmbientAirController::class, 'add'])->name('ambient_air.add');
+    Route::any('/create', [AmbientAirController::class, 'create'])->name('ambient_air.create');
 });
 
 
@@ -42,7 +43,7 @@ Route::group(['prefix' => 'resume'], function () {
     Route::any('/', [ResumeController::class, 'index'])->name('resume.index')->middleware('auth');
     Route::get('/data', [ResumeController::class, 'data'])->name('resume.data');
     Route::delete('/delete', [ResumeController::class, 'delete'])->name('resume.delete');
-    Route::any('/resume', [ResumeController::class, 'create'])->name('resume.create');
+    Route::any('/resume/create', [ResumeController::class, 'create'])->name('resume.create');
 });
 
 Route::middleware('auth')->group(function () {

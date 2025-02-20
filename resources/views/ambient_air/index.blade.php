@@ -38,13 +38,13 @@
                     </select>
                 </div>
                 <div class="col-md d-flex justify-content-center justify-content-md-end">
-                    <a class="btn btn-primary btn-block btn-mail" title="Add new" href="{{ route('ambient_air.add')}}">
-                        <i data-feather="plus"></i>+ Add Sampling
+                    <a class="btn btn-primary btn-block btn-mail me-2" title="Add new"
+                        href="{{ route('ambient_air.add')}}">
+                        <i data-feather="plus"></i> + Add Sampling
                     </a>
-                </div>
-                <div class="col-md d-flex justify-content-center justify-content-md-end">
-                    <a class="btn btn-warning btn-block btn-mail" title="Add new" href="{{ route('ambient_air.create')}}">
-                        <i data-feather="plus"></i>+ Add Parameter
+                    <a class="btn btn-dark btn-block btn-mail" title="Add new"
+                        href="{{ route('ambient_air.create')}}">
+                        <i data-feather="plus"></i> + Add Parameter
                     </a>
                 </div>
                 <table class="table" id="datatable">
@@ -53,8 +53,7 @@
                             <th><b>No Sample</b></th>
                             <th><b>Location</b></th>
                             <th><b>Description</b></th>
-                            <th><b>Date</b></th>
-                            <th><b>Time</b></th>
+                            <th><b>Date & Time </b></th>
                             <th><b>Method</b></th>
                             <th><b>Date Received</b></th>
                             <th><b>ITD</b></th>
@@ -121,22 +120,14 @@
                 url: "{{ route('ambient_air.data') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
-                        d.select_description = $('#select_description').val()
+                    d.select_description = $('#select_description').val()
                 },
             },
             columnDefs: [{
                 "defaultContent": "-",
                 "targets": "_all"
             }],
-            columns: [{
-                    data: 'id',
-                    render: function (data, type, row, meta) {
-                        var no = (meta.row + meta.settings._iDisplayStart + 1);
-                        return no;
-                    },
-                    className: "text-center",
-                    orderable: true
-                },
+            columns: [
                 {
                     render: function (data, type, row, meta) {
                         return row.no_sample;
@@ -151,28 +142,25 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        if (row.description) {
+                        // Check if row.category exists and has an id
+                        if (row.description && row.description.name) {
                             var html =
-                                `<a class="text-info" title="${row.description.name}">${row.description.name}</a>`;
+                                `<a class="text-danger" title="${row.description.name}" href="">${row.description.name}</a>`;
                             return html;
+                        } else {
+                            return ''; // Return empty string or handle the case where category.title is missing
                         }
-                        return "-"; // Jika description null
                     },
-                    className: "text-center",
-                    orderable: false
                 },
                 {
-                    render: function (data, type, row, meta) {
-                        return row.date;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        return row.time;
-                    },
-                    orderable: false
-                },
+    render: function (data, type, row, meta) {
+        // Pastikan row.date dan row.time memiliki nilai sebelum ditampilkan
+        var dateTime = (row.date ? row.date : '') + ' ' + (row.time ? row.time : '');
+        return dateTime.trim() !== '' ? dateTime : '-';
+    },
+    orderable: false
+},
+
                 {
                     render: function (data, type, row, meta) {
                         return row.method;

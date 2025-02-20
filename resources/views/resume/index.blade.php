@@ -46,15 +46,12 @@
                     <table class="table" id="datatable">
                         <thead>
                             <tr>
+                                <th><b>No</b></th>
                                 <th><b>Customer</b></th>
                                 <th><b>Contact Name</b></th>
-                                <th><b>Email</b></th>
                                 <th><b>Phone</b></th>
                                 <th><b>Description</b></th>
-                                <th><b>Sampel Taken By</b></th>
-                                <th><b>Sample Received Date</b></th>
-                                <th><b>Sample Analysis Date</b></th>
-                                <th><b>report_date</b></th>
+                                <th><b>Action</b></th>
                             </tr>
                         </thead>
                     </table>
@@ -66,6 +63,7 @@
 
 @section('script')
 <script src="{{asset('assets/vendor/libs/datatables/jquery.dataTables.js')}}"></script>
+<script src="{{asset('assets/vendor/libs/datatables/datatables-bootstrap5.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/datatables/datatables.responsive.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/datatables/responsive.bootstrap5.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/datatables/datatables.checkboxes.js')}}"></script>
@@ -73,8 +71,6 @@
 <script src="{{asset('assets/vendor/libs/datatables/buttons.bootstrap5.js')}}"></script>
 <script src="{{asset('assets/js/sweetalert.min.js')}}"></script>
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
-<script src="{{asset('assets/vendor/libs/moment/moment.js')}}"></script>
-<script src="{{asset('assets/vendor/libs/moment/id.js')}}"></script>
 
 @if(session('msg'))
 <script type="text/javascript">
@@ -109,9 +105,10 @@
             responsive: true,
             processing: true,
             serverSide: true,
-            ordering: true,
+            ordering: false,
+            searching: true,
             language: {
-                searchPlaceholder: 'Search data..'
+                searchPlaceholder: 'Search..',
             },
             ajax: {
                 url: "{{ route('resume.data') }}",
@@ -125,79 +122,66 @@
                 "targets": "_all"
             }],
             columns: [{
-                    data: 'id',
                     render: function (data, type, row, meta) {
                         var no = (meta.row + meta.settings._iDisplayStart + 1);
                         return no;
-                    },
-                    className: "text-center",
-                    orderable: true
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        return row.no_sample;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        return row.sampling_location;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        // Check if row.category exists and has an id
-                        if (row.description) {
-                            var html =
-                                `<a class="text-info" title="${row.description.name}"</a>`;
-                            return html;
-                        }
                     },
                     className: "text-center"
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.date;
+                        return row.customer;
                     },
                     orderable: false
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.time;
+                        return row.contact_name;
                     },
                     orderable: false
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.method;
+                        return row.phone;
                     },
                     orderable: false
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.date_received;
-                    },
-                    orderable: false
+                        if (row.sample_descriptions && row.sample_descriptions.length > 0) {
+                            var html = row.sample_descriptions.map(function(desc, index) {
+                                return `<span class="badge bg-dark"
+                                            style="border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
+                                            ${desc.name}
+                                        </span>`;
+                            }).join('');
+                            return html;
+                        } else {
+                            return '-';
+                        }
+                    }
                 },
-                {
-                    data: null, // Kita akan menggabungkan date_start dan date_end, jadi tidak ada sumber data spesifik
-                    render: function (data, type, row, meta) {
-                        // Menggunakan moment.js untuk memformat tanggal
-                        var formattedStartDate = moment(row.itd_start).format(
-                            'DD MMMM YYYY');
-                        var formattedEndDate = moment(row.itd_end).format(
-                            'DD MMMM YYYY');
-                        return formattedStartDate + ' - ' + formattedEndDate;
-                    },
-                    orderable: false
-                },
+                // {
+                //     render: function (data, type, row, meta) {
+                //         if (row.sample_descriptions && row.sample_descriptions.length > 0) {
+                //             // Gunakan list dengan bullet atau badge untuk membedakan setiap description
+                //             var html = '<ul style="padding-left: 15px;">';
+                //             row.sample_descriptions.forEach(function(desc) {
+                //                 html += `<li><span class="badge bg-primary">${desc.name}</span></li>`;
+                //             });
+                //             html += '</ul>';
+                //             return html;
+                //         } else {
+                //             return '-';
+                //         }
+                //     }
+                // },
                 {
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-dark badge-icon" title="Edit Auditor Standard" href="/${row.id}">
-                                    <i class="bx bx-show-alt icon-white"></i></a>
+                            html = `<a class="badge bg-dark badge-icon" title="Add Sampling" href="/${row.id}">
+                                    <i class="bx bx-plus icon-white"></i></a>
                                     <a class="badge bg-warning badge-icon" title="Edit Audit Plan" href="/${row.id}">
                                     <i class="bx bx-pencil"></i></a>
                                     <a class="badge bg-danger badge-icon" title="Delete Audit Plan" style="cursor:pointer" onclick="DeleteId('${row.id}')">
