@@ -18,46 +18,46 @@ class ResumeController extends Controller
     }
 
     public function create(Request $request)
-{
-    if ($request->isMethod('POST')) {
-        $this->validate($request, [
-            'customer' => ['required'],
-            'address' => ['required'],
-            'contact_name' => ['required'],
-            'email' => ['required', 'email'],
-            'phone' => ['required'],
-            'sample_description_id' => ['required', 'array'], // Pastikan ini array
-            'sample_taken_by' => ['required'],
-            'sample_receive_date' => ['required'],
-            'sample_analysis_date' => ['required'],
-            'report_date' => ['required']
-        ]);
+    {
+        if ($request->isMethod('POST')) {
+            $this->validate($request, [
+                'customer' => ['required'],
+                'address' => ['required'],
+                'contact_name' => ['required'],
+                'email' => ['required', 'email'],
+                'phone' => ['required'],
+                'sample_description_id' => ['required', 'array'], // Pastikan ini array
+                'sample_taken_by' => ['required'],
+                'sample_receive_date' => ['required'],
+                'sample_analysis_date' => ['required'],
+                'report_date' => ['required']
+            ]);
 
-        // Buat Resume baru
-        $resume = Resume::create([
-            'customer' => $request->customer,
-            'address' => $request->address,
-            'contact_name' => $request->contact_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'sample_taken_by' => $request->sample_taken_by,
-            'sample_receive_date' => $request->sample_receive_date,
-            'sample_analysis_date' => $request->sample_analysis_date,
-            'report_date' => $request->report_date,
-        ]);
+            // Buat Resume baru
+            $resume = Resume::create([
+                'customer' => $request->customer,
+                'address' => $request->address,
+                'contact_name' => $request->contact_name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'sample_taken_by' => $request->sample_taken_by,
+                'sample_receive_date' => $request->sample_receive_date,
+                'sample_analysis_date' => $request->sample_analysis_date,
+                'report_date' => $request->report_date,
+            ]);
 
-        // Simpan sample_description_id ke tabel pivot
-        if ($request->has('sample_description_id')) {
-            $resume->sampleDescriptions()->attach($request->sample_description_id);
+            // Simpan sample_description_id ke tabel pivot
+            if ($request->has('sample_description_id')) {
+                $resume->sampleDescriptions()->attach($request->sample_description_id);
+            }
+
+            return redirect()->route('resume.index')->with('msg', 'Data berhasil ditambahkan');
         }
 
-        return redirect()->route('resume.index')->with('msg', 'Data berhasil ditambahkan');
+        $data = Resume::all();
+        $description = SampleDescription::orderBy('name')->get();
+        return view('resume.create', compact('data', 'description'));
     }
-
-    $data = Resume::all();
-    $description = SampleDescription::orderBy('name')->get();
-    return view('resume.create', compact('data', 'description'));
-}
 
     public function data(Request $request)
     {

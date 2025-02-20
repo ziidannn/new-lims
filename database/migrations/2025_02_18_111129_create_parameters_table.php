@@ -13,11 +13,8 @@ return new class extends Migration
     {
         Schema::create('parameters', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('sample_description_id');
-            $table->foreign('sample_description_id')->references('id')->on('sample_descriptions');
             $table->string('name');
             $table->string('sampling_time');
-            $table->string('regulation');
             $table->string('unit');
             $table->string('method');
             $table->timestamp('updated_at')->nullable();

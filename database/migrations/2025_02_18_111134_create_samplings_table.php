@@ -24,7 +24,8 @@ return new class extends Migration
             $table->date('itd_start');
             $table->date('itd_end');
             $table->timestamp('updated_at')->nullable();
-            $table->timestamp('created_at')->nullable();        });
+            $table->timestamp('created_at')->nullable();
+        });
     }
 
     /**
