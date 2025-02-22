@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'Resume')
+@section('title', 'Sampling Time')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -27,6 +27,22 @@
 
 </style>
 @endsection
+<div class="col-md-12">
+    <ul class="nav nav-pills flex-column flex-sm-row mb-4">
+        <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation.index') }}"><i
+                    class="bx bx-add-to-queue me-1"></i>
+                Regulation</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('coa.parameter.index') }}"><i
+                    class="bx bx-chart me-1"></i>
+                Parameter</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ route('coa.sampling_time.index') }}"><i
+                    class="bx bx-chart me-1"></i>
+                Sampling Time</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation_standard.index') }}"><i
+                    class="bx bx-chart me-1"></i>
+                Regulation Standard</a></li>
+    </ul>
+</div>
 <div class="card">
     <div class="card-datatable table-responsive">
         <div class="card-header">
@@ -34,23 +50,53 @@
                     <div class="col-md-3">
                         <select id="select_description" class="form-control input-sm select2" data-placeholder="Description">
                             <option value="">Select Description</option>
-
                         </select>
                     </div>
                     <div class="col-md d-flex justify-content-center justify-content-md-end">
-                        <a class="btn btn-primary btn-block btn-mail" title="Add new"
-                            href="{{ route('institute.create')}}">
-                            <i data-feather="plus"></i>+ Add
-                        </a>
+                        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#newrecord"
+                            aria-controls="offcanvasEnd" tabindex="0" aria-controls="DataTables_Table_0"
+                            title="Add Standard Criteria" type="button"><span><i class="bx bx-plus me-sm-2"></i>
+                                <span>Add</span></span>
+                        </button>
+                    </div>
+
+                    <div class="offcanvas offcanvas-end @if($errors->all()) show @endif" tabindex="-1" id="newrecord"
+                        aria-labelledby="offcanvasEndLabel">
+                        <div class="offcanvas-header">
+                            <h5 id="offcanvasEndLabel" class="offcanvas-title">Add Sampling Time</h5>
+                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body my-auto mx-0 flex-grow-1">
+                            <form class="add-new-record pt-0 row g-2 fv-plugins-bootstrap5 fv-plugins-framework"
+                                id="form-add-new-record" method="POST" action="">
+                                @csrf
+                                <div class="col-sm-12 fv-plugins-icon-container">
+                                    <label class="form-label" for="basicDate">Time</label>
+                                    <div class="input-group input-group-merge has-validation">
+                                        <input type="text" class="form-control @error('time')  is-invalid @enderror"
+                                            maxlength="120" name="time" placeholder="Example 1 Hours, 24 Hours, 1 Year"
+                                            value="{{ old('time') }}"></input>
+                                        @error('time')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 mt-4">
+                                    <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">Create</button>
+                                    <button type="reset" class="btn btn-outline-secondary"
+                                        data-bs-dismiss="offcanvas">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                     <table class="table" id="datatable">
                         <thead>
                             <tr>
                                 <th scope="col" width="20px"><b>No</b></th>
-                                <th scope="col" width="20px"><b>Customer</b></th>
-                                <th scope="col" width="20px"><b>Contact Name</b></th>
-                                <th scope="col" width="20px"><b>Phone</b></th>
-                                <th scope="col" width="20px"><b>Description</b></th>
+                                <th><b>Time</b></th>
                                 <th scope="col" width="20px"><b>Action</b></th>
                             </tr>
                         </thead>
@@ -111,7 +157,7 @@
                 searchPlaceholder: 'Search..',
             },
             ajax: {
-                url: "{{ route('resume.data') }}",
+                url: "{{ route('coa.sampling_time.data_sampling_time') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
                     d.select_description = $('#select_description').val()
@@ -130,62 +176,16 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.customer;
+                        return row.time;
                     },
                     orderable: false
                 },
-                {
-                    render: function (data, type, row, meta) {
-                        return row.contact_name;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        return row.phone;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        if (row.sample_descriptions && row.sample_descriptions.length > 0) {
-                            var html = row.sample_descriptions.map(function(desc, index) {
-                                return `<span class="badge bg-dark"
-                                            style="border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
-                                            ${desc.name}
-                                        </span>`;
-                            }).join('');
-                            return html;
-                        } else {
-                            return '-';
-                        }
-                    }
-                },
-                // {
-                //     render: function (data, type, row, meta) {
-                //         if (row.sample_descriptions && row.sample_descriptions.length > 0) {
-                //             // Gunakan list dengan bullet atau badge untuk membedakan setiap description
-                //             var html = '<ul style="padding-left: 15px;">';
-                //             row.sample_descriptions.forEach(function(desc) {
-                //                 html += `<li><span class="badge bg-primary">${desc.name}</span></li>`;
-                //             });
-                //             html += '</ul>';
-                //             return html;
-                //         } else {
-                //             return '-';
-                //         }
-                //     }
-                // },
                 {
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('resume/add_sampling/${row.id}') }}">
-                                    <i class="bx bx-plus icon-white"></i></a>
-                                    <a class="badge bg-warning badge-icon" title="Edit Sampling" href="/${row.id}">
-                                    <i class="bx bx-pencil"></i></a>
-                                    <a class="badge bg-danger badge-icon" title="Delete Sampling" style="cursor:pointer" onclick="DeleteId('${row.id}')">
-                                    <i class="bx bx-trash icon-white"></i></a>`;
+                            html = `<a class="badge bg-warning badge-icon" title="Add Resume COA" href="{{ url('coa/add_sampling/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
                         }
                         return html;
                     },
@@ -198,40 +198,5 @@
             table.draw();
         });
     });
-
-    function DeleteId(id, data) {
-        swal({
-                title: "Are you sure?",
-                text: "After deleting, the data (" + data + ") cannot be recovered!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then((willDelete) => {
-                if (willDelete) {
-                    $.ajax({
-                        url: "",
-                        type: "DELETE",
-                        data: {
-                            "id": id,
-                            "_token": $("meta[name='csrf-token']").attr("content"),
-                        },
-                        success: function (data) {
-                            if (data['success']) {
-                                swal(data['message'], {
-                                    icon: "success",
-                                });
-                                $('#datatable').DataTable().ajax.reload();
-                            } else {
-                                swal(data['message'], {
-                                    icon: "error",
-                                });
-                            }
-                        }
-                    })
-                }
-            })
-    }
-
 </script>
 @endsection

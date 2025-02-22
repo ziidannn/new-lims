@@ -19,40 +19,6 @@ class InstituteController extends Controller
         return view('institute.index', compact('data', 'description'));
     }
 
-    public function add(Request $request) {
-        if ($request->isMethod('POST')) {
-            $this->validate($request, [
-                'no_sample' => ['required'],
-                'sampling_location' => ['required'],
-                'date' => ['required'],
-                'time' => ['required'],
-                'method' => ['required'],
-                'date_received' => ['required'],
-                'itd_start' => ['required'],
-                'itd_end' => ['required'],
-            ]);
-
-            $data = Sampling::create([
-                'no_sample' => $request->no_sample,
-                'sampling_location' => $request->sampling_location,
-                'sample_description_id' => 1, // Master Data dengan ID 1
-                'date' => $request->date,
-                'time' => $request->time,
-                'method' => $request->method,
-                'date_received' => $request->date_received,
-                'itd_start' => $request->itd_start,
-                'itd_end' => $request->itd_end,
-            ]);
-
-            if ($data) {
-                return redirect()->route('institute.index')->with('msg', 'Data ('.$request->no_sample.') added successfully');
-            }
-        }
-
-        $data = Sampling::all();
-        return view('institute.add', compact('data'));
-    }
-
     public function create(Request $request) {
         if ($request->isMethod('POST')) {
             $this->validate($request, [
@@ -70,45 +36,10 @@ class InstituteController extends Controller
         }
 
         $data = AmbientAir::all();
-        return view('institute.create', compact('data'));
+        $description = SampleDescription::orderBy('name')->get();
+        return view('institute.create', compact('data','description'));
     }
 
-    public function add_description(Request $request, $id)
-    {
-        if ($request->isMethod('POST')) {
-            $this->validate($request, [
-                'no_sample' => ['required'],
-                'sampling_location' => ['required'],
-                'date' => ['required'],
-                'time' => ['required'],
-                'method' => ['required'],
-                'date_received' => ['required'],
-                'itd_start' => ['required'],
-                'itd_end' => ['required'],
-            ]);
-
-            $data = Sampling::create([
-                'no_sample' => $request->no_sample,
-                'sampling_location' => $request->sampling_location,
-                'resume_lims_id' => 1,
-                'date' => $request->date,
-                'time' => $request->time,
-                'method' => $request->method,
-                'date_received' => $request->date_received,
-                'itd_start' => $request->itd_start,
-                'itd_end' => $request->itd_end,
-            ]);
-
-            if ($data) {
-                return redirect()->route('institute.index')->with('msg', 'Data ('.$request->no_sample.') added successfully');
-            }
-        }
-
-        $data = Resume::findOrFail($id);
-        $description = SampleDescription::all();
-        // dd($description);
-        return view('institute.add_sampling', compact('data','description'));
-    }
 
     //Data institute
     public function data(Request $request)

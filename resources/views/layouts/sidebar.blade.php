@@ -23,18 +23,18 @@
             </a>
         </li>
         @can('setting/manage_account/users.read')
-        <li class="menu-item {{ request()->segment(1) == 'resume' ? 'active' : '' }}">
-            <a href="{{ route('resume.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div data-i18n="resume">Resume</div>
+        <li class="menu-item {{ request()->segment(1) == 'institute' ? 'active' : '' }}">
+            <a href="{{ route('institute.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-area"></i>
+                <div data-i18n="institute">Institute</div>
             </a>
         </li>
         @endcan
         @can('setting/manage_account/users.read')
-        <li class="menu-item {{ request()->segment(1) == 'institute' ? 'active' : '' }}">
-            <a href="{{ route('institute.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-book-add"></i>
-                <div data-i18n="institute">Institute</div>
+        <li class="menu-item {{ request()->segment(1) == 'resume' ? 'active' : '' }}">
+            <a href="{{ route('resume.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-add-to-queue"></i>
+                <div data-i18n="resume">Resume</div>
             </a>
         </li>
         @endcan
@@ -86,7 +86,7 @@
         @can('setting/manage_account/users.read')
         <li class="menu-item {{ request()->segment(1) == 'coa' ? 'active' : '' }}">
             <a href="{{ route('coa.regulation.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-book-add"></i>
+                <i class="menu-icon tf-icons bx bx-cog"></i>
                 <div data-i18n="coa">Manage COA</div>
             </a>
         </li>

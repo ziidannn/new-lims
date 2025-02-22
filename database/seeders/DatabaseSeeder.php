@@ -26,6 +26,9 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             SampleDescriptionSeeder::class,
             AmbientAirSeeder::class,
+            RegulationSeeder::class,
+            RegulationStandardSeeder::class,
+            SamplingTimeSeeder::class
         ]);
     }
 }

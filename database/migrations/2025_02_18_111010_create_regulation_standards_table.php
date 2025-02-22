@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('regulations', function (Blueprint $table) {
+        Schema::create('regulation_standards', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->timestamp('updated_at')->nullable();
             $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('regulations');
+        Schema::dropIfExists('regulation_standards');
     }
 };

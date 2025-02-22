@@ -11,17 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('resume_limses', function (Blueprint $table) {
+        Schema::create('regulations', function (Blueprint $table) {
             $table->id();
-            $table->string('customer');
-            $table->string('address');
-            $table->string('contact_name');
-            $table->string('email');
-            $table->string('phone');
-            $table->string('sample_taken_by');
-            $table->date('sample_receive_date');
-            $table->date('sample_analysis_date');
-            $table->date('report_date');
+            $table->string('title');
+            $table->unsignedBigInteger('sample_description_id')->nullable();
+            $table->foreign('sample_description_id')->references('id')->on('sample_descriptions');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
         });
@@ -32,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('resume_limses');
+        Schema::dropIfExists('regulations');
     }
 };

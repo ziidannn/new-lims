@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'Resume')
+@section('title', 'Institute')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -37,12 +37,12 @@
 
                         </select>
                     </div>
-                    <div class="col-md d-flex justify-content-center justify-content-md-end">
+                    <!-- <div class="col-md d-flex justify-content-center justify-content-md-end">
                         <a class="btn btn-primary btn-block btn-mail" title="Add new"
                             href="{{ route('resume.create')}}">
                             <i data-feather="plus"></i>+ Add
                         </a>
-                    </div>
+                    </div> -->
                     <table class="table" id="datatable">
                         <thead>
                             <tr>
@@ -180,12 +180,8 @@
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('resume/add_sampling/${row.id}') }}">
-                                    <i class="bx bx-plus icon-white"></i></a>
-                                    <a class="badge bg-warning badge-icon" title="Edit Sampling" href="/${row.id}">
-                                    <i class="bx bx-pencil"></i></a>
-                                    <a class="badge bg-danger badge-icon" title="Delete Sampling" style="cursor:pointer" onclick="DeleteId('${row.id}')">
-                                    <i class="bx bx-trash icon-white"></i></a>`;
+                            html = `<a class="badge bg-warning badge-icon" title="Add Resume COA" href="{{ url('institute/add_sampling/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
                         }
                         return html;
                     },
@@ -198,40 +194,5 @@
             table.draw();
         });
     });
-
-    function DeleteId(id, data) {
-        swal({
-                title: "Are you sure?",
-                text: "After deleting, the data (" + data + ") cannot be recovered!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then((willDelete) => {
-                if (willDelete) {
-                    $.ajax({
-                        url: "",
-                        type: "DELETE",
-                        data: {
-                            "id": id,
-                            "_token": $("meta[name='csrf-token']").attr("content"),
-                        },
-                        success: function (data) {
-                            if (data['success']) {
-                                swal(data['message'], {
-                                    icon: "success",
-                                });
-                                $('#datatable').DataTable().ajax.reload();
-                            } else {
-                                swal(data['message'], {
-                                    icon: "error",
-                                });
-                            }
-                        }
-                    })
-                }
-            })
-    }
-
 </script>
 @endsection
