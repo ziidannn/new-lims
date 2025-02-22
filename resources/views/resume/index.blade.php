@@ -46,12 +46,12 @@
                     <table class="table" id="datatable">
                         <thead>
                             <tr>
-                                <th scope="col" width="20px"><b>No</b></th>
-                                <th scope="col" width="20px"><b>Customer</b></th>
-                                <th scope="col" width="20px"><b>Contact Name</b></th>
-                                <th scope="col" width="20px"><b>Phone</b></th>
-                                <th scope="col" width="20px"><b>Description</b></th>
-                                <th scope="col" width="20px"><b>Action</b></th>
+                                <th><b>No</b></th>
+                                <th><b>Customer</b></th>
+                                <th><b>Contact Name</b></th>
+                                <th><b>Phone</b></th>
+                                <th><b>Description</b></th>
+                                <th><b>Action</b></th>
                             </tr>
                         </thead>
                     </table>
@@ -180,8 +180,12 @@
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-warning badge-icon" title="Add Resume COA" href="{{ url('institute/add_sampling/${row.id}') }}">
-                                    <i class="bx bx-plus icon-white"></i></a>`;
+                            html = `<a class="badge bg-dark badge-icon" title="Viwe Resume" href="{{ url('pdf/view//${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>
+                                    <a class="badge bg-warning badge-icon" title="Edit Audit Plan" href="/${row.id}">
+                                    <i class="bx bx-pencil"></i></a>
+                                    <a class="badge bg-danger badge-icon" title="Delete Audit Plan" style="cursor:pointer" onclick="DeleteId('${row.id}')">
+                                    <i class="bx bx-trash icon-white"></i></a>`;
                         }
                         return html;
                     },
