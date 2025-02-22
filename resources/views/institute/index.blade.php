@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'Resume')
+@section('title', 'Institute')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -46,12 +46,13 @@
                     <table class="table" id="datatable">
                         <thead>
                             <tr>
-                                <th scope="col" width="20px"><b>No</b></th>
-                                <th scope="col" width="20px"><b>Customer</b></th>
-                                <th scope="col" width="20px"><b>Contact Name</b></th>
-                                <th scope="col" width="20px"><b>Phone</b></th>
-                                <th scope="col" width="20px"><b>Description</b></th>
-                                <th scope="col" width="20px"><b>Action</b></th>
+                                <th scope="col" width=""><b>No</b></th>
+                                <th scope="col" width=""><b>Customer</b></th>
+                                <th scope="col" width=""><b>Contact Name</b></th>
+                                <th scope="col" width=""><b>Email</b></th>
+                                <th scope="col" width=""><b>Phone</b></th>
+                                <th scope="col" width=""><b>Description</b></th>
+                                <th scope="col" width=""><b>Action</b></th>
                             </tr>
                         </thead>
                     </table>
@@ -142,40 +143,47 @@
                 },
                 {
                     render: function (data, type, row, meta) {
+                        var html = "<span title='" + row.email + "'>" + row.email +
+                            "</span>";
+                        return html;
+                    },
+                },
+                {
+                    render: function (data, type, row, meta) {
                         return row.phone;
                     },
                     orderable: false
                 },
-                {
-                    render: function (data, type, row, meta) {
-                        if (row.sample_descriptions && row.sample_descriptions.length > 0) {
-                            var html = row.sample_descriptions.map(function(desc, index) {
-                                return `<span class="badge bg-dark"
-                                            style="border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
-                                            ${desc.name}
-                                        </span>`;
-                            }).join('');
-                            return html;
-                        } else {
-                            return '-';
-                        }
-                    }
-                },
                 // {
                 //     render: function (data, type, row, meta) {
                 //         if (row.sample_descriptions && row.sample_descriptions.length > 0) {
-                //             // Gunakan list dengan bullet atau badge untuk membedakan setiap description
-                //             var html = '<ul style="padding-left: 15px;">';
-                //             row.sample_descriptions.forEach(function(desc) {
-                //                 html += `<li><span class="badge bg-primary">${desc.name}</span></li>`;
-                //             });
-                //             html += '</ul>';
+                //             var html = row.sample_descriptions.map(function(desc, index) {
+                //                 return `<span class="badge bg-dark"
+                //                             style="border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
+                //                             ${desc.name}
+                //                         </span>`;
+                //             }).join('');
                 //             return html;
                 //         } else {
                 //             return '-';
                 //         }
                 //     }
                 // },
+                {
+                    render: function (data, type, row, meta) {
+                        if (row.sample_descriptions && row.sample_descriptions.length > 0) {
+                            // Gunakan list dengan bullet atau badge untuk membedakan setiap description
+                            var html = '<ul style="padding-left: 15px;">';
+                            row.sample_descriptions.forEach(function(desc) {
+                                html += `<li><span class="badge bg-dark">${desc.name}</span></li>`;
+                            });
+                            html += '</ul>';
+                            return html;
+                        } else {
+                            return '-';
+                        }
+                    }
+                },
                 {
                     render: function (data, type, row, meta) {
                         var html = '';

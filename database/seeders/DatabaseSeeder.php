@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             UserRolePermissionSeeder::class,
             PermissionSeeder::class,
             SampleDescriptionSeeder::class,
-            AmbientAirSeeder::class,
+            ResumeSeeder::class,
             RegulationSeeder::class,
             RegulationStandardSeeder::class,
             SamplingTimeSeeder::class

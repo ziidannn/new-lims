@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ambient_airs', function (Blueprint $table) {
+        Schema::create('resumes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('sample_description_id');
+            $table->unsignedBigInteger('sample_description_id')->nullable();
             $table->foreign('sample_description_id')->references('id')->on('sample_descriptions');
             $table->string('name_parameter');
             $table->string('sampling_time');
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ambient_air');
+        Schema::dropIfExists('resumes');
     }
 };

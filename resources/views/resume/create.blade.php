@@ -36,7 +36,7 @@
 @endsection
 @section('content')
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-<form class="card" action="{{ route('coa.create') }}" method="POST">
+<form class="card" action="{{ route('resume.create') }}" method="POST">
 @csrf
     <div class="row">
         <div class="col-xl-12">

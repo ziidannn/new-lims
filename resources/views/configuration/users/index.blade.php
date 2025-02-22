@@ -321,7 +321,6 @@
                         return html;
                     },
                 },
-
                 {
                     render: function (data, type, row, meta) {
                         if (row.gender != null) {

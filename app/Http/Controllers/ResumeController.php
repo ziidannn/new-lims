@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Resume;
+use Illuminate\Http\Request;
 use App\Models\Sampling;
 use App\Models\SampleDescription;
 use Yajra\DataTables\Facades\DataTables;
@@ -17,46 +17,59 @@ class ResumeController extends Controller
         return view('resume.index', compact('data', 'description'));
     }
 
-    public function create(Request $request)
-    {
+    public function add(Request $request) {
         if ($request->isMethod('POST')) {
             $this->validate($request, [
-                'customer' => ['required'],
-                'address' => ['required'],
-                'contact_name' => ['required'],
-                'email' => ['required', 'email'],
-                'phone' => ['required'],
-                'sample_description_id' => ['required', 'array'], // Pastikan ini array
-                'sample_taken_by' => ['required'],
-                'sample_receive_date' => ['required'],
-                'sample_analysis_date' => ['required'],
-                'report_date' => ['required']
+                'no_sample' => ['required'],
+                'sampling_location' => ['required'],
+                'date' => ['required'],
+                'time' => ['required'],
+                'method' => ['required'],
+                'date_received' => ['required'],
+                'itd_start' => ['required'],
+                'itd_end' => ['required'],
             ]);
 
-            // Buat Resume baru
-            $resume = Resume::create([
-                'customer' => $request->customer,
-                'address' => $request->address,
-                'contact_name' => $request->contact_name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'sample_taken_by' => $request->sample_taken_by,
-                'sample_receive_date' => $request->sample_receive_date,
-                'sample_analysis_date' => $request->sample_analysis_date,
-                'report_date' => $request->report_date,
+            $data = Sampling::create([
+                'no_sample' => $request->no_sample,
+                'sampling_location' => $request->sampling_location,
+                'sample_description_id' => 1, // Master Data dengan ID 1
+                'date' => $request->date,
+                'time' => $request->time,
+                'method' => $request->method,
+                'date_received' => $request->date_received,
+                'itd_start' => $request->itd_start,
+                'itd_end' => $request->itd_end,
             ]);
 
-            // Simpan sample_description_id ke tabel pivot
-            if ($request->has('sample_description_id')) {
-                $resume->sampleDescriptions()->attach($request->sample_description_id);
+            if ($data) {
+                return redirect()->route('ambient_air.index')->with('msg', 'Data ('.$request->no_sample.') added successfully');
+            }
+        }
+
+        $data = Sampling::all();
+        return view('ambient_air.add', compact('data'));
+    }
+
+    public function create(Request $request) {
+        if ($request->isMethod('POST')) {
+            $this->validate($request, [
+                'testing_result.*' => ['required'], // Validasi array input
+            ]);
+
+            foreach ($request->testing_result as $id => $result) {
+                Resume::where('id', $id)->update([
+                    'testing_result' => $result,
+                    'sample_description_id' => $request->sample_description_id[$id] ??'',
+                ]);
             }
 
-            return redirect()->route('resume.index')->with('msg', 'Data berhasil ditambahkan');
+            return redirect()->route('resume.index')->with('msg', 'Data added successfully');
         }
 
         $data = Resume::all();
         $description = SampleDescription::orderBy('name')->get();
-        return view('resume.create', compact('data', 'description'));
+        return view('resume.create', compact('data','description'));
     }
 
     public function data(Request $request)
