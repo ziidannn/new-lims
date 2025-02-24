@@ -13,7 +13,6 @@
 
 @section('style')
 <style>
-
     .badge-icon {
         display: inline-block;
         font-size: 1em;
@@ -30,36 +29,37 @@
 <div class="card">
     <div class="card-datatable table-responsive">
         <div class="card-header">
-                <div class="row">
-                    <div class="col-md-3">
-                        <select id="select_description" class="form-control input-sm select2" data-placeholder="Description">
-                            <option value="">Select Description</option>
+            <div class="row">
+                <div class="col-md-3">
+                    <select id="select_description" class="form-control input-sm select2"
+                        data-placeholder="Description">
+                        <option value="">Select Description</option>
 
-                        </select>
-                    </div>
-                    <!-- <div class="col-md d-flex justify-content-center justify-content-md-end">
+                    </select>
+                </div>
+                <!-- <div class="col-md d-flex justify-content-center justify-content-md-end">
                         <a class="btn btn-primary btn-block btn-mail" title="Add new"
                             href="{{ route('institute.create')}}">
                             <i data-feather="plus"></i>+ Add
                         </a>
                     </div> -->
-                    <table class="table" id="datatable">
-                        <thead>
-                            <tr>
-                                <th scope="col" width=""><b>No</b></th>
-                                <th scope="col" width=""><b>Customer</b></th>
-                                <th scope="col" width=""><b>Contact Name</b></th>
-                                <th scope="col" width=""><b>Email</b></th>
-                                <th scope="col" width=""><b>Phone</b></th>
-                                <th scope="col" width=""><b>Description</b></th>
-                                <th scope="col" width=""><b>Action</b></th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+                <table class="table" id="datatable">
+                    <thead>
+                        <tr>
+                            <th scope="col" width=""><b>No</b></th>
+                            <th scope="col" width=""><b>Customer</b></th>
+                            <th scope="col" width=""><b>Contact Name</b></th>
+                            <th scope="col" width=""><b>Email</b></th>
+                            <th scope="col" width=""><b>Phone</b></th>
+                            <th scope="col" width=""><b>Description</b></th>
+                            <th scope="col" width=""><b>Action</b></th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
+</div>
 @endsection
 
 @section('script')
@@ -115,7 +115,7 @@
                 url: "{{ route('institute.data') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
-                    d.select_description = $('#select_description').val()
+                        d.select_description = $('#select_description').val()
                 },
             },
             columnDefs: [{
@@ -174,8 +174,9 @@
                         if (row.sample_descriptions && row.sample_descriptions.length > 0) {
                             // Gunakan list dengan bullet atau badge untuk membedakan setiap description
                             var html = '<ul style="padding-left: 15px;">';
-                            row.sample_descriptions.forEach(function(desc) {
-                                html += `<li><span class="badge bg-dark">${desc.name}</span></li>`;
+                            row.sample_descriptions.forEach(function (desc) {
+                                html +=
+                                    `<li><span class="badge bg-dark">${desc.name}</span></li>`;
                             });
                             html += '</ul>';
                             return html;
@@ -186,9 +187,11 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        var html = '';
-                        {
-                            html = `<a class="badge bg-warning badge-icon" title="List Resume" href="{{ url('resume/list_resume/${row.id}') }}">
+                        var html = ''; {
+                            html = `<a class="badge bg-dark badge-icon" title="Viwe Resume" href="/preview-pdf/${row.Id}">
+                                    <a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('resume/add_sampling/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>
+                                    <a class="badge bg-warning badge-icon" title="List Resume" href="{{ url('resume/list_resume/${row.id}') }}">
                                     <i class="bx bx-pencil"></i></a>`;
                         }
                         return html;

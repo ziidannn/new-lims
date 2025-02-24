@@ -82,8 +82,9 @@ Route::middleware('auth')->group(function () {
 });
 
 //PDF
-Route::get('/pdf/view/{id}', [PDFController::class, 'view'])->name('pdf.view');
-Route::get('/view_pdf', [PDFController::class, 'view_pdf']);
+Route::get('/generate-pdf/{customerId}', [PDFController::class, 'generatePdf'])->name('generate.pdf');
+Route::get('/preview-pdf/{customerId}', [PDFController::class, 'previewPdf'])->name('preview.pdf');
+                    
 
 Route::get('log-viewers', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['can:log-viewers.read']);
 
