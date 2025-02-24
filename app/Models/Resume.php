@@ -9,20 +9,18 @@ class Resume extends Model
 {
     use HasFactory;
 
-    protected $table = 'resume_limses';
+    protected $table = 'resumes';
     public $timestamps = true;
     public $incrementing = true;
 
     protected $fillable = [
-        'customer',
-        'address',
-        'contact_name',
-        'email',
-        'phone',
-        'sample_taken_by',
-        'sample_receive_date',
-        'sample_analysis_date',
-        'report_date'
+        'name_parameter',
+        'sample_description_id',
+        'sampling_time',
+        'testing_result',
+        'regulation',
+        'unit',
+        'method',
     ];
 
     public function sampleDescriptions()

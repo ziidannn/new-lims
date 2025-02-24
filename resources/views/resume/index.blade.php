@@ -39,19 +39,20 @@
                     </div>
                     <div class="col-md d-flex justify-content-center justify-content-md-end">
                         <a class="btn btn-primary btn-block btn-mail" title="Add new"
-                            href="{{ route('resume.create')}}">
+                            href="{{ route('institute.create')}}">
                             <i data-feather="plus"></i>+ Add
                         </a>
                     </div>
                     <table class="table" id="datatable">
                         <thead>
                             <tr>
-                                <th><b>No</b></th>
-                                <th><b>Customer</b></th>
-                                <th><b>Contact Name</b></th>
-                                <th><b>Phone</b></th>
-                                <th><b>Description</b></th>
-                                <th><b>Action</b></th>
+                                <th scope="col" width=""><b>No</b></th>
+                                <th scope="col" width=""><b>Customer</b></th>
+                                <th scope="col" width=""><b>Contact Name</b></th>
+                                <th scope="col" width=""><b>Email</b></th>
+                                <th scope="col" width=""><b>Phone</b></th>
+                                <th scope="col" width=""><b>Description</b></th>
+                                <th scope="col" width=""><b>Action</b></th>
                             </tr>
                         </thead>
                     </table>
@@ -142,34 +143,26 @@
                 },
                 {
                     render: function (data, type, row, meta) {
+                        var html = "<span title='" + row.email + "'>" + row.email +
+                            "</span>";
+                        return html;
+                    },
+                },
+                {
+                    render: function (data, type, row, meta) {
                         return row.phone;
                     },
                     orderable: false
                 },
-                {
-                    render: function (data, type, row, meta) {
-                        if (row.sample_descriptions && row.sample_descriptions.length > 0) {
-                            var html = row.sample_descriptions.map(function(desc, index) {
-                                return `<span class="badge bg-dark"
-                                            style="border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
-                                            ${desc.name}
-                                        </span>`;
-                            }).join('');
-                            return html;
-                        } else {
-                            return '-';
-                        }
-                    }
-                },
                 // {
                 //     render: function (data, type, row, meta) {
                 //         if (row.sample_descriptions && row.sample_descriptions.length > 0) {
-                //             // Gunakan list dengan bullet atau badge untuk membedakan setiap description
-                //             var html = '<ul style="padding-left: 15px;">';
-                //             row.sample_descriptions.forEach(function(desc) {
-                //                 html += `<li><span class="badge bg-primary">${desc.name}</span></li>`;
-                //             });
-                //             html += '</ul>';
+                //             var html = row.sample_descriptions.map(function(desc, index) {
+                //                 return `<span class="badge bg-dark"
+                //                             style="border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
+                //                             ${desc.name}
+                //                         </span>`;
+                //             }).join('');
                 //             return html;
                 //         } else {
                 //             return '-';
@@ -178,13 +171,30 @@
                 // },
                 {
                     render: function (data, type, row, meta) {
+                        if (row.sample_descriptions && row.sample_descriptions.length > 0) {
+                            // Gunakan list dengan bullet atau badge untuk membedakan setiap description
+                            var html = '<ul style="padding-left: 15px;">';
+                            row.sample_descriptions.forEach(function(desc) {
+                                html += `<li><span class="badge bg-dark">${desc.name}</span></li>`;
+                            });
+                            html += '</ul>';
+                            return html;
+                        } else {
+                            return '-';
+                        }
+                    }
+                },
+                {
+                    render: function (data, type, row, meta) {
                         var html = '';
                         {
+
                             html = `<a class="badge bg-dark badge-icon" title="Viwe Resume" href="/preview-pdf/${row.Id}">
+
+<a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('resume/add_sampling/${row.id}') }}">
                                     <i class="bx bx-plus icon-white"></i></a>
-                                    <a class="badge bg-warning badge-icon" title="Edit Audit Plan" href="/${row.id}">
-                                    <i class="bx bx-pencil"></i></a>
-                                    <a class="badge bg-danger badge-icon" title="Delete Audit Plan" style="cursor:pointer" onclick="DeleteId('${row.id}')">
+                                    
+                                    <a class="badge bg-danger badge-icon" title="Delete Sampling" style="cursor:pointer" onclick="DeleteId('${row.id}')">
                                     <i class="bx bx-trash icon-white"></i></a>`;
                         }
                         return html;

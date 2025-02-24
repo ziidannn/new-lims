@@ -20,7 +20,8 @@ return new class extends Migration
             $table->float('wind_speed');
             $table->integer('wind_direction');
             $table->string('weather'); // Bisa diubah jika membutuhkan lebih banyak informasi
-            $table->timestamps();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
         });
     }
 

@@ -44,7 +44,7 @@
 @endsection
 @section('content')
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('institute.add_sampling', $data->id) }}" method="POST">
+    <form class="card" action="{{ route('resume.add_sampling', $data->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
@@ -74,7 +74,7 @@
 <br>
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('institute.add_sampling', $data->id) }}" method="POST">
+    <form class="card" action="{{ route('resume.add_sampling', $data->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">

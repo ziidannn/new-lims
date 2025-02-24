@@ -13,8 +13,17 @@ class Parameter extends Model
 
     protected $fillable = [
         'name',
-        'sampling_time',
         'unit',
         'method',
+        'regulation_id'
     ];
+    public function regulation()
+    {
+        return $this->belongsTo(Regulation::class, 'regulation_id', 'id');
+    }
+
+    public function samplingTimeRegulations()
+    {
+        return $this->hasMany(SamplingTimeRegulation::class, 'parameter_id', 'id');
+    }
 }

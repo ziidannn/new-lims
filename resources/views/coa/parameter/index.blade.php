@@ -13,7 +13,6 @@
 
 @section('style')
 <style>
-
     .badge-icon {
         display: inline-block;
         font-size: 1em;
@@ -25,46 +24,168 @@
         color: white;
     }
 
+    table.dataTable td {
+        text-overflow: ellipsis;
+    }
+
 </style>
 @endsection
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-        <li class="nav-item"><a class="nav-link" href=""><i
+        <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation.index') }}"><i
                     class="bx bx-add-to-queue me-1"></i>
                 Regulation</a></li>
         <li class="nav-item"><a class="nav-link active" href="{{ route('coa.parameter.index') }}"><i
                     class="bx bx-chart me-1"></i>
                 Parameter</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('coa.sampling_time.index') }}"><i
+                    class="bx bx-chart me-1"></i>
+                Sampling Time</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation_standard.index') }}"><i
+                    class="bx bx-chart me-1"></i>
+                Regulation Standard</a></li>
     </ul>
 </div>
 <div class="card">
     <div class="card-datatable table-responsive">
         <div class="card-header">
-                <div class="row">
-                    <div class="col-md-3">
-                        <select id="select_description" class="form-control input-sm select2" data-placeholder="Description">
-                            <option value="">Select Description</option>
-
-                        </select>
-                    </div>
-                    <div class="col-md d-flex justify-content-center justify-content-md-end">
+            <div class="row">
+                <div class="col-md-3">
+                    <select id="select_description" class="form-control input-sm select2"
+                        data-placeholder="Description">
+                        <option value="">Select Description</option>
+                    </select>
+                </div>
+                <!-- <div class="col-md d-flex justify-content-center justify-content-md-end">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#newrecord"
+                        aria-controls="offcanvasEnd" tabindex="0" aria-controls="DataTables_Table_0"
+                        title="Add Standard Criteria" type="button"><span><i class="bx bx-plus me-sm-2"></i>
+                            <span>Add</span></span>
+                    </button>
+                </div> -->
+                <div class="col-md d-flex justify-content-center justify-content-md-end">
                         <a class="btn btn-primary btn-block btn-mail" title="Add new"
-                            href="{{ route('resume.create')}}">
+                            href="{{ route('parameter.add_parameter')}}">
                             <i data-feather="plus"></i>+ Add
                         </a>
                     </div>
-                    <table class="table" id="datatable">
-                        <thead>
-                            <tr>
-                                <th scope="col" width="20px"><b>No</b></th>
-                                <th scope="col" width="20px"><b>Name</b></th>
-                            </tr>
-                        </thead>
-                    </table>
+                <div class="offcanvas offcanvas-end @if($errors->all()) show @endif" tabindex="-1" id="newrecord"
+                    aria-labelledby="offcanvasEndLabel">
+                    <div class="offcanvas-header">
+                        <h5 id="offcanvasEndLabel" class="offcanvas-title">Add Parameter</h5>
+                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body my-auto mx-0 flex-grow-1">
+                        <form class="add-new-record pt-0 row g-2 fv-plugins-bootstrap5 fv-plugins-framework"
+                            id="form-add-new-record" method="POST" action="">
+                            @csrf
+                            <div class="col-sm-12 fv-plugins-icon-container">
+                                <label class="form-label" for="basicDate">Regulation</label>
+                                <div class="input-group input-group-merge has-validation">
+                                    <select
+                                        class="form-select @error('regulation_id') is-invalid @enderror input-sm select2-modal"
+                                        name="regulation_id" id="regulation_id">
+                                        <option value="">-- Select Regulation --</option>
+                                        @foreach($regulation as $p)
+                                        <option value="{{ $p->id }}"
+                                            {{ old('regulation_id') == $p->id ? 'selected' : '' }}>
+                                            {{ $p->id }} - {{ $p->title }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                    @error('regulation_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-sm-12 fv-plugins-icon-container">
+                                <label class="form-label" for="basicDate">Parameter</label>
+                                <div class="input-group input-group-merge has-validation">
+                                    <input type="text" class="form-control @error('name')  is-invalid @enderror"
+                                        maxlength="120" name="name" placeholder="Input The New Criteria"
+                                        value="{{ old('name') }}">
+                                    @error('name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- Sampling Time --}}
+                            <div class="col-sm-12">
+                                <label class="form-label">Sampling Time</label>
+                                <select class="form-select" name="sampling_time_id" id="sampling_time_id">
+                                    <option value="">-- Select Sampling Time --</option>
+                                    @foreach($sampling_times as $time)
+                                        <option value="{{ $time->id }}">{{ $time->time }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Regulation Standard --}}
+                            <div class="col-sm-12">
+                                <label class="form-label">Regulation Standard</label>
+                                <select class="form-select" name="regulation_standard_id" id="regulation_standard_id"
+                                    disabled>
+                                    <option value="">-- Select Regulation Standard --</option>
+                                    @foreach($regulation_standards as $standard)
+                                    <option value="{{ $standard->id }}">{{ $standard->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-sm-12 fv-plugins-icon-container">
+                                <label class="form-label" for="basicDate">Unit</label>
+                                <div class="input-group input-group-merge has-validation">
+                                    <input type="text" class="form-control @error('unit')  is-invalid @enderror"
+                                        maxlength="120" name="unit" placeholder="Input The New Criteria"
+                                        value="{{ old('unit') }}">
+                                    @error('unit')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-sm-12 fv-plugins-icon-container">
+                                <label class="form-label" for="basicDate">Method</label>
+                                <div class="input-group input-group-merge has-validation">
+                                    <input type="text" class="form-control @error('method')  is-invalid @enderror"
+                                        maxlength="120" name="method" placeholder="Input The New Criteria"
+                                        value="{{ old('method') }}">
+                                    @error('method')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-sm-12 mt-4">
+                                <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">Create</button>
+                                <button type="reset" class="btn btn-outline-secondary"
+                                    data-bs-dismiss="offcanvas">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
+                <table class="table" id="datatable">
+                    <thead>
+                        <tr>
+                            <th scope="col" width="10px"><b>No</b></th>
+                            <th scope="col" width="20px"><b>Regulation</b></th>
+                            <th scope="col" width="20px"><b>Parameter</b></th>
+                            <th scope="col" width="20px"><b>Sampling Time</b></th>
+                            <th scope="col" width="20px"><b>Regulatory Standard</b></th>
+                            <th scope="col" width="20px"><b>Action</b></th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
+</div>
 @endsection
 
 @section('script')
@@ -117,10 +238,10 @@
                 searchPlaceholder: 'Search..',
             },
             ajax: {
-                url: "{{ route('coa.regulation.data_regulation') }}",
+                url: "{{ route('coa.parameter.data_parameter') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
-                    d.select_description = $('#select_description').val()
+                        d.select_description = $('#select_description').val()
                 },
             },
             columnDefs: [{
@@ -136,16 +257,85 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.title;
+                        // Check if row.category exists and has an id
+                        if (row.regulation && row.regulation.id) {
+                            var html =
+                                `<a class="text-dark" title="${row.regulation.title}" href="">${row.regulation.title}</a>`;
+                            return html;
+                        } else {
+                            return ''; // Return empty string or handle the case where regulation.title is missing
+                        }
+                    },
+                    className: "text-center"
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        return row.name;
                     },
                     orderable: false
                 },
                 {
                     render: function (data, type, row, meta) {
-                        var html = '';
-                        {
-                            html = `<a class="badge bg-warning badge-icon" title="Add Resume COA" href="{{ url('coa/add_sampling/${row.id}') }}">
-                                    <i class="bx bx-plus icon-white"></i></a>`;
+                        if (row.sampling_times) {
+                            var html = '<ul style="padding-left: 15px;">';
+                            row.sampling_times.split(', ').forEach(function(time) {
+                                html += `<li>${time}</span></li>`;
+                            });
+                            html += '</ul>';
+                            return html;
+                        } else {
+                            return '-';
+                        }
+                    }
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        if (row.regulation_standards) {
+                            var html = '<ul style="padding-left: 15px;">';
+                            row.regulation_standards.split(', ').forEach(function(title) {
+                                html += `<li>${title}</span></li>`;
+                            });
+                            html += '</ul>';
+                            return html;
+                        } else {
+                            return '-';
+                        }
+                    }
+                },
+                // {
+                //     render: function (data, type, row, meta) {
+                //         // Check if row.category exists and has an id
+                //         if (row.sampling_times && row.sampling_times.id) {
+                //             var html =
+                //                 `<a class="text-dark" title="${row.sampling_times.time}" href="">${row.sampling_times.time}</a>`;
+                //             return html;
+                //         } else {
+                //             return ''; // Return empty string or handle the case where regulation.title is missing
+                //         }
+                //     },
+                //     className: "text-center"
+                // },
+                // {
+                //     render: function (data, type, row, meta) {
+                //         // Check if row.category exists and has an id
+                //         if (row.regulation_standards && row.regulation_standards.id) {
+                //             var html =
+                //                 `<a class="text-dark" title="${row.regulation_standards.title}" href="">${row.regulation_standards.title}</a>`;
+                //             return html;
+                //         } else {
+                //             return ''; // Return empty string or handle the case where regulation.title is missing
+                //         }
+                //     },
+                //     className: "text-center"
+                // },
+                {
+                    render: function (data, type, row, meta) {
+                        var html = ''; {
+                            html = `<a class="badge bg-warning badge-icon" title="Edit parameter" style="cursor:pointer" href="{{ url('coa/parameter/edit_parameter/${row.id}') }}">
+                                    <i class="bx bx-pencil icon-white"></i></a>
+                                    <a class="badge bg-danger badge-icon" title="Delete parameter" style="cursor:pointer"
+                                    onclick="DeleteId(\'` + row.id + `\',\'` + row.title + `\')" >
+                                    <i class='bx bx-trash icon-white'></i></a>`;
                         }
                         return html;
                     },
@@ -156,6 +346,20 @@
         });
         $('#select_description').change(function () {
             table.draw();
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const samplingTimeSelect = document.getElementById('sampling_time_id');
+        const regulationStandardSelect = document.getElementById('regulation_standard_id');
+
+        samplingTimeSelect.addEventListener('change', function () {
+            if (this.value) {
+                regulationStandardSelect.removeAttribute('disabled');
+            } else {
+                regulationStandardSelect.setAttribute('disabled', 'disabled');
+            }
         });
     });
 </script>

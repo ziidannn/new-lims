@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('resume_sample_description', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('resume_id')->constrained('resume_limses')->onDelete('cascade');
+            $table->foreignId('resume_id')->constrained('resumes')->onDelete('cascade');
             $table->foreignId('sample_description_id')->constrained('sample_descriptions')->onDelete('cascade');
-            $table->timestamps();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
         });
     }
 

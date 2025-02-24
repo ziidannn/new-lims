@@ -19,95 +19,46 @@ class InstituteController extends Controller
         return view('institute.index', compact('data', 'description'));
     }
 
-    public function add(Request $request) {
-        if ($request->isMethod('POST')) {
-            $this->validate($request, [
-                'no_sample' => ['required'],
-                'sampling_location' => ['required'],
-                'date' => ['required'],
-                'time' => ['required'],
-                'method' => ['required'],
-                'date_received' => ['required'],
-                'itd_start' => ['required'],
-                'itd_end' => ['required'],
-            ]);
-
-            $data = Sampling::create([
-                'no_sample' => $request->no_sample,
-                'sampling_location' => $request->sampling_location,
-                'sample_description_id' => 1, // Master Data dengan ID 1
-                'date' => $request->date,
-                'time' => $request->time,
-                'method' => $request->method,
-                'date_received' => $request->date_received,
-                'itd_start' => $request->itd_start,
-                'itd_end' => $request->itd_end,
-            ]);
-
-            if ($data) {
-                return redirect()->route('institute.index')->with('msg', 'Data ('.$request->no_sample.') added successfully');
-            }
-        }
-
-        $data = Sampling::all();
-        return view('institute.add', compact('data'));
-    }
-
-    public function create(Request $request) {
-        if ($request->isMethod('POST')) {
-            $this->validate($request, [
-                'testing_result.*' => ['required'], // Validasi array input
-            ]);
-
-            foreach ($request->testing_result as $id => $result) {
-                AmbientAir::where('id', $id)->update([
-                    'testing_result' => $result,
-                    'sample_description_id' => $request->sample_description_id[$id] ?? 1,
-                ]);
-            }
-
-            return redirect()->route('institute.index')->with('msg', 'Data added successfully');
-        }
-
-        $data = AmbientAir::all();
-        return view('institute.create', compact('data'));
-    }
-
-    public function add_description(Request $request, $id)
+    public function create(Request $request)
     {
         if ($request->isMethod('POST')) {
             $this->validate($request, [
-                'no_sample' => ['required'],
-                'sampling_location' => ['required'],
-                'date' => ['required'],
-                'time' => ['required'],
-                'method' => ['required'],
-                'date_received' => ['required'],
-                'itd_start' => ['required'],
-                'itd_end' => ['required'],
+                'customer' => ['required'],
+                'address' => ['required'],
+                'contact_name' => ['required'],
+                'email' => ['required', 'email'],
+                'phone' => ['required'],
+                'sample_description_id' => ['required', 'array'], // Pastikan ini array
+                'sample_taken_by' => ['required'],
+                'sample_receive_date' => ['required'],
+                'sample_analysis_date' => ['required'],
+                'report_date' => ['required']
             ]);
 
-            $data = Sampling::create([
-                'no_sample' => $request->no_sample,
-                'sampling_location' => $request->sampling_location,
-                'resume_lims_id' => 1,
-                'date' => $request->date,
-                'time' => $request->time,
-                'method' => $request->method,
-                'date_received' => $request->date_received,
-                'itd_start' => $request->itd_start,
-                'itd_end' => $request->itd_end,
+            // Buat Resume baru
+            $resume = Resume::create([
+                'customer' => $request->customer,
+                'address' => $request->address,
+                'contact_name' => $request->contact_name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'sample_taken_by' => $request->sample_taken_by,
+                'sample_receive_date' => $request->sample_receive_date,
+                'sample_analysis_date' => $request->sample_analysis_date,
+                'report_date' => $request->report_date,
             ]);
 
-            if ($data) {
-                return redirect()->route('institute.index')->with('msg', 'Data ('.$request->no_sample.') added successfully');
+            // Simpan sample_description_id ke tabel pivot
+            if ($request->has('sample_description_id')) {
+                $resume->sampleDescriptions()->attach($request->sample_description_id);
             }
+
+            return redirect()->route('institute.index')->with('msg', 'Data berhasil ditambahkan');
         }
 
-        $data = Resume::findOrFail($id);
-        $description = SampleDescription::all();
-        // dd($description);
-        return view('institute.add_sampling', compact('data','description'));
+        $data = Resume::all();
+        $description = SampleDescription::orderBy('name')->get();
+        return view('institute.create', compact('data', 'description'));
     }
 
     //Data institute

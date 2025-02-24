@@ -23,9 +23,4 @@ class SampleDescription extends Model
     {
         return $this->hasMany(Resume::class, 'sample_description_id', 'id');
     }
-
-    public function ambient()
-    {
-        return $this->hasMany(AmbientAir::class, 'sample_description_id', 'id');
-    }
 }

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'Regulation')
+@section('title', 'Sampling Time')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -29,13 +29,13 @@
 @endsection
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-        <li class="nav-item"><a class="nav-link active" href="{{ route('coa.regulation.index') }}"><i
+        <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation.index') }}"><i
                     class="bx bx-add-to-queue me-1"></i>
                 Regulation</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('coa.parameter.index') }}"><i
                     class="bx bx-chart me-1"></i>
                 Parameter</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('coa.sampling_time.index') }}"><i
+        <li class="nav-item"><a class="nav-link active" href="{{ route('coa.sampling_time.index') }}"><i
                     class="bx bx-chart me-1"></i>
                 Sampling Time</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation_standard.index') }}"><i
@@ -63,7 +63,7 @@
                     <div class="offcanvas offcanvas-end @if($errors->all()) show @endif" tabindex="-1" id="newrecord"
                         aria-labelledby="offcanvasEndLabel">
                         <div class="offcanvas-header">
-                            <h5 id="offcanvasEndLabel" class="offcanvas-title">Add Regulation</h5>
+                            <h5 id="offcanvasEndLabel" class="offcanvas-title">Add Sampling Time</h5>
                             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
                                 aria-label="Close"></button>
                         </div>
@@ -72,32 +72,12 @@
                                 id="form-add-new-record" method="POST" action="">
                                 @csrf
                                 <div class="col-sm-12 fv-plugins-icon-container">
-                                    <label class="form-label" for="basicDate">Sample Description</label>
+                                    <label class="form-label" for="basicDate">Time</label>
                                     <div class="input-group input-group-merge has-validation">
-                                    <select
-                                        class="form-select @error('sample_description_id') is-invalid @enderror input-sm select2-modal"
-                                        name="sample_description_id" id="sample_description_id">
-                                        <option value="">-- Select Sample Description --</option>
-                                        @foreach($description as $p)
-                                            <option value="{{ $p->id }}" {{ old('sample_description_id') == $p->id ? 'selected' : '' }}>
-                                                {{ $p->id }} - {{ $p->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                        @error('sample_description_id')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 fv-plugins-icon-container">
-                                    <label class="form-label" for="basicDate">Name Regulation</label>
-                                    <div class="input-group input-group-merge has-validation">
-                                        <textarea type="text" class="form-control @error('title')  is-invalid @enderror"
-                                            maxlength="120" name="title" placeholder="Input The New Criteria"
-                                            value="{{ old('title') }}"></textarea>
-                                        @error('title')
+                                        <input type="text" class="form-control @error('time')  is-invalid @enderror"
+                                            maxlength="120" name="time" placeholder="Example 1 Hours, 24 Hours, 1 Year"
+                                            value="{{ old('time') }}"></input>
+                                        @error('time')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
@@ -115,10 +95,9 @@
                     <table class="table" id="datatable">
                         <thead>
                             <tr>
-                                <th><b>No</b></th>
-                                <th><b>Subject</b></th>
-                                <th><b>Name</b></th>
-                                <th><b>Action</b></th>
+                                <th scope="col" width="20px"><b>No</b></th>
+                                <th><b>Time</b></th>
+                                <th scope="col" width="20px"><b>Action</b></th>
                             </tr>
                         </thead>
                     </table>
@@ -178,7 +157,7 @@
                 searchPlaceholder: 'Search..',
             },
             ajax: {
-                url: "{{ route('coa.regulation.data_regulation') }}",
+                url: "{{ route('coa.sampling_time.data_sampling_time') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
                     d.select_description = $('#select_description').val()
@@ -197,20 +176,7 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        // Check if row.category exists and has an id
-                        if (row.description && row.description.id) {
-                            var html =
-                                `<a class="text-dark" title="${row.description.name}" href="">${row.description.name}</a>`;
-                            return html;
-                        } else {
-                            return ''; // Return empty string or handle the case where regulation.title is missing
-                        }
-                    },
-                    className: "text-center"
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        return row.title;
+                        return row.time;
                     },
                     orderable: false
                 },
@@ -218,11 +184,8 @@
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-warning badge-icon" title="Edit Regulation" style="cursor:pointer" href="{{ url('coa/regulation/edit_regulation/${row.id}') }}">
-                                    <i class="bx bx-pencil icon-white"></i></a>
-                                    <a class="badge bg-danger badge-icon" title="Delete Regulation" style="cursor:pointer"
-                                    onclick="DeleteId(\'` + row.id + `\',\'` + row.title + `\')" >
-                                    <i class='bx bx-trash icon-white'></i></a>`;
+                            html = `<a class="badge bg-warning badge-icon" title="Add Resume COA" href="{{ url('coa/add_sampling/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
                         }
                         return html;
                     },
@@ -235,39 +198,5 @@
             table.draw();
         });
     });
-
-    function DeleteId(id, data) {
-        swal({
-                title: "Apa kamu yakin?",
-                text: "Setelah dihapus, data (" + data + ") tidak dapat dipulihkan!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then((willDelete) => {
-                if (willDelete) {
-                    $.ajax({
-                        url: "{{ route('coa.regulation.delete_regulation') }}",
-                        type: "DELETE",
-                        data: {
-                            "id": id,
-                            "_token": $("meta[name='csrf-token']").attr("content"),
-                        },
-                        success: function (data) {
-                            if (data['success']) {
-                                swal(data['message'], {
-                                    icon: "success",
-                                });
-                                $('#datatable').DataTable().ajax.reload();
-                            } else {
-                                swal(data['message'], {
-                                    icon: "error",
-                                });
-                            }
-                        }
-                    })
-                }
-            })
-    }
 </script>
 @endsection

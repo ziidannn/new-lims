@@ -49,12 +49,24 @@ Route::group(['prefix' => 'resume'], function () {
 });
 
 Route::group(['prefix' => 'coa'], function () {
-    Route::get('/regulation', [CoaController::class, 'index'])->name('coa.regulation.index')->middleware('auth');
+    Route::any('/regulation', [CoaController::class, 'index'])->name('coa.regulation.index')->middleware('auth');
     Route::get('/data_regulation', [CoaController::class, 'data_regulation'])->name('coa.regulation.data_regulation');
-    Route::any('/add', [CoaController::class, 'add'])->name('coa.add');
-    Route::any('/create', [CoaController::class, 'create'])->name('coa.create');
-    Route::any('/add_sampling/{id}', [CoaController::class, 'add_description'])->name('coa.add_sampling');
-    Route::get('/parameter', [CoaController::class, 'parameter'])->name('coa.parameter.index')->middleware('auth');
+    Route::any('/regulation/edit_regulation/{id}', [CoaController::class, 'edit_regulation'])->name('coa.regulation.edit');
+    Route::delete('/regulation/delete_regulation', [CoaController::class, 'delete_regulation'])->name('coa.regulation.delete_regulation');
+
+    //parameter
+    Route::any('/parameter', [CoaController::class, 'parameter'])->name('coa.parameter.index')->middleware('auth');
+    Route::any('/parameter/add_parameter', [CoaController::class, 'add_parameter'])->name('parameter.add_parameter');
+    Route::get('/data_parameter', [CoaController::class, 'data_parameter'])->name('coa.parameter.data_parameter');
+    Route::any('/parameter/edit_parameter/{id}', [CoaController::class, 'edit_parameter'])->name('coa.parameter.edit');
+
+    //sampling_time
+    Route::any('/sampling_time', [CoaController::class, 'sampling_time'])->name('coa.sampling_time.index')->middleware('auth');
+    Route::get('/data_sampling_time', [CoaController::class, 'data_sampling_time'])->name('coa.sampling_time.data_sampling_time');
+
+    //regulation_standard
+    Route::any('/regulation_standard', [CoaController::class, 'regulation_standard'])->name('coa.regulation_standard.index')->middleware('auth');
+    Route::get('/data_regulation_standard', [CoaController::class, 'data_regulation_standard'])->name('coa.regulation_standard.data_regulation_standard');
 });
 
 Route::middleware('auth')->group(function () {

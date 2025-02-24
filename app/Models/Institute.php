@@ -5,20 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AmbientAir extends Model
+class Institute extends Model
 {
     use HasFactory;
-    protected $table = 'ambient_airs';
+    protected $table = 'institutes';
     public $timestamps = true;
     public $incrementing = true;
     protected $fillable = [
-            'name_parameter',
-            'sample_description_id',
-            'sampling_time',
-            'testing_result',
-            'regulation',
-            'unit',
-            'method',
+        'customer',
+        'address',
+        'contact_name',
+        'email',
+        'phone',
+        'sample_taken_by',
+        'sample_receive_date',
+        'sample_analysis_date',
+        'report_date'
     ];
 
     public function description()
