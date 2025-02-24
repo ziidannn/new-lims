@@ -180,7 +180,7 @@
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-dark badge-icon" title="Viwe Resume" href="{{ url('pdf/view//${row.id}') }}">
+                            html = `<a class="badge bg-dark badge-icon" title="Viwe Resume" href="/preview-pdf/${row.Id}">
                                     <i class="bx bx-plus icon-white"></i></a>
                                     <a class="badge bg-warning badge-icon" title="Edit Audit Plan" href="/${row.id}">
                                     <i class="bx bx-pencil"></i></a>
@@ -232,6 +232,5 @@
                 }
             })
     }
-
 </script>
 @endsection

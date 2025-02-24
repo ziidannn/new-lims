@@ -4,21 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Models\Resume;
 use Illuminate\Http\Request;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PDFController extends Controller
 {
-    public function view(Request $request, $id)
+    public function generatePdf($customerId)
     {
-        $data = Resume::findOrFail($id);
-        return view("pdf.view", ['data' => $data]);
+        $resume = Resume::where('id', $customerId)->get();
+        $data = [
+            'title' => 'Resume Limses',
+            'date' => date('m/d/y'),
+            'resume' => $resume // Ensure this key matches the variable used in the view
+        ];
+        $pdf = Pdf::loadView('pdf.resume_generate_pdf', $data);
+        return $pdf->download('resume_limses.pdf');
     }
 
-    public function view_pdf()
+    public function previewPdf($customerId)
     {
-        $mpdf = new \Mpdf\Mpdf();
-        $mpdf->WriteHTML('<h1>Hello world!</h1>');
-        $mpdf->Output();
+        $resume = Resume::where('id', $customerId)->get();
+        $data = [
+            'title' => 'Resume Limses',
+            'date' => date('m/d/y'),
+            'resume' => $resume // Ensure this key matches the variable used in the view
+        ];
+        $pdf = Pdf::loadView('pdf.resume_generate_pdf', $data);
+        return $pdf->stream('resume_limses.pdf'); // Display PDF in the browser
     }
 }
 
