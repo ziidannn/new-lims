@@ -12,6 +12,7 @@ class Sampling extends Model
     public $timestamps = true;
     public $incrementing = true;
     protected $fillable = [
+        'institute_id',
         'no_sample',
         'sampling_location',
         'sample_description_id',
@@ -21,7 +22,6 @@ class Sampling extends Model
         'date_received',
         'itd_start',
         'itd_end',
-        're'
     ];
 
     public function description()

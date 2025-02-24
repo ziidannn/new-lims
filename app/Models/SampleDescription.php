@@ -15,9 +15,9 @@ class SampleDescription extends Model
 
     protected $fillable = ['name'];
 
-    public function resumes()
+    public function institute()
     {
-        return $this->belongsToMany(Resume::class, 'resume_sample_description', 'sample_description_id', 'resume_id');
+        return $this->belongsToMany(Institute::class, 'institute_sample_descriptions', 'sample_description_id', 'institute_id');
     }
     public function resume()
     {

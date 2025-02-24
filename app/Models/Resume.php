@@ -26,7 +26,7 @@ class Resume extends Model
 
     public function sampleDescriptions()
     {
-        return $this->belongsToMany(SampleDescription::class, 'resume_sample_description', 'resume_id', 'sample_description_id');
+        return $this->belongsToMany(SampleDescription::class, 'institute_sample_descriptions', 'institute_id', 'sample_description_id');
     }
     public function description()
     {

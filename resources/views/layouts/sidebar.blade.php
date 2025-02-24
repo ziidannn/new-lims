@@ -25,7 +25,7 @@
         @can('setting/manage_account/users.read')
         <li class="menu-item {{ request()->segment(1) == 'institute' ? 'active' : '' }}">
             <a href="{{ route('institute.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-area"></i>
+                <i class="menu-icon tf-icons bx bx-buildings"></i>
                 <div data-i18n="institute">Institute</div>
             </a>
         </li>
@@ -33,7 +33,7 @@
         @can('setting/manage_account/users.read')
         <li class="menu-item {{ request()->segment(1) == 'resume' ? 'active' : '' }}">
             <a href="{{ route('resume.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-add-to-queue"></i>
+                <i class="menu-icon tf-icons bx bx-file-find"></i>
                 <div data-i18n="resume">Resume</div>
             </a>
         </li>
@@ -86,7 +86,7 @@
         @can('setting/manage_account/users.read')
         <li class="menu-item {{ request()->segment(1) == 'coa' ? 'active' : '' }}">
             <a href="{{ route('coa.regulation.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-cog"></i>
+                <i class="menu-icon tf-icons bx bx-copyright"></i>
                 <div data-i18n="coa">Manage COA</div>
             </a>
         </li>

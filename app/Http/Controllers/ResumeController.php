@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Institute;
+use App\Models\InstituteSampleDescription;
+use App\Models\Parameter;
 use App\Models\Resume;
 use Illuminate\Http\Request;
 use App\Models\Sampling;
@@ -17,59 +20,106 @@ class ResumeController extends Controller
         return view('resume.index', compact('data', 'description'));
     }
 
-    public function add(Request $request) {
+    public function list_resume(Request $request, $id)
+    {
+        // Ambil data institute berdasarkan ID yang dikirim
+        $institute = Institute::findOrFail($id);
+
+        // Ambil data yang berelasi dari tabel institute_sample_descriptions
+        $institute_description = InstituteSampleDescription::where('institute_id', $id)->get();
+
+        return view('resume.list_resume', compact('institute', 'institute_description'));
+    }
+
+    public function getDataResume($id)
+    {
+        $data = InstituteSampleDescription::where('institute_id', $id)
+            ->with('sampleDescription') // Pastikan relasi ke sample_description dimuat
+            ->get();
+
+        return response()->json(['data' => $data]);
+    }
+
+    public function add_sample(Request $request, $id) {
         if ($request->isMethod('POST')) {
-            $this->validate($request, [
+            $institute = Institute::findOrFail($id);
+
+            $validatedData = $request->validate([
                 'no_sample' => ['required'],
                 'sampling_location' => ['required'],
+                'sample_description_id' => ['required', 'integer'], // Pastikan hanya menerima integer
                 'date' => ['required'],
                 'time' => ['required'],
                 'method' => ['required'],
                 'date_received' => ['required'],
                 'itd_start' => ['required'],
                 'itd_end' => ['required'],
+                'testing_results.*' => ['required'], // Validasi untuk inputan testing result
             ]);
 
-            $data = Sampling::create([
-                'no_sample' => $request->no_sample,
-                'sampling_location' => $request->sampling_location,
-                'sample_description_id' => 1, // Master Data dengan ID 1
-                'date' => $request->date,
-                'time' => $request->time,
-                'method' => $request->method,
-                'date_received' => $request->date_received,
-                'itd_start' => $request->itd_start,
-                'itd_end' => $request->itd_end,
-            ]);
+            // Tambahkan institute_id secara manual sebelum menyimpan
+            $validatedData['institute_id'] = $id;
 
-            if ($data) {
-                return redirect()->route('ambient_air.index')->with('msg', 'Data ('.$request->no_sample.') added successfully');
-            }
+            // Simpan data ke tabel Sampling
+            $sampling = Sampling::create($validatedData);
+
+            return back()->with('msg', 'Data Sample (' . $request->no_sample . ') and Resume saved successfully');
         }
 
-        $data = Sampling::all();
-        return view('ambient_air.add', compact('data'));
+        $samplings = Sampling::all();
+        $institute = Institute::findOrFail($id);
+        $description = SampleDescription::orderBy('name')->get();
+        $parameters = Parameter::orderBy('name')->get();
+        return view('resume.add_resume', compact('samplings','institute', 'description','parameters'));
     }
 
-    public function create(Request $request) {
+    public function add_resume(Request $request, $id) {
         if ($request->isMethod('POST')) {
-            $this->validate($request, [
-                'testing_result.*' => ['required'], // Validasi array input
+            $institute = Institute::findOrFail($id);
+
+            $validatedData = $request->validate([
+                'no_sample' => ['required'],
+                'sampling_location' => ['required'],
+                'sample_description_id' => ['required', 'integer'], // Pastikan hanya menerima integer
+                'date' => ['required'],
+                'time' => ['required'],
+                'method' => ['required'],
+                'date_received' => ['required'],
+                'itd_start' => ['required'],
+                'itd_end' => ['required'],
+                'testing_results.*' => ['required'], // Validasi untuk inputan testing result
             ]);
 
-            foreach ($request->testing_result as $id => $result) {
-                Resume::where('id', $id)->update([
-                    'testing_result' => $result,
-                    'sample_description_id' => $request->sample_description_id[$id] ??'',
-                ]);
+            // Tambahkan institute_id secara manual sebelum menyimpan
+            $validatedData['institute_id'] = $id;
+
+            // Simpan data ke tabel Sampling
+            $sampling = Sampling::create($validatedData);
+
+            // Simpan data ke tabel Resumes berdasarkan Sampling ID
+            if ($request->has('testing_results')) {
+                foreach ($request->testing_results as $key => $result) {
+                    Resume::create([
+                        'sampling_id' => $sampling->id,
+                        'sample_description_id' => $request->sample_description_id,
+                        'name_parameter' => $request->parameters[$key] ?? null,
+                        'sampling_time' => $request->sampling_times[$key] ?? null,
+                        'testing_result' => $result,
+                        'regulation' => $request->regulations[$key] ?? null,
+                        'unit' => $request->units[$key] ?? null,
+                        'method' => $request->methods[$key] ?? null,
+                    ]);
+                }
             }
 
-            return redirect()->route('resume.index')->with('msg', 'Data added successfully');
+            return back()->with('msg', 'Data Resume (' . $request->no_sample . ') saved successfully');
         }
 
-        $data = Resume::all();
+        $samplings = Sampling::all();
+        $resumes = Resume::all();
+        $institute = Institute::findOrFail($id);
         $description = SampleDescription::orderBy('name')->get();
-        return view('resume.create', compact('data','description'));
+        return view('resume.add_resume', compact('samplings','resumes','institute', 'description'));
     }
 
     public function data(Request $request)

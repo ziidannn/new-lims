@@ -38,21 +38,25 @@ Route::group(['prefix' => 'institute'], function () {
     Route::delete('/delete', [InstituteController::class, 'delete'])->name('institute.delete');
     Route::any('/add', [InstituteController::class, 'add'])->name('institute.add');
     Route::any('/create', [InstituteController::class, 'create'])->name('institute.create');
-    Route::any('/add_sampling/{id}', [InstituteController::class, 'add_description'])->name('institute.add_sampling');
 });
 
 Route::group(['prefix' => 'resume'], function () {
     Route::any('/', [ResumeController::class, 'index'])->name('resume.index')->middleware('auth');
     Route::get('/data', [ResumeController::class, 'data'])->name('resume.data');
     Route::delete('/delete', [ResumeController::class, 'delete'])->name('resume.delete');
-    Route::any('/resume/create', [ResumeController::class, 'create'])->name('resume.create');
+    // Route::any('/resume/create', [ResumeController::class, 'create'])->name('resume.create');
+    Route::any('/add_resume/{id}', [ResumeController::class, 'add_resume'])->name('resume.add_resume');
+    Route::any('/add_sample/{id}', [ResumeController::class, 'add_sample'])->name('resume.add_sample');
+    Route::any('/list_resume/{id}', [ResumeController::class, 'list_resume'])->name('resume.list_resume');
+    Route::get('/getDataResume/{id}', [ResumeController::class, 'getDataResume'])->name('resume.getDataResume');
 });
 
 Route::group(['prefix' => 'coa'], function () {
     Route::any('/regulation', [CoaController::class, 'index'])->name('coa.regulation.index')->middleware('auth');
     Route::get('/data_regulation', [CoaController::class, 'data_regulation'])->name('coa.regulation.data_regulation');
-    Route::any('/regulation/edit_regulation/{id}', [CoaController::class, 'edit_regulation'])->name('coa.regulation.edit');
     Route::delete('/regulation/delete_regulation', [CoaController::class, 'delete_regulation'])->name('coa.regulation.delete_regulation');
+    Route::any('/regulation/update/{id}', [CoaController::class, 'edit_regulation'])->name('coa.regulation.update');
+    // Route::any('/regulation/edit_regulation/{id}', [CoaController::class, 'edit_regulation'])->name('coa.regulation.edit');
 
     //parameter
     Route::any('/parameter', [CoaController::class, 'parameter'])->name('coa.parameter.index')->middleware('auth');
@@ -63,10 +67,12 @@ Route::group(['prefix' => 'coa'], function () {
     //sampling_time
     Route::any('/sampling_time', [CoaController::class, 'sampling_time'])->name('coa.sampling_time.index')->middleware('auth');
     Route::get('/data_sampling_time', [CoaController::class, 'data_sampling_time'])->name('coa.sampling_time.data_sampling_time');
+    Route::any('/sampling_time/update/{id}', [CoaController::class, 'edit_sampling_time'])->name('coa.sampling_time.update');
 
     //regulation_standard
     Route::any('/regulation_standard', [CoaController::class, 'regulation_standard'])->name('coa.regulation_standard.index')->middleware('auth');
     Route::get('/data_regulation_standard', [CoaController::class, 'data_regulation_standard'])->name('coa.regulation_standard.data_regulation_standard');
+    Route::any('/regulation_standard/update/{id}', [CoaController::class, 'edit_regulation_standard'])->name('coa.regulation_standard.update');
 });
 
 Route::middleware('auth')->group(function () {

@@ -106,6 +106,8 @@ class CoaController extends Controller
             ->make(true);
     }
 
+    //----------------------------------------------- P A R A M E T E R ----------------------------------------------------//
+
     public function parameter(Request $request)
     {
         if ($request->isMethod('POST')) {
@@ -262,6 +264,8 @@ class CoaController extends Controller
             ->make(true);
     }
 
+    //----------------------------------- S A M P L I N G  T I M E ------------------------------------------//
+
     //sampling_time
     public function sampling_time(Request $request)
     {
@@ -281,6 +285,26 @@ class CoaController extends Controller
 
         $data = SamplingTime::all();
         return view('coa.sampling_time.index', compact('data'));
+    }
+
+    public function edit_sampling_time(Request $request, $id){
+
+        $data = SamplingTime::findOrFail($id);
+
+        if ($request->isMethod('POST')) {
+            $this->validate($request, [
+            'time'    => 'string', 'max:191',
+        ]);
+
+        $data->update([
+            'time'=> $request->time,
+        ]);
+            if ($data) {
+                return redirect()->route('coa.sampling_time.index')->with('msg', 'Data Sampling Time ('.$request->time.') added successfully');
+            }
+        }
+
+        return view('coa.sampling_time.edit', compact('data'));
     }
 
     //data_sampling_time
@@ -309,6 +333,7 @@ class CoaController extends Controller
             ->make(true);
     }
 
+    //----------------------------------- R E G U L A T I O N  S T A N D A R D ------------------------------------------//
 
     public function regulation_standard(Request $request)
     {
@@ -328,6 +353,25 @@ class CoaController extends Controller
 
         $data = RegulationStandard::all();
         return view('coa.regulation_standard.index', compact('data'));
+    }
+
+    public function edit_regulation_standard(Request $request, $id)
+    {
+        $data = RegulationStandard::findOrFail($id);
+
+        if ($request->isMethod('POST')) {
+            $this->validate($request, [
+                'title' => 'required|string|max:191',
+            ]);
+
+            $data->update([
+                'title' => $request->title,
+            ]);
+
+            return redirect()->route('coa.regulation_standard.index')->with('msg', 'Regulation Standard updated successfully.');
+        }
+
+        return view('coa.regulation_standard.edit', compact('data'));
     }
 
     //data_regulation

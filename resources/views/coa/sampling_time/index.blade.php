@@ -13,7 +13,6 @@
 
 @section('style')
 <style>
-
     .badge-icon {
         display: inline-block;
         font-size: 1em;
@@ -46,65 +45,90 @@
 <div class="card">
     <div class="card-datatable table-responsive">
         <div class="card-header">
-                <div class="row">
-                    <div class="col-md-3">
-                        <select id="select_description" class="form-control input-sm select2" data-placeholder="Description">
-                            <option value="">Select Description</option>
-                        </select>
-                    </div>
-                    <div class="col-md d-flex justify-content-center justify-content-md-end">
-                        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#newrecord"
-                            aria-controls="offcanvasEnd" tabindex="0" aria-controls="DataTables_Table_0"
-                            title="Add Standard Criteria" type="button"><span><i class="bx bx-plus me-sm-2"></i>
-                                <span>Add</span></span>
-                        </button>
-                    </div>
-
-                    <div class="offcanvas offcanvas-end @if($errors->all()) show @endif" tabindex="-1" id="newrecord"
-                        aria-labelledby="offcanvasEndLabel">
-                        <div class="offcanvas-header">
-                            <h5 id="offcanvasEndLabel" class="offcanvas-title">Add Sampling Time</h5>
-                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="offcanvas-body my-auto mx-0 flex-grow-1">
-                            <form class="add-new-record pt-0 row g-2 fv-plugins-bootstrap5 fv-plugins-framework"
-                                id="form-add-new-record" method="POST" action="">
-                                @csrf
-                                <div class="col-sm-12 fv-plugins-icon-container">
-                                    <label class="form-label" for="basicDate">Time</label>
-                                    <div class="input-group input-group-merge has-validation">
-                                        <input type="text" class="form-control @error('time')  is-invalid @enderror"
-                                            maxlength="120" name="time" placeholder="Example 1 Hours, 24 Hours, 1 Year"
-                                            value="{{ old('time') }}"></input>
-                                        @error('time')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 mt-4">
-                                    <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">Create</button>
-                                    <button type="reset" class="btn btn-outline-secondary"
-                                        data-bs-dismiss="offcanvas">Cancel</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <table class="table" id="datatable">
-                        <thead>
-                            <tr>
-                                <th scope="col" width="20px"><b>No</b></th>
-                                <th><b>Time</b></th>
-                                <th scope="col" width="20px"><b>Action</b></th>
-                            </tr>
-                        </thead>
-                    </table>
+            <div class="row">
+                <div class="col-md-3">
+                    <select id="select_description" class="form-control input-sm select2"
+                        data-placeholder="Description">
+                        <option value="">Select Description</option>
+                    </select>
                 </div>
+                <div class="col-md d-flex justify-content-center justify-content-md-end">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#newrecord"
+                        aria-controls="offcanvasEnd" tabindex="0" aria-controls="DataTables_Table_0"
+                        title="Add Standard Criteria" type="button"><span><i class="bx bx-plus me-sm-2"></i>
+                            <span>Add</span></span>
+                    </button>
+                </div>
+
+                <div class="offcanvas offcanvas-end @if($errors->all()) show @endif" tabindex="-1" id="newrecord"
+                    aria-labelledby="offcanvasEndLabel">
+                    <div class="offcanvas-header">
+                        <h5 id="offcanvasEndLabel" class="offcanvas-title">Add Sampling Time</h5>
+                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body my-auto mx-0 flex-grow-1">
+                        <form class="add-new-record pt-0 row g-2 fv-plugins-bootstrap5 fv-plugins-framework"
+                            id="form-add-new-record" method="POST" action="">
+                            @csrf
+                            <div class="col-sm-12 fv-plugins-icon-container">
+                                <label class="form-label" for="basicDate">Time</label>
+                                <div class="input-group input-group-merge has-validation">
+                                    <input type="text" class="form-control @error('time')  is-invalid @enderror"
+                                        maxlength="120" name="time" placeholder="Example 1 Hours, 24 Hours, 1 Year"
+                                        value="{{ old('time') }}"></input>
+                                    @error('time')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-sm-12 mt-4">
+                                <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">Create</button>
+                                <button type="reset" class="btn btn-outline-secondary"
+                                    data-bs-dismiss="offcanvas">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <table class="table" id="datatable">
+                    <thead>
+                        <tr>
+                            <th><b>No</b></th>
+                            <th><b>Time</b></th>
+                            <th><b>Action</b></th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
+</div>
+<!-- Modal for Edit Sampling Time -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Sampling Time</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editForm" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editTitle" class="form-label">Time</label>
+                        <input type="text" class="form-control" id="editTitle" name="time" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')
@@ -160,7 +184,7 @@
                 url: "{{ route('coa.sampling_time.data_sampling_time') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
-                    d.select_description = $('#select_description').val()
+                        d.select_description = $('#select_description').val()
                 },
             },
             columnDefs: [{
@@ -182,12 +206,15 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        var html = '';
-                        {
-                            html = `<a class="badge bg-warning badge-icon" title="Add Resume COA" href="{{ url('coa/add_sampling/${row.id}') }}">
-                                    <i class="bx bx-plus icon-white"></i></a>`;
-                        }
-                        return html;
+                        return `
+                            <a class="badge bg-warning badge-icon edit-btn" title="Edit Sampling Time"
+                            style="cursor:pointer" data-id="${row.id}" data-time="${row.time}">
+                                <i class="bx bx-pencil icon-white"></i>
+                            </a>
+                            <a class="badge bg-danger badge-icon" title="Delete Sampling Time" style="cursor:pointer"
+                            onclick="DeleteId('${row.id}', '${row.time}')">
+                                <i class='bx bx-trash icon-white'></i>
+                            </a>`;
                     },
                     orderable: false,
                     className: "text-md-center"
@@ -198,5 +225,46 @@
             table.draw();
         });
     });
+
+</script>
+<script>
+    $(document).ready(function () {
+        $(document).on('click', '.edit-btn', function () {
+            let id = $(this).data('id');
+            let time = $(this).data('time');
+
+            // Set data ke dalam modal
+            $('#editTitle').val(time);
+            $('#editForm').attr('action', `/coa/sampling_time/update/${id}`);
+
+            // Tampilkan modal
+            $('#editModal').modal('show');
+        });
+
+        // Handle form submission
+        $('#editForm').submit(function (e) {
+            e.preventDefault();
+
+            let form = $(this);
+            let url = form.attr('action');
+            let formData = form.serialize();
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    $('#editModal').modal('hide');
+                    swal("Success!", "Sampling Time updated successfully.",
+                        "success");
+                    $('#datatable').DataTable().ajax.reload();
+                },
+                error: function (xhr) {
+                    alert("Error updating data.");
+                }
+            });
+        });
+    });
+
 </script>
 @endsection

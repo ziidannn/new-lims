@@ -37,12 +37,12 @@
 
                         </select>
                     </div>
-                    <div class="col-md d-flex justify-content-center justify-content-md-end">
+                    <!-- <div class="col-md d-flex justify-content-center justify-content-md-end">
                         <a class="btn btn-primary btn-block btn-mail" title="Add new"
                             href="{{ route('institute.create')}}">
                             <i data-feather="plus"></i>+ Add
                         </a>
-                    </div>
+                    </div> -->
                     <table class="table" id="datatable">
                         <thead>
                             <tr>
@@ -112,7 +112,7 @@
                 searchPlaceholder: 'Search..',
             },
             ajax: {
-                url: "{{ route('resume.data') }}",
+                url: "{{ route('institute.data') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
                     d.select_description = $('#select_description').val()
@@ -188,12 +188,8 @@
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('resume/add_sampling/${row.id}') }}">
-                                    <i class="bx bx-plus icon-white"></i></a>
-                                    <a class="badge bg-warning badge-icon" title="Edit Sampling" href="/${row.id}">
-                                    <i class="bx bx-pencil"></i></a>
-                                    <a class="badge bg-danger badge-icon" title="Delete Sampling" style="cursor:pointer" onclick="DeleteId('${row.id}')">
-                                    <i class="bx bx-trash icon-white"></i></a>`;
+                            html = `<a class="badge bg-warning badge-icon" title="List Resume" href="{{ url('resume/list_resume/${row.id}') }}">
+                                    <i class="bx bx-pencil"></i></a>`;
                         }
                         return html;
                     },

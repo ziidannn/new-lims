@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AmbientAir;
 use App\Models\Location;
-use App\Models\Resume;
+use App\Models\Institute;
 use App\Models\Sampling;
 use App\Models\SampleDescription;
 use Illuminate\Http\Request;
@@ -35,8 +35,8 @@ class InstituteController extends Controller
                 'report_date' => ['required']
             ]);
 
-            // Buat Resume baru
-            $resume = Resume::create([
+            // Buat Institute baru
+            $Institute = Institute::create([
                 'customer' => $request->customer,
                 'address' => $request->address,
                 'contact_name' => $request->contact_name,
@@ -50,13 +50,13 @@ class InstituteController extends Controller
 
             // Simpan sample_description_id ke tabel pivot
             if ($request->has('sample_description_id')) {
-                $resume->sampleDescriptions()->attach($request->sample_description_id);
+                $Institute->sampleDescriptions()->attach($request->sample_description_id);
             }
 
             return redirect()->route('institute.index')->with('msg', 'Data berhasil ditambahkan');
         }
 
-        $data = Resume::all();
+        $data = Institute::all();
         $description = SampleDescription::orderBy('name')->get();
         return view('institute.create', compact('data', 'description'));
     }
@@ -64,7 +64,7 @@ class InstituteController extends Controller
     //Data institute
     public function data(Request $request)
     {
-        $data = Resume::with(['sampleDescriptions' => function ($query) {
+        $data = Institute::with(['sampleDescriptions' => function ($query) {
                 $query->select('sample_descriptions.id', 'sample_descriptions.name');
             }])
             ->select('*')

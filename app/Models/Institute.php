@@ -23,8 +23,17 @@ class Institute extends Model
         'report_date'
     ];
 
+    public function sampleDescriptions()
+    {
+        return $this->belongsToMany(SampleDescription::class, 'institute_sample_descriptions', 'institute_id', 'sample_description_id');
+    }
     public function description()
     {
         return $this->belongsTo(SampleDescription::class, 'sample_description_id', 'id');
     }
+    public function institute_description()
+    {
+        return $this->hasMany(InstituteSampleDescription::class, 'institute_id');
+    }
+
 }

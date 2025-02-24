@@ -13,7 +13,6 @@
 
 @section('style')
 <style>
-
     .badge-icon {
         display: inline-block;
         font-size: 1em;
@@ -46,86 +45,121 @@
 <div class="card">
     <div class="card-datatable table-responsive">
         <div class="card-header">
-                <div class="row">
-                    <div class="col-md-3">
-                        <select id="select_description" class="form-control input-sm select2" data-placeholder="Description">
-                            <option value="">Select Description</option>
-                        </select>
-                    </div>
-                    <div class="col-md d-flex justify-content-center justify-content-md-end">
-                        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#newrecord"
-                            aria-controls="offcanvasEnd" tabindex="0" aria-controls="DataTables_Table_0"
-                            title="Add Standard Criteria" type="button"><span><i class="bx bx-plus me-sm-2"></i>
-                                <span>Add</span></span>
-                        </button>
-                    </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <select id="select_description" class="form-control input-sm select2"
+                        data-placeholder="Description">
+                        <option value="">Select Description</option>
+                    </select>
+                </div>
+                <div class="col-md d-flex justify-content-center justify-content-md-end">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#newrecord"
+                        aria-controls="offcanvasEnd" tabindex="0" aria-controls="DataTables_Table_0"
+                        title="Add Standard Criteria" type="button"><span><i class="bx bx-plus me-sm-2"></i>
+                            <span>Add</span></span>
+                    </button>
+                </div>
 
-                    <div class="offcanvas offcanvas-end @if($errors->all()) show @endif" tabindex="-1" id="newrecord"
-                        aria-labelledby="offcanvasEndLabel">
-                        <div class="offcanvas-header">
-                            <h5 id="offcanvasEndLabel" class="offcanvas-title">Add Regulation</h5>
-                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="offcanvas-body my-auto mx-0 flex-grow-1">
-                            <form class="add-new-record pt-0 row g-2 fv-plugins-bootstrap5 fv-plugins-framework"
-                                id="form-add-new-record" method="POST" action="">
-                                @csrf
-                                <div class="col-sm-12 fv-plugins-icon-container">
-                                    <label class="form-label" for="basicDate">Sample Description</label>
-                                    <div class="input-group input-group-merge has-validation">
+                <div class="offcanvas offcanvas-end @if($errors->all()) show @endif" tabindex="-1" id="newrecord"
+                    aria-labelledby="offcanvasEndLabel">
+                    <div class="offcanvas-header">
+                        <h5 id="offcanvasEndLabel" class="offcanvas-title">Add Regulation</h5>
+                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body my-auto mx-0 flex-grow-1">
+                        <form class="add-new-record pt-0 row g-2 fv-plugins-bootstrap5 fv-plugins-framework"
+                            id="form-add-new-record" method="POST" action="">
+                            @csrf
+                            <div class="col-sm-12 fv-plugins-icon-container">
+                                <label class="form-label" for="basicDate">Sample Description</label>
+                                <div class="input-group input-group-merge has-validation">
                                     <select
                                         class="form-select @error('sample_description_id') is-invalid @enderror input-sm select2-modal"
                                         name="sample_description_id" id="sample_description_id">
                                         <option value="">-- Select Sample Description --</option>
                                         @foreach($description as $p)
-                                            <option value="{{ $p->id }}" {{ old('sample_description_id') == $p->id ? 'selected' : '' }}>
-                                                {{ $p->id }} - {{ $p->name }}
-                                            </option>
+                                        <option value="{{ $p->id }}"
+                                            {{ old('sample_description_id') == $p->id ? 'selected' : '' }}>
+                                            {{ $p->id }} - {{ $p->name }}
+                                        </option>
                                         @endforeach
                                     </select>
-                                        @error('sample_description_id')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                        @enderror
-                                    </div>
+                                    @error('sample_description_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
                                 </div>
-                                <div class="col-sm-12 fv-plugins-icon-container">
-                                    <label class="form-label" for="basicDate">Name Regulation</label>
-                                    <div class="input-group input-group-merge has-validation">
-                                        <textarea type="text" class="form-control @error('title')  is-invalid @enderror"
-                                            maxlength="120" name="title" placeholder="Input The New Criteria"
-                                            value="{{ old('title') }}"></textarea>
-                                        @error('title')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                        @enderror
-                                    </div>
+                            </div>
+                            <div class="col-sm-12 fv-plugins-icon-container">
+                                <label class="form-label" for="basicDate">Name Regulation</label>
+                                <div class="input-group input-group-merge has-validation">
+                                    <textarea type="text" class="form-control @error('title')  is-invalid @enderror"
+                                        maxlength="120" name="title" placeholder="Input The New Criteria"
+                                        value="{{ old('title') }}"></textarea>
+                                    @error('title')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
                                 </div>
-                                <div class="col-sm-12 mt-4">
-                                    <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">Create</button>
-                                    <button type="reset" class="btn btn-outline-secondary"
-                                        data-bs-dismiss="offcanvas">Cancel</button>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="col-sm-12 mt-4">
+                                <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">Create</button>
+                                <button type="reset" class="btn btn-outline-secondary"
+                                    data-bs-dismiss="offcanvas">Cancel</button>
+                            </div>
+                        </form>
                     </div>
-                    <table class="table" id="datatable">
-                        <thead>
-                            <tr>
-                                <th><b>No</b></th>
-                                <th><b>Subject</b></th>
-                                <th><b>Name</b></th>
-                                <th><b>Action</b></th>
-                            </tr>
-                        </thead>
-                    </table>
                 </div>
+                <table class="table" id="datatable">
+                    <thead>
+                        <tr>
+                            <th><b>No</b></th>
+                            <th><b>Subject</b></th>
+                            <th><b>Name</b></th>
+                            <th><b>Action</b></th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
+</div>
+<!-- Modal for Edit Regulation -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Regulation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editForm" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editSampleDescription" class="form-label">Sample Description</label>
+                        <select class="form-select" id="editSampleDescription" name="sample_description_id" required>
+                            <option value="">-- Select Sample Description --</option>
+                            @foreach($description as $p)
+                            <option value="{{ $p->id }}">{{ $p->id }} - {{ $p->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="editTitle" name="title" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')
@@ -181,7 +215,7 @@
                 url: "{{ route('coa.regulation.data_regulation') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
-                    d.select_description = $('#select_description').val()
+                        d.select_description = $('#select_description').val()
                 },
             },
             columnDefs: [{
@@ -216,19 +250,35 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        var html = '';
-                        {
-                            html = `<a class="badge bg-warning badge-icon" title="Edit Regulation" style="cursor:pointer" href="{{ url('coa/regulation/edit_regulation/${row.id}') }}">
-                                    <i class="bx bx-pencil icon-white"></i></a>
-                                    <a class="badge bg-danger badge-icon" title="Delete Regulation" style="cursor:pointer"
-                                    onclick="DeleteId(\'` + row.id + `\',\'` + row.title + `\')" >
-                                    <i class='bx bx-trash icon-white'></i></a>`;
-                        }
-                        return html;
+                        return `
+                            <a class="badge bg-warning badge-icon edit-btn" title="Edit Regulation"
+                            style="cursor:pointer" data-id="${row.id}" data-title="${row.title}"
+                            data-sample_description_id="${row.sample_description_id}">
+                                <i class="bx bx-pencil icon-white"></i>
+                            </a>
+                            <a class="badge bg-danger badge-icon" title="Delete Regulation" style="cursor:pointer"
+                            onclick="DeleteId('${row.id}', '${row.title}')">
+                                <i class='bx bx-trash icon-white'></i>
+                            </a>`;
                     },
                     orderable: false,
                     className: "text-md-center"
                 }
+                // {
+                //     render: function (data, type, row, meta) {
+                //         var html = '';
+                //         {
+                //             html = `<a class="badge bg-warning badge-icon" title="Edit Regulation" style="cursor:pointer" href="{{ url('coa/regulation/edit_regulation/${row.id}') }}">
+                //                     <i class="bx bx-pencil icon-white"></i></a>
+                //                     <a class="badge bg-danger badge-icon" title="Delete Regulation" style="cursor:pointer"
+                //                     onclick="DeleteId(\'` + row.id + `\',\'` + row.title + `\')" >
+                //                     <i class='bx bx-trash icon-white'></i></a>`;
+                //         }
+                //         return html;
+                //     },
+                //     orderable: false,
+                //     className: "text-md-center"
+                // }
             ]
         });
         $('#select_description').change(function () {
@@ -269,5 +319,46 @@
                 }
             })
     }
+</script>
+<script>
+    $(document).ready(function () {
+        $(document).on('click', '.edit-btn', function () {
+            let id = $(this).data('id');
+            let sample_description_id = $(this).data('sample_description_id');
+            let title = $(this).data('title');
+
+            // Set data ke dalam modal
+            $('#editTitle').val(title);
+            $('#editSampleDescription').val(sample_description_id);
+            $('#editForm').attr('action', `/coa/regulation/update/${id}`);
+
+            // Tampilkan modal
+            $('#editModal').modal('show');
+        });
+
+        // Handle form submission
+        $('#editForm').submit(function (e) {
+            e.preventDefault();
+
+            let form = $(this);
+            let url = form.attr('action');
+            let formData = form.serialize();
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    $('#editModal').modal('hide');
+                    swal("Success!", "Regulation updated successfully.",
+                    "success");
+                    $('#datatable').DataTable().ajax.reload();
+                },
+                error: function (xhr) {
+                    alert("Error updating data.");
+                }
+            });
+        });
+    });
 </script>
 @endsection

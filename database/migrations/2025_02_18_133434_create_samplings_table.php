@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('samplings', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('institute_id')->nullable();
+            $table->foreign('institute_id')->references('id')->on('institutes');
             $table->string('no_sample');
             $table->string('sampling_location');
             $table->unsignedBigInteger('sample_description_id');

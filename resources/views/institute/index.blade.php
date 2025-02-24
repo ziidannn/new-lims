@@ -112,7 +112,7 @@
                 searchPlaceholder: 'Search..',
             },
             ajax: {
-                url: "{{ route('resume.data') }}",
+                url: "{{ route('institute.data') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
                     d.select_description = $('#select_description').val()
