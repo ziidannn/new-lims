@@ -62,12 +62,14 @@ class ResumeController extends Controller
 
             $validatedData['institute_id'] = $id;
 
-            if ($sampling) {
-                $sampling->update($validatedData);
-                $message = 'Data Sample (' . $request->no_sample . ') updated successfully';
+            if ($sampling->isNotEmpty()) {
+                foreach ($sampling as $sample) {
+                    $sample->update($validatedData);
+                }
+                $message = "Data Sample ({$request->no_sample}) updated successfully";
             } else {
                 $sampling = Sampling::create($validatedData);
-                $message = 'Data Sample (' . $request->no_sample . ') saved successfully';
+                $message = "Data Sample ({$request->no_sample}) saved successfully";
             }
 
             return back()->with('msg', $message);
