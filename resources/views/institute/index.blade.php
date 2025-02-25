@@ -188,8 +188,8 @@
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('resume/add_sampling/${row.id}') }}">
-                                    <i class="bx bx-plus icon-white"></i></a>
+                            html = `<a class="badge bg-dark badge-icon" title="Viwe Resume" href="/preview-pdf/${row.Id}">
+                                    <i class="bx bx-printer"></i></a>
                                     <a class="badge bg-warning badge-icon" title="Edit Sampling" href="/${row.id}">
                                     <i class="bx bx-pencil"></i></a>
                                     <a class="badge bg-danger badge-icon" title="Delete Sampling" style="cursor:pointer" onclick="DeleteId('${row.id}')">
