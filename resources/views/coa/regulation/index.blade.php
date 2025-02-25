@@ -47,9 +47,9 @@
         <div class="card-header">
             <div class="row">
                 <div class="col-md-3">
-                    <select id="select_description" class="form-control input-sm select2"
-                        data-placeholder="Description">
-                        <option value="">Select Description</option>
+                    <select id="select_subjects" class="form-control input-sm select2"
+                        data-placeholder="subjects">
+                        <option value="">Select subjects</option>
                     </select>
                 </div>
                 <div class="col-md d-flex justify-content-center justify-content-md-end">
@@ -72,20 +72,20 @@
                             id="form-add-new-record" method="POST" action="">
                             @csrf
                             <div class="col-sm-12 fv-plugins-icon-container">
-                                <label class="form-label" for="basicDate">Sample Description</label>
+                                <label class="form-label" for="basicDate">Sample subjects</label>
                                 <div class="input-group input-group-merge has-validation">
                                     <select
-                                        class="form-select @error('sample_description_id') is-invalid @enderror input-sm select2-modal"
-                                        name="sample_description_id" id="sample_description_id">
-                                        <option value="">-- Select Sample Description --</option>
-                                        @foreach($description as $p)
+                                        class="form-select @error('subject_id') is-invalid @enderror input-sm select2-modal"
+                                        name="subject_id" id="subject_id">
+                                        <option value="">-- Select Subject --</option>
+                                        @foreach($subjects as $p)
                                         <option value="{{ $p->id }}"
-                                            {{ old('sample_description_id') == $p->id ? 'selected' : '' }}>
+                                            {{ old('subject_id') == $p->id ? 'selected' : '' }}>
                                             {{ $p->id }} - {{ $p->name }}
                                         </option>
                                         @endforeach
                                     </select>
-                                    @error('sample_description_id')
+                                    @error('subject_id')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
@@ -118,7 +118,7 @@
                         <tr>
                             <th><b>No</b></th>
                             <th><b>Subject</b></th>
-                            <th><b>Name</b></th>
+                            <th><b>Regulation</b></th>
                             <th><b>Action</b></th>
                         </tr>
                     </thead>
@@ -139,10 +139,10 @@
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="editSampleDescription" class="form-label">Sample Description</label>
-                        <select class="form-select" id="editSampleDescription" name="sample_description_id" required>
-                            <option value="">-- Select Sample Description --</option>
-                            @foreach($description as $p)
+                        <label for="editSamplesubjects" class="form-label">Sample subjects</label>
+                        <select class="form-select" id="editSamplesubjects" name="subject_id" required>
+                            <option value="">-- Select Sample subjects --</option>
+                            @foreach($subjects as $p)
                             <option value="{{ $p->id }}">{{ $p->id }} - {{ $p->name }}</option>
                             @endforeach
                         </select>
@@ -215,7 +215,7 @@
                 url: "{{ route('coa.regulation.data_regulation') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
-                        d.select_description = $('#select_description').val()
+                        d.select_subjects = $('#select_subjects').val()
                 },
             },
             columnDefs: [{
@@ -232,9 +232,9 @@
                 {
                     render: function (data, type, row, meta) {
                         // Check if row.category exists and has an id
-                        if (row.description && row.description.id) {
+                        if (row.subjects && row.subjects.id) {
                             var html =
-                                `<a class="text-dark" title="${row.description.name}" href="">${row.description.name}</a>`;
+                                `<a class="text-dark" title="${row.subjects.name}" href="">${row.subjects.name}</a>`;
                             return html;
                         } else {
                             return ''; // Return empty string or handle the case where regulation.title is missing
@@ -253,7 +253,7 @@
                         return `
                             <a class="badge bg-warning badge-icon edit-btn" title="Edit Regulation"
                             style="cursor:pointer" data-id="${row.id}" data-title="${row.title}"
-                            data-sample_description_id="${row.sample_description_id}">
+                            data-subject_id="${row.subject_id}">
                                 <i class="bx bx-pencil icon-white"></i>
                             </a>
                             <a class="badge bg-danger badge-icon" title="Delete Regulation" style="cursor:pointer"
@@ -281,7 +281,7 @@
                 // }
             ]
         });
-        $('#select_description').change(function () {
+        $('#select_subjects').change(function () {
             table.draw();
         });
     });
@@ -324,12 +324,12 @@
     $(document).ready(function () {
         $(document).on('click', '.edit-btn', function () {
             let id = $(this).data('id');
-            let sample_description_id = $(this).data('sample_description_id');
+            let subject_id = $(this).data('subject_id');
             let title = $(this).data('title');
 
             // Set data ke dalam modal
             $('#editTitle').val(title);
-            $('#editSampleDescription').val(sample_description_id);
+            $('#editSamplesubjects').val(subject_id);
             $('#editForm').attr('action', `/coa/regulation/update/${id}`);
 
             // Tampilkan modal

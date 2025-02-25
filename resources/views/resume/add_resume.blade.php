@@ -63,18 +63,21 @@
     </div>
     @endif
     <form class="card" action="{{ route('resume.add_sample', $institute->id) }}" method="POST">
+        @php
+        $sampling = \App\Models\Sampling::where('institute_id', $institute->id)->first();
+        @endphp
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
                 <h4 class="card-title mb-0">@yield('title')
                     @php
-                    $sampleDescriptions = \App\Models\InstituteSampleDescription::where('institute_id', $institute->id)
-                    ->pluck('sample_description_id')
+                    $subjects = \App\Models\InstituteSubject::where('institute_id', $institute->id)
+                    ->pluck('subject_id')
                     ->toArray();
-                    $sampleNames = \App\Models\SampleDescription::whereIn('id', $sampleDescriptions)
+                    $sampleNames = \App\Models\Subject::whereIn('id', $subjects)
                     ->pluck('name', 'id')
                     ->toArray();
-                    $selectedSampleId = reset($sampleDescriptions); // Get the first ID from the list
+                    $selectedSampleId = reset($subjects); // Get the first ID from the list
                     $selectedSampleName = $sampleNames[$selectedSampleId] ?? 'N/A';
                     @endphp
                     <b><i>{{ $selectedSampleName }}</i>
@@ -101,34 +104,33 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($samplings as $sampling)
                             <tr>
-                                <td><textarea class="form-control w-100" name="no_sample"
-                                        rows="2">{{ $sampling->no_sample }}</textarea></td>
-                                <td><textarea class="form-control w-100" name="sampling_location"
-                                        rows="2">{{ $sampling->sampling_location }}</textarea></td>
+                                <td><input type="text" class="form-control w-100" name="no_sample"
+                                        value="{{ $sampling->no_sample ?? '' }}"></td>
+                                <td><input type="text" class="form-control w-100" name="sampling_location"
+                                        value="{{ $sampling->sampling_location ?? '' }}"></td>
                                 <td>
-                                    <input type="hidden" name="sample_description_id" value="{{ $selectedSampleId }}">
-                                    <textarea class="form-control w-100" rows="3"
-                                        readonly>{{ $selectedSampleName }}</textarea>
+                                    <input type="hidden" name="institute_subject_id"
+                                        value="{{ $selectedSampleId }}">
+                                    <input type="text" class="form-control w-100" value="{{ $selectedSampleName }}"
+                                        readonly>
                                 </td>
-                                <td><input type="date" class="form-control w-100" name="date"
-                                        value="{{ $sampling->date }}"></td>
-                                <td><input type="time" class="form-control w-100 me-2" name="time"
-                                        value="{{ $sampling->time }}"></td>
-                                <td><textarea class="form-control w-100" name="method" rows="2"
-                                        readonly>{{ $sampling->method }}</textarea></td>
+                                <td><input type="date" class="form-control w-100" name="sampling_date"
+                                        value="{{ $sampling->sampling_date ?? '' }}"></td>
+                                <td><input type="text" class="form-control w-100" name="sampling_time"
+                                        value="{{ $sampling->sampling_time ?? '' }}"></td>
+                                <td><input type="text" class="form-control w-100" name="sampling_method"
+                                        value="Grab/24 Hours" readonly></td>
                                 <td><input type="date" class="form-control w-100" name="date_received"
-                                        value="{{ $sampling->date_received }}"></td>
+                                        value="{{ $sampling->date_received ?? '' }}"></td>
                                 <td>
-                                    <input type="date" class="form-control w-100 me-2" name="itd_start"
-                                        value="{{ $sampling->itd_start }}">
+                                    <input type="date" class="form-control w-100" name="itd_start"
+                                        value="{{ $sampling->itd_start ?? '' }}">
                                     <span class="mx-2">to</span>
                                     <input type="date" class="form-control w-100" name="itd_end"
-                                        value="{{ $sampling->itd_end }}">
+                                        value="{{ $sampling->itd_end ?? '' }}">
                                 </td>
                             </tr>
-                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -160,37 +162,20 @@
                             <th><b>Unit</b></th>
                             <th><b>Methods</b></th>
                         </tr>
-                        @foreach ($resumes as $index => $item)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <input type="hidden" name="sample_description_id[{{ $item->id }}]" value="1">
-                            <td>
-                                @php
-                                    $parameter = \App\Models\Parameter::where('id', $item->parameter_id)
-                                        ->whereHas('regulation', function($query) use ($selectedSampleId) {
-                                            $query->where('sample_description_id', $selectedSampleId);
-                                        })
-                                        ->first();
-                                @endphp
-                                {{ $parameter ? $parameter->name : 'N/A' }}
-                            </td>
-                            <td>
-                                @foreach(explode(',', $item->sampling_time) as $time)
-                                    <div>{{ $time }}</div>
+                        @foreach($samps as $sampling)
+                            @foreach($sampling->regulations as $regulation)
+                                @foreach($regulation->parameters as $parameter)
+                                    <tr>
+                                        <td>{{ $loop->parent->parent->iteration }}</td>
+                                        <td>{{ $parameter->name }}</td>
+                                        <td>{{ $sampling->sampling_time }}</td>
+                                        <td>{{ $parameter->pivot->testing_result }}</td>
+                                        <td>{{ $regulation->title }}</td>
+                                        <td>{{ $parameter->unit }}</td>
+                                        <td>{{ $parameter->method }}</td>
+                                    </tr>
                                 @endforeach
-                            </td></td>
-                            <td>
-                                <input type="text" name="testing_result[{{ $item->id }}]" class="form-control"
-                                    value="{{ $item->testing_result }}">
-                            </td>
-                            <td>
-                                @foreach(explode(',', $item->regulation) as $regulation)
-                                    <div>{{ $regulation }}</div>
-                                @endforeach
-                            </td>
-                            <td>{{ $item->unit }}</td>
-                            <td>{{ $item->method }}</td>
-                        </tr>
+                            @endforeach
                         @endforeach
                     </table>
                 </div>
@@ -203,6 +188,7 @@
             </div>
         </div>
     </form>
+
 </div>
 
 </div>

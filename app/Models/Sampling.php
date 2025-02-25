@@ -15,10 +15,10 @@ class Sampling extends Model
         'institute_id',
         'no_sample',
         'sampling_location',
-        'sample_description_id',
-        'date',
-        'time',
-        'method',
+        'institute_subject_id',
+        'sampling_date',
+        'sampling_time',
+        'sampling_method',
         'date_received',
         'itd_start',
         'itd_end',
@@ -26,7 +26,22 @@ class Sampling extends Model
 
     public function description()
     {
-        return $this->belongsTo(SampleDescription::class, 'sample_description_id', 'id');
+        return $this->belongsTo(Subject::class, 'subject_id', 'id');
+    }
+
+    public function instituteSubject()
+    {
+        return $this->belongsTo(InstituteSubject::class, 'sampling_id', 'id');
+    }
+    public function parameter()
+    {
+        return $this->belongsTo(Parameter::class, 'parameter_id', 'id');
+    }
+
+    // Relasi ke Regulations
+    public function regulation()
+    {
+        return $this->belongsTo(Regulation::class, 'regulation_id', 'id');
     }
 }
 

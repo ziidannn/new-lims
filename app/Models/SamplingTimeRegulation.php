@@ -27,7 +27,7 @@ class SamplingTimeRegulation extends Model
         return $this->belongsTo(SamplingTime::class, 'sampling_time_id', 'id');
     }
 
-    public function regulationStandard()
+    public function regulationStandards()
     {
         return $this->belongsTo(RegulationStandard::class, 'regulation_standard_id', 'id');
     }

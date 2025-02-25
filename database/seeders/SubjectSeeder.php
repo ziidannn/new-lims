@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\SampleDescription;
+use App\Models\Subject;
 
-class SampleDescriptionSeeder extends Seeder
+class SubjectSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -22,8 +22,8 @@ class SampleDescriptionSeeder extends Seeder
         ];
 
         foreach ($data as $x) {
-            if(!SampleDescription::where('id', $x['id'])->first()){
-                $m = new SampleDescription();
+            if(!Subject::where('id', $x['id'])->first()){
+                $m = new Subject();
                 $m->id = $x['id'];
                 $m->name = $x['name'];
                 $m->save();

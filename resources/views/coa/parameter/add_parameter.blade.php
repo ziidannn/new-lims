@@ -75,7 +75,7 @@
                                         <div class="col-md-5">
                                             <select name="sampling_time_id[]" class="form-control" required>
                                                 <option value="">Select Sampling Time</option>
-                                                @foreach ($sampling_times as $sampling)
+                                                @foreach ($samplingTime as $sampling)
                                                 <option value="{{ $sampling->id }}">{{ $sampling->time }}</option>
                                                 @endforeach
                                             </select>
@@ -84,7 +84,7 @@
                                         <div class="col-md-5">
                                             <select name="regulation_standard_id[]" class="form-control" required>
                                                 <option value="">Select Regulation Standard</option>
-                                                @foreach ($regulation_standards as $standard)
+                                                @foreach ($regulationStandards as $standard)
                                                 <option value="{{ $standard->id }}">{{ $standard->title }}</option>
                                                 @endforeach
                                             </select>
@@ -137,7 +137,7 @@ document.getElementById('add_more').addEventListener('click', function () {
         <div class="col-md-5">
             <select name="sampling_time_id[]" class="form-control" required>
                 <option value="">Select Sampling Time</option>
-                @foreach ($sampling_times as $sampling)
+                @foreach ($samplingTime as $sampling)
                     <option value="{{ $sampling->id }}">{{ $sampling->time }}</option>
                 @endforeach
             </select>
@@ -146,7 +146,7 @@ document.getElementById('add_more').addEventListener('click', function () {
         <div class="col-md-5">
             <select name="regulation_standard_id[]" class="form-control" required>
                 <option value="">Select Regulation Standard</option>
-                @foreach ($regulation_standards as $standard)
+                @foreach ($regulationStandards as $standard)
                     <option value="{{ $standard->id }}">{{ $standard->title }}</option>
                 @endforeach
             </select>

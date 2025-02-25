@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('resumes', function (Blueprint $table) {
+        Schema::create('results', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('sampling_id')->nullable();
             $table->foreign('sampling_id')->references('id')->on('samplings');
-            $table->unsignedBigInteger('sample_description_id')->nullable();
-            $table->foreign('sample_description_id')->references('id')->on('sample_descriptions');
+            $table->unsignedBigInteger('regulation_id')->nullable();
+            $table->foreign('regulation_id')->references('id')->on('regulations');
+            $table->unsignedBigInteger('institute_subject_id')->nullable();
+            $table->foreign('institute_subject_id')->references('id')->on('institute_subjects');
             $table->string('name_parameter')->nullable();
             $table->string('sampling_time')->nullable();
             $table->string('testing_result')->nullable()->nullable();
@@ -38,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('resumes');
+        Schema::dropIfExists('results');
     }
 };

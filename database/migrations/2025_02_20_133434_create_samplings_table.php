@@ -17,11 +17,11 @@ return new class extends Migration
             $table->foreign('institute_id')->references('id')->on('institutes');
             $table->string('no_sample');
             $table->string('sampling_location');
-            $table->unsignedBigInteger('sample_description_id');
-            $table->foreign('sample_description_id')->references('id')->on('sample_descriptions');
-            $table->date('date');
-            $table->time('time');
-            $table->string('method');
+            $table->unsignedBigInteger('institute_subject_id')->nullable();
+            $table->foreign('institute_subject_id')->references('id')->on('institute_subjects');
+            $table->date('sampling_date');
+            $table->string('sampling_time');
+            $table->string('sampling_method');
             $table->date('date_received');
             $table->date('itd_start');
             $table->date('itd_end');

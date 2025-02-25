@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('regulations', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->unsignedBigInteger('sample_description_id')->nullable();
-            $table->foreign('sample_description_id')->references('id')->on('sample_descriptions');
+            $table->unsignedBigInteger('subject_id')->nullable();
+            $table->foreign('subject_id')->references('id')->on('subjects');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
         });

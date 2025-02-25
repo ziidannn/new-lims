@@ -105,16 +105,16 @@
                         <div class="col-lg-6 col-md-12">
                             <label class="form-label" for="basicDate">Sampling Description<i class="text-danger">*</i></label>
                             <div class="input-group input-group-merge has-validation">
-                                <select class="form-select @error('sample_description_id') is-invalid @enderror input-sm select2-modal"
-                                        name="sample_description_id[]" id="sample_description_id" multiple>
+                                <select class="form-select @error('subject_id') is-invalid @enderror input-sm select2-modal"
+                                        name="subject_id[]" id="subject_id" multiple>
                                     @foreach($description as $p)
                                         <option value="{{ $p->id }}"
-                                            {{ (is_array(old('sample_description_id')) && in_array($p->id, old('sample_description_id')) ? "selected": "") }}>
+                                            {{ (is_array(old('subject_id')) && in_array($p->id, old('subject_id')) ? "selected": "") }}>
                                             {{ $p->id }} - {{ $p->name }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('sample_description_id')
+                                @error('subject_id')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
@@ -205,7 +205,7 @@
 </script>
 <script>
     $(document).ready(function() {
-        $('#sample_description_id').select2({
+        $('#subject_id').select2({
             placeholder: "Select Sampling Description",
             allowClear: true
         });
