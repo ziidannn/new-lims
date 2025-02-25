@@ -117,8 +117,8 @@
                 {
                     render: function (data, type, row, meta) {
                         console.log(row); // Debug data di browser console
-                        if (row.sample_description) {
-                            return `<span class="badge bg-secondary">${row.sample_description.name}</span>`;
+                        if (row.subject) {
+                            return `<span class="badge bg-secondary">${row.subject.name}</span>`;
                         } else {
                             return '-';
                         }

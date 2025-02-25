@@ -9,7 +9,7 @@ use App\Models\Regulation;
 use App\Models\RegulationStandard;
 use App\Models\Resume;
 use App\Models\Sampling;
-use App\Models\SampleDescription;
+use App\Models\Subject;
 use App\Models\SamplingTime;
 use App\Models\SamplingTimeRegulation;
 use Illuminate\Http\Request;
@@ -23,12 +23,12 @@ class CoaController extends Controller
         if ($request->isMethod('POST')) {
             $this->validate($request, [
                 'title' => ['required'],
-                'sample_description_id' => ['required'],
+                'subject_id' => ['required'],
             ]);
 
             $data = Regulation::create([
                 'title' => $request->title,
-                'sample_description_id' => $request->sample_description_id, // Tambahkan regulation_id
+                'subject_id' => $request->subject_id, // Tambahkan regulation_id
             ]);
 
             if ($data) {
@@ -37,8 +37,8 @@ class CoaController extends Controller
         }
 
         $data = Regulation::all();
-        $description = SampleDescription::orderBy('name')->get();
-        return view('coa.regulation.index', compact('data', 'description'));
+        $subjects = Subject::orderBy('name')->get();
+        return view('coa.regulation.index', compact('data', 'subjects'));
     }
 
     public function edit_regulation(Request $request, $id){
@@ -46,18 +46,18 @@ class CoaController extends Controller
         if ($request->isMethod('POST')) {
             $this->validate($request, [
             'title'    => 'string', 'max:191',
-            'sample_description_id' => 'string'
+            'subject_id' => 'string'
         ]);
 
         $data->update([
             'title'=> $request->title,
-            'sample_description_id'=> $request->sample_description_id,
+            'subject_id'=> $request->subject_id,
         ]);
             return redirect()->route('coa.regulation.index')->with('msg', 'Regulation updated successfully.');
         }
 
-        $description = SampleDescription::orderBy('name')->get();
-        return view('coa.regulation.edit', compact('data', 'description'));
+        $subjects = Subject::orderBy('name')->get();
+        return view('coa.regulation.edit', compact('data', 'subjects'));
     }
 
     public function delete_regulation(Request $request){
@@ -79,7 +79,7 @@ class CoaController extends Controller
     //data_regulation
     public function data_regulation(Request $request)
     {
-        $data = Regulation::with(['description' => function ($query) {
+        $data = Regulation::with(['subjects' => function ($query) {
             $query->select('id','name');
         }])
         ->select('*')
@@ -87,9 +87,9 @@ class CoaController extends Controller
         ->get();
         return DataTables::of($data)
             ->filter(function ($instance) use ($request) {
-                if (!empty($request->get('select_description'))) {
-                    $instance->whereHas('sampleDescriptions', function ($q) use ($request) {
-                        $q->where('sample_descriptions.id', $request->get('select_description'));
+                if (!empty($request->get('select_subjects'))) {
+                    $instance->whereHas('Subjects', function ($q) use ($request) {
+                        $q->where('sample_subjects.id', $request->get('select_subjects'));
                     });
                 }
                 if (!empty($request->get('search'))) {
@@ -97,7 +97,7 @@ class CoaController extends Controller
                     $instance->where(function ($w) use ($search) {
                         $w->orWhere('no_sample', 'LIKE', "%$search%")
                             ->orWhere('date', 'LIKE', "%$search%")
-                            ->orWhereHas('sampleDescriptions', function ($q) use ($search) {
+                            ->orWhereHas('Subjects', function ($q) use ($search) {
                                 $q->where('name', 'LIKE', "%$search%");
                             });
                     });
@@ -142,11 +142,11 @@ class CoaController extends Controller
 
         $data = Parameter::all();
         $regulation = Regulation::orderBy('title')->get();
-        $sampling_times = SamplingTime::orderBy('time')->get();
-        $regulation_standards = RegulationStandard::orderBy('title')->get();
+        $samplingTime = SamplingTime::orderBy('time')->get();
+        $regulationStandards = RegulationStandard::orderBy('title')->get();
 
         return view('coa.parameter.index', compact(
-            'data', 'regulation', 'sampling_times', 'regulation_standards'
+            'data', 'regulation', 'samplingTime', 'regulationStandards'
         ));
     }
 
@@ -184,11 +184,11 @@ class CoaController extends Controller
 
         // Ambil data untuk dropdown
         $regulation = Regulation::orderBy('title')->get();
-        $sampling_times = SamplingTime::orderBy('time')->get();
-        $regulation_standards = RegulationStandard::orderBy('title')->get();
+        $samplingTime = SamplingTime::orderBy('time')->get();
+        $regulationStandards = RegulationStandard::orderBy('title')->get();
 
         return view('coa.parameter.add_parameter', compact(
-            'regulation', 'sampling_times', 'regulation_standards'
+            'regulation', 'samplingTime', 'regulationStandards'
         ));
     }
 
@@ -231,15 +231,31 @@ class CoaController extends Controller
 
         // Ambil semua data terkait untuk dropdown
         $regulation = Regulation::orderBy('title')->get();
-        $sampling_times = SamplingTime::orderBy('time')->get();
-        $regulation_standards = RegulationStandard::orderBy('title')->get();
+        $samplingTime = SamplingTime::orderBy('time')->get();
+        $regulationStandards = RegulationStandard::orderBy('title')->get();
 
         // Ambil data yang sudah ada dari tabel `sampling_time_regulations`
         $existingSamplingTimes = SamplingTimeRegulation::where('parameter_id', $id)->get();
 
         return view('coa.parameter.edit', compact(
-            'data', 'regulation', 'sampling_times', 'regulation_standards', 'existingSamplingTimes'
+            'data', 'regulation', 'samplingTime', 'regulationStandards', 'existingSamplingTimes'
         ));
+    }
+
+    public function delete_parameter(Request $request){
+        $data = Parameter::find($request->id);
+        if($data){
+            $data->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Successfully deleted!'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete! Data not found'
+            ]);
+        }
     }
 
     //data_parameter
@@ -248,19 +264,19 @@ class CoaController extends Controller
         $data = Parameter::with([
             'regulation:id,title',
             'samplingTimeRegulations.samplingTime:id,time',
-            'samplingTimeRegulations.regulationStandard:id,title'
+            'samplingTimeRegulations.regulationStandards:id,title'
         ])->select('*')->orderBy("id")->get();
 
         return DataTables::of($data)
-            ->addColumn('sampling_times', function ($row) {
+            ->addColumn('samplingTime', function ($row) {
                 $samplingTimes = $row->samplingTimeRegulations->pluck('samplingTime.time')->toArray();
                 return !empty($samplingTimes) ? implode(', ', $samplingTimes) : '-';
             })
-            ->addColumn('regulation_standards', function ($row) {
-                $regulationStandards = $row->samplingTimeRegulations->pluck('regulationStandard.title')->toArray();
+            ->addColumn('regulationStandards', function ($row) {
+                $regulationStandards = $row->samplingTimeRegulations->pluck('regulationStandards.title')->toArray();
                 return !empty($regulationStandards) ? implode(', ', $regulationStandards) : '-';
             })
-            ->rawColumns(['sampling_times', 'regulation_standards'])
+            ->rawColumns(['samplingTime', 'regulationStandards'])
             ->make(true);
     }
 
@@ -307,6 +323,22 @@ class CoaController extends Controller
         return view('coa.sampling_time.edit', compact('data'));
     }
 
+    public function delete_sampling_time(Request $request){
+        $data = SamplingTime::find($request->id);
+        if($data){
+            $data->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Successfully deleted!'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete! Data not found'
+            ]);
+        }
+    }
+
     //data_sampling_time
     public function data_sampling_time(Request $request)
     {
@@ -314,9 +346,9 @@ class CoaController extends Controller
         ->get();
         return DataTables::of($data)
             ->filter(function ($instance) use ($request) {
-                if (!empty($request->get('select_description'))) {
-                    $instance->whereHas('sampleDescriptions', function ($q) use ($request) {
-                        $q->where('sample_descriptions.id', $request->get('select_description'));
+                if (!empty($request->get('select_subjects'))) {
+                    $instance->whereHas('Subjects', function ($q) use ($request) {
+                        $q->where('sample_subjectss.id', $request->get('select_subjects'));
                     });
                 }
                 if (!empty($request->get('search'))) {
@@ -324,7 +356,7 @@ class CoaController extends Controller
                     $instance->where(function ($w) use ($search) {
                         $w->orWhere('no_sample', 'LIKE', "%$search%")
                             ->orWhere('date', 'LIKE', "%$search%")
-                            ->orWhereHas('sampleDescriptions', function ($q) use ($search) {
+                            ->orWhereHas('Subjects', function ($q) use ($search) {
                                 $q->where('name', 'LIKE', "%$search%");
                             });
                     });
@@ -374,6 +406,22 @@ class CoaController extends Controller
         return view('coa.regulation_standard.edit', compact('data'));
     }
 
+    public function delete_regulation_standard(Request $request){
+        $data = RegulationStandard::find($request->id);
+        if($data){
+            $data->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Successfully deleted!'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete! Data not found'
+            ]);
+        }
+    }
+
     //data_regulation
     public function data_regulation_standard(Request $request)
     {
@@ -381,9 +429,9 @@ class CoaController extends Controller
         ->get();
         return DataTables::of($data)
             ->filter(function ($instance) use ($request) {
-                if (!empty($request->get('select_description'))) {
-                    $instance->whereHas('sampleDescriptions', function ($q) use ($request) {
-                        $q->where('sample_descriptions.id', $request->get('select_description'));
+                if (!empty($request->get('select_subjects'))) {
+                    $instance->whereHas('Subjects', function ($q) use ($request) {
+                        $q->where('sample_subjectss.id', $request->get('select_subjects'));
                     });
                 }
                 if (!empty($request->get('search'))) {
@@ -391,7 +439,7 @@ class CoaController extends Controller
                     $instance->where(function ($w) use ($search) {
                         $w->orWhere('no_sample', 'LIKE', "%$search%")
                             ->orWhere('date', 'LIKE', "%$search%")
-                            ->orWhereHas('sampleDescriptions', function ($q) use ($search) {
+                            ->orWhereHas('Subjects', function ($q) use ($search) {
                                 $q->where('name', 'LIKE', "%$search%");
                             });
                     });

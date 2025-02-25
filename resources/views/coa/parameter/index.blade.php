@@ -119,7 +119,7 @@
                                 <label class="form-label">Sampling Time</label>
                                 <select class="form-select" name="sampling_time_id" id="sampling_time_id">
                                     <option value="">-- Select Sampling Time --</option>
-                                    @foreach($sampling_times as $time)
+                                    @foreach($samplingTime as $time)
                                         <option value="{{ $time->id }}">{{ $time->time }}</option>
                                     @endforeach
                                 </select>
@@ -131,7 +131,7 @@
                                 <select class="form-select" name="regulation_standard_id" id="regulation_standard_id"
                                     disabled>
                                     <option value="">-- Select Regulation Standard --</option>
-                                    @foreach($regulation_standards as $standard)
+                                    @foreach($regulationStandards as $standard)
                                     <option value="{{ $standard->id }}">{{ $standard->title }}</option>
                                     @endforeach
                                 </select>
@@ -276,9 +276,9 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        if (row.sampling_times) {
+                        if (row.samplingTime) {
                             var html = '<ul style="padding-left: 15px;">';
-                            row.sampling_times.split(', ').forEach(function(time) {
+                            row.samplingTime.split(', ').forEach(function(time) {
                                 html += `<li>${time}</span></li>`;
                             });
                             html += '</ul>';
@@ -290,9 +290,9 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        if (row.regulation_standards) {
+                        if (row.regulationStandards) {
                             var html = '<ul style="padding-left: 15px;">';
-                            row.regulation_standards.split(', ').forEach(function(title) {
+                            row.regulationStandards.split(', ').forEach(function(title) {
                                 html += `<li>${title}</span></li>`;
                             });
                             html += '</ul>';
@@ -305,9 +305,9 @@
                 // {
                 //     render: function (data, type, row, meta) {
                 //         // Check if row.category exists and has an id
-                //         if (row.sampling_times && row.sampling_times.id) {
+                //         if (row.samplingTime && row.samplingTime.id) {
                 //             var html =
-                //                 `<a class="text-dark" title="${row.sampling_times.time}" href="">${row.sampling_times.time}</a>`;
+                //                 `<a class="text-dark" title="${row.samplingTime.time}" href="">${row.samplingTime.time}</a>`;
                 //             return html;
                 //         } else {
                 //             return ''; // Return empty string or handle the case where regulation.title is missing
@@ -318,9 +318,9 @@
                 // {
                 //     render: function (data, type, row, meta) {
                 //         // Check if row.category exists and has an id
-                //         if (row.regulation_standards && row.regulation_standards.id) {
+                //         if (row.regulationStandard && row.regulationStandard.id) {
                 //             var html =
-                //                 `<a class="text-dark" title="${row.regulation_standards.title}" href="">${row.regulation_standards.title}</a>`;
+                //                 `<a class="text-dark" title="${row.regulationStandard.title}" href="">${row.regulationStandards.title}</a>`;
                 //             return html;
                 //         } else {
                 //             return ''; // Return empty string or handle the case where regulation.title is missing

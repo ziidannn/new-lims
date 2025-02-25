@@ -27,20 +27,20 @@
                             @csrf
                             <div class="row">
                             <div class="form-group mb-3">
-                                <label for="sample_description_id" class="form-label"><b>Select Criteria</b><i
+                                <label for="subject_id" class="form-label"><b>Select Criteria</b><i
                                         class="text-danger">*</i></label>
                                 <select
-                                    class="form-select digits select2 @error('sample_description_id') is-invalid @enderror"
-                                    name="sample_description_id" id="sample_descriptioon_d" data-placeholder="Select">
-                                    <option value="" selected disabled>Select Sample Description</option>
-                                    @foreach($description as $c)
+                                    class="form-select digits select2 @error('subject_id') is-invalid @enderror"
+                                    name="subject_id" id="subject_id" data-placeholder="Select">
+                                    <option value="" selected disabled>Select Subjects</option>
+                                    @foreach($subjects as $c)
                                     <option value="{{ $c->id }}"
-                                        {{ $data->sample_description_id == $c->id ? 'selected' : '' }}>
+                                        {{ $data->subject_id == $c->id ? 'selected' : '' }}>
                                         {{ $c->id }} - {{$c->name}}
                                     </option>
                                     @endforeach
                                 </select>
-                                @error('sample_description_id')
+                                @error('subject_id')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>

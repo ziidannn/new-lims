@@ -15,21 +15,26 @@ class Resume extends Model
 
     protected $fillable = [
         'name_parameter',
-        'sample_description_id',
+        'sampling_id',
         'sampling_time',
         'testing_result',
         'regulation',
         'unit',
         'method',
+        'regulation_id',
+        'noise',
+        'leq',
+        'ls',
+        'lm',
+        'lsm'
     ];
 
-    public function sampleDescriptions()
+    public function regulation()
     {
-        return $this->belongsToMany(SampleDescription::class, 'institute_sample_descriptions', 'institute_id', 'sample_description_id');
+        return $this->belongsTo(Regulation::class, 'regulation_id');
     }
-
-    public function description()
+    public function sampling()
     {
-        return $this->belongsTo(SampleDescription::class, 'sample_description_id', 'id');
+        return $this->belongsTo(Sampling::class, 'sampling_id');
     }
 }

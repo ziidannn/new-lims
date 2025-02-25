@@ -15,10 +15,10 @@ class Regulation extends Model
 
     protected $fillable = [
         'title',
-        'sample_description_id'
+        'subject_id'
     ];
-    public function description()
+    public function subjects()
     {
-        return $this->belongsTo(SampleDescription::class, 'sample_description_id', 'id');
+        return $this->belongsTo(Subject::class, 'subject_id', 'id');
     }
 }

@@ -68,11 +68,13 @@ Route::group(['prefix' => 'coa'], function () {
     Route::any('/sampling_time', [CoaController::class, 'sampling_time'])->name('coa.sampling_time.index')->middleware('auth');
     Route::get('/data_sampling_time', [CoaController::class, 'data_sampling_time'])->name('coa.sampling_time.data_sampling_time');
     Route::any('/sampling_time/update/{id}', [CoaController::class, 'edit_sampling_time'])->name('coa.sampling_time.update');
+    Route::delete('/sampling_time/delete_sampling_time', [CoaController::class, 'delete_sampling_time'])->name('coa.sampling_time.delete_sampling_time');
 
     //regulation_standard
     Route::any('/regulation_standard', [CoaController::class, 'regulation_standard'])->name('coa.regulation_standard.index')->middleware('auth');
     Route::get('/data_regulation_standard', [CoaController::class, 'data_regulation_standard'])->name('coa.regulation_standard.data_regulation_standard');
     Route::any('/regulation_standard/update/{id}', [CoaController::class, 'edit_regulation_standard'])->name('coa.regulation_standard.update');
+    Route::delete('/regulation_standard/delete_regulation_standard', [CoaController::class, 'delete_regulation_standard'])->name('coa.regulation_standard.delete_regulation_standard');
 });
 
 Route::middleware('auth')->group(function () {
@@ -84,7 +86,7 @@ Route::middleware('auth')->group(function () {
 //PDF
 Route::get('/generate-pdf/{customerId}', [PDFController::class, 'generatePdf'])->name('generate.pdf');
 Route::get('/preview-pdf/{customerId}', [PDFController::class, 'previewPdf'])->name('preview.pdf');
-                    
+
 
 Route::get('log-viewers', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['can:log-viewers.read']);
 

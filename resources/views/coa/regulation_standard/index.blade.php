@@ -226,6 +226,39 @@
         });
     });
 
+    function DeleteId(id, data) {
+        swal({
+                title: "Apa kamu yakin?",
+                text: "Setelah dihapus, data (" + data + ") tidak dapat dipulihkan!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: "{{ route('coa.regulation_standard.delete_regulation_standard') }}",
+                        type: "DELETE",
+                        data: {
+                            "id": id,
+                            "_token": $("meta[name='csrf-token']").attr("content"),
+                        },
+                        success: function (data) {
+                            if (data['success']) {
+                                swal(data['message'], {
+                                    icon: "success",
+                                });
+                                $('#datatable').DataTable().ajax.reload();
+                            } else {
+                                swal(data['message'], {
+                                    icon: "error",
+                                });
+                            }
+                        }
+                    })
+                }
+            })
+    }
 </script>
 <script>
     $(document).ready(function () {

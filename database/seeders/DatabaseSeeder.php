@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\AmbientAir;
+use App\Models\Parameter;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -24,11 +25,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserRolePermissionSeeder::class,
             PermissionSeeder::class,
-            SampleDescriptionSeeder::class,
-            ResumeSeeder::class,
+            SubjectSeeder::class,
             RegulationSeeder::class,
+            SamplingTimeSeeder::class,
             RegulationStandardSeeder::class,
-            SamplingTimeSeeder::class
+            ParameterSeeder::class,
         ]);
     }
 }

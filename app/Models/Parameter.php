@@ -21,9 +21,16 @@ class Parameter extends Model
     {
         return $this->belongsTo(Regulation::class, 'regulation_id', 'id');
     }
-
     public function samplingTimeRegulations()
     {
         return $this->hasMany(SamplingTimeRegulation::class, 'parameter_id', 'id');
+    }
+    public function samplingTime()
+    {
+        return $this->belongsToMany(SamplingTime::class, 'sampling_time_id');
+    }
+    public function regulationStandards()
+    {
+        return $this->belongsToMany(RegulationStandard::class, 'regulation_standard_id');
     }
 }
