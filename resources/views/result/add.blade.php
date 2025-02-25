@@ -66,7 +66,7 @@
                                     class="text-danger">*</i></label>
                             <div class="input-group input-group-merge has-validation">
                                 <input type="text" class="form-control"
-                                    value="1 - {{ \App\Models\SampleDescription::find(1)->name }}" readonly>
+                                    value="1 - {{ \App\Models\Subject::find(1)->name }}" readonly>
                                 <input type="hidden" name="sample_description_id" value="1">
                             </div>
                         </div>

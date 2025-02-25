@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Resume extends Model
+class Result extends Model
 {
     use HasFactory;
 
-    protected $table = 'resumes';
+    protected $table = 'results';
     public $timestamps = true;
     public $incrementing = true;
 

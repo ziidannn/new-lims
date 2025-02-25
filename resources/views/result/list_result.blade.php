@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'List Resume')
+@section('title', 'List Result')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -98,7 +98,7 @@
                 searchPlaceholder: 'Search..',
             },
             ajax: {
-                url: "{{ route('resume.getDataResume', $institute->id) }}", // Ambil data berdasarkan institute_id
+                url: "{{ route('result.getDataResult', $institute->id) }}", // Ambil data berdasarkan institute_id
                 data: function (d) {
                     d.search = $('input[type="search"]').val();
                 },
@@ -128,7 +128,7 @@
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Resume" href="{{ url('resume/add_resume/${row.id}') }}">
+                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('result/add_result/${row.id}') }}">
                                     <i class="bx bx-plus icon-white"></i></a>`;
                         }
                         return html;

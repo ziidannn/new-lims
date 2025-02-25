@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'Add Resume')
+@section('title', 'Add Result')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
@@ -62,7 +62,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('resume.add_sample', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.add_sample', $institute->id) }}" method="POST">
         @php
         $sampling = \App\Models\Sampling::where('institute_id', $institute->id)->first();
         @endphp
@@ -147,7 +147,7 @@
 <br>
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('resume.add_resume', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.add_result', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">

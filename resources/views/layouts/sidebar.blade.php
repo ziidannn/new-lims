@@ -31,10 +31,10 @@
         </li>
         @endcan
         @can('setting/manage_account/users.read')
-        <li class="menu-item {{ request()->segment(1) == 'resume' ? 'active' : '' }}">
-            <a href="{{ route('resume.index') }}" class="menu-link">
+        <li class="menu-item {{ request()->segment(1) == 'result' ? 'active' : '' }}">
+            <a href="{{ route('result.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-file-find"></i>
-                <div data-i18n="resume">Resume</div>
+                <div data-i18n="result">Result</div>
             </a>
         </li>
         @endcan

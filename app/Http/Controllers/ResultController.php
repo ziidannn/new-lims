@@ -7,23 +7,23 @@ use App\Models\InstituteSubject;
 use App\Models\Parameter;
 use App\Models\Regulation;
 use App\Models\RegulationStandard;
-use App\Models\Resume;
+use App\Models\Result;
 use Illuminate\Http\Request;
 use App\Models\Sampling;
 use App\Models\Subject;
 use App\Models\SamplingTime;
 use Yajra\DataTables\Facades\DataTables;
 
-class ResumeController extends Controller
+class ResultController extends Controller
 {
     public function index(Request $request)
     {
         $data = Sampling::all();
         $subjects = Subject::orderBy('name')->get();
-        return view('resume.index', compact('data', 'subjects'));
+        return view('result.index', compact('data', 'subjects'));
     }
 
-    public function list_resume(Request $request, $id)
+    public function list_result(Request $request, $id)
     {
         // Ambil data institute berdasarkan ID yang dikirim
         $institute = Institute::findOrFail($id);
@@ -31,10 +31,10 @@ class ResumeController extends Controller
         // Ambil data yang berelasi dari tabel institute_sample_subjectss
         $institute_subject = InstituteSubject::where('institute_id', $id)->get();
 
-        return view('resume.list_resume', compact('institute', 'institute_subject'));
+        return view('result.list_result', compact('institute', 'institute_subject'));
     }
 
-    public function getDataResume($id)
+    public function getDataResult($id)
     {
         $data = InstituteSubject::where('institute_id', $id)
             ->with('Subject') // Pastikan relasi ke sample_subjects dimuat
@@ -79,10 +79,10 @@ class ResumeController extends Controller
         $institute = Institute::findOrFail($id);
         $subjects = Subject::orderBy('name')->get();
         $parameters = Parameter::orderBy('name')->get();
-        return view('resume.add_resume', compact('samplings','institute', 'subjects','parameters'));
+        return view('result.add_result', compact('samplings','institute', 'subjects','parameters'));
     }
 
-    public function add_resume(Request $request, $id)
+    public function add_result(Request $request, $id)
     {
         if ($request->isMethod('POST')) {
             $institute = Institute::findOrFail($id);
@@ -90,7 +90,7 @@ class ResumeController extends Controller
 
             if ($request->has('testing_result')) {
                 foreach ($request->testing_result as $key => $result) {
-                    Resume::updateOrCreate(
+                    Result::updateOrCreate(
                         [
                             'sampling_id' => $id,
                             'subject_id' => $request->subject_id[$key] ?? null,
@@ -107,7 +107,7 @@ class ResumeController extends Controller
                 }
             }
 
-            return back()->with('msg', 'Data Resume (' . $request->no_sample . ') saved successfully');
+            return back()->with('msg', 'Data Result (' . $request->no_sample . ') saved successfully');
         }
 
         $samplingTimes = SamplingTime::orderBy('time')->get();
@@ -136,13 +136,13 @@ class ResumeController extends Controller
         // Debugging data
         // dd(compact('institute', 'subjects', 'samplingTimes', 'regulationStandards', 'regulations', 'parameters', 'instituteSamples', 'samplings', 'samps'));
 
-        return view('resume.add_resume', compact('institute', 'subjects', 'samplingTimes',
+        return view('result.add_result', compact('institute', 'subjects', 'samplingTimes',
         'regulationStandards', 'parameters', 'regulations', 'instituteSamples', 'samplings','samps'));
     }
 
     public function data(Request $request)
     {
-        $data = Resume::with(['Subjects' => function ($query) {
+        $data = Result::with(['Subjects' => function ($query) {
                 $query->select('sample_subjectss.id', 'sample_subjectss.name');
             }])
             ->select('*')
@@ -174,13 +174,13 @@ class ResumeController extends Controller
     // public function delete(Request $request)
     // {
     //     $id = $request->input('id'); // Get the ID to delete
-    //     $resume = Resume::find($id);
+    //     $result = Result::find($id);
 
-    //     if ($resume) {
-    //         $resume->delete();
-    //         return response()->json(['message' => 'Resume deleted'], 200);
+    //     if ($result) {
+    //         $result->delete();
+    //         return response()->json(['message' => 'Result deleted'], 200);
     //     } else {
-    //         return response()->json(['message' => 'Resume not found'], 404);
+    //         return response()->json(['message' => 'Result not found'], 404);
     //     }
     // }
 }

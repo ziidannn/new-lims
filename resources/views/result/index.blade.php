@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'Resume')
+@section('title', 'Result')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -188,12 +188,9 @@
                 {
                     render: function (data, type, row, meta) {
                         var html = ''; {
-
-                            html = `
-                                <a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('resume/add_sampling/${row.id}') }}">
+                            html = `<a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('result/add_sampling/${row.id}') }}">
                                     <i class="bx bx-plus icon-white"></i></a>
-                                    <a class="badge bg-warning badge-icon" title="List Resume" href="{{ url('resume/list_resume/${row.id}') }}">
-                            html = `<a class="badge bg-warning badge-icon" title="List Resume" href="{{ url('resume/list_resume/${row.id}') }}">
+                                    <a class="badge bg-warning badge-icon" title="List result" href="{{ url('result/list_result/${row.id}') }}">
                                     <i class="bx bx-pencil"></i></a>`;
                         }
                         return html;

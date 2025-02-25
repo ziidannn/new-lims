@@ -2,8 +2,7 @@
 
 use App\Http\Controllers\CoaController;
 use App\Http\Controllers\InstituteController;
-use App\Http\Controllers\ResumeController;
-use App\Http\Controllers\Resume;
+use App\Http\Controllers\ResultController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
@@ -40,15 +39,15 @@ Route::group(['prefix' => 'institute'], function () {
     Route::any('/create', [InstituteController::class, 'create'])->name('institute.create');
 });
 
-Route::group(['prefix' => 'resume'], function () {
-    Route::any('/', [ResumeController::class, 'index'])->name('resume.index')->middleware('auth');
-    Route::get('/data', [ResumeController::class, 'data'])->name('resume.data');
-    Route::delete('/delete', [ResumeController::class, 'delete'])->name('resume.delete');
-    // Route::any('/resume/create', [ResumeController::class, 'create'])->name('resume.create');
-    Route::any('/add_resume/{id}', [ResumeController::class, 'add_resume'])->name('resume.add_resume');
-    Route::any('/add_sample/{id}', [ResumeController::class, 'add_sample'])->name('resume.add_sample');
-    Route::any('/list_resume/{id}', [ResumeController::class, 'list_resume'])->name('resume.list_resume');
-    Route::get('/getDataResume/{id}', [ResumeController::class, 'getDataResume'])->name('resume.getDataResume');
+Route::group(['prefix' => 'result'], function () {
+    Route::any('/', [ResultController::class, 'index'])->name('result.index')->middleware('auth');
+    Route::get('/data', [ResultController::class, 'data'])->name('result.data');
+    Route::delete('/delete', [ResultController::class, 'delete'])->name('result.delete');
+    // Route::any('/result/create', [ResultController::class, 'create'])->name('result.create');
+    Route::any('/add_result/{id}', [ResultController::class, 'add_result'])->name('result.add_result');
+    Route::any('/add_sample/{id}', [ResultController::class, 'add_sample'])->name('result.add_sample');
+    Route::any('/list_result/{id}', [ResultController::class, 'list_result'])->name('result.list_result');
+    Route::get('/getDataResult/{id}', [ResultController::class, 'getDataResult'])->name('result.getDataResult');
 });
 
 Route::group(['prefix' => 'coa'], function () {
