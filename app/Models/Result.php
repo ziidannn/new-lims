@@ -14,14 +14,14 @@ class Result extends Model
     public $incrementing = true;
 
     protected $fillable = [
-        'name_parameter',
         'sampling_id',
+        'parameter_id',
+        'name_parameter',
         'sampling_time',
         'testing_result',
         'regulation',
         'unit',
         'method',
-        'regulation_id',
         'noise',
         'leq',
         'ls',
@@ -29,9 +29,9 @@ class Result extends Model
         'lsm'
     ];
 
-    public function regulation()
+    public function parameter()
     {
-        return $this->belongsTo(Regulation::class, 'regulation_id');
+        return $this->belongsTo(Parameter::class, 'parameter_id');
     }
     public function sampling()
     {

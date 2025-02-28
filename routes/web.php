@@ -37,6 +37,7 @@ Route::group(['prefix' => 'institute'], function () {
     Route::delete('/delete', [InstituteController::class, 'delete'])->name('institute.delete');
     Route::any('/add', [InstituteController::class, 'add'])->name('institute.add');
     Route::any('/create', [InstituteController::class, 'create'])->name('institute.create');
+    Route::any('/edit/{id}', [InstituteController::class, 'edit'])->name('institute.edit');
 });
 
 Route::group(['prefix' => 'result'], function () {

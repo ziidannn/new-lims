@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\Sampling;
 use App\Models\Subject;
 use App\Models\SamplingTime;
+use App\Models\SamplingTimeRegulation;
 use Yajra\DataTables\Facades\DataTables;
 
 class ResultController extends Controller
@@ -89,37 +90,34 @@ class ResultController extends Controller
             $samplings = Sampling::where('institute_id', $id)->get();
 
             if ($request->has('testing_result')) {
-                foreach ($request->testing_result as $key => $result) {
+                foreach ($request->input('testing_result') as $key => $result) {
                     Result::updateOrCreate(
                         [
                             'sampling_id' => $id,
-                            'subject_id' => $request->subject_id[$key] ?? null,
-                            'name_parameter' => $request->parameters[$key] ?? null,
+                            'name_parameter' => $request->input('parameters')[$key] ?? null,
                         ],
                         [
-                            'sampling_time' => $request->sampling_times[$key] ?? null,
+                            'sampling_time' => $request->input('sampling_times')[$key] ?? null,
                             'testing_result' => $result,
-                            'regulation' => $request->regulations[$key] ?? null,
-                            'unit' => $request->units[$key] ?? null,
-                            'method' => $request->methods[$key] ?? null,
+                            'regulation' => $request->input('regulations')[$key] ?? null,
+                            'unit' => $request->input('units')[$key] ?? null,
+                            'method' => $request->input('methods')[$key] ?? null,
                         ]
                     );
                 }
             }
 
-            return back()->with('msg', 'Data Result (' . $request->no_sample . ') saved successfully');
+            return back()->with('msg', 'Data Result (' . $request->sampling_id . ') saved successfully');
         }
 
         $samplingTimes = SamplingTime::orderBy('time')->get();
         $regulationStandards = RegulationStandard::orderBy('title')->get();
 
-        $parameters = Parameter::whereHas('regulation', function ($query) use ($id) {
-            $query->where('subject_id', $id);
-        })->get();
-        $parametersIds = $parameters->pluck('id');
-
         $regulations = Regulation::where('subject_id', $id)->get();
         $regulationsIds = $regulations->pluck('id');
+
+        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $parametersIds = $parameters->pluck('id');
 
         $instituteSamples = InstituteSubject::where('institute_id', $id)->get();
         $instituteSamplesIds = $instituteSamples->pluck('id');
@@ -130,14 +128,18 @@ class ResultController extends Controller
             ->with('regulations.parameters', 'sampling_times.regulation_standards')
             ->get();
 
+        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+        ->with(['samplingTime', 'regulationStandards'])
+        ->get();
+
         $institute = Institute::findOrFail($id);
         $subjects = Subject::orderBy('name')->get();
+        $results = Result::where('sampling_id', $id)->get();
 
-        // Debugging data
-        // dd(compact('institute', 'subjects', 'samplingTimes', 'regulationStandards', 'regulations', 'parameters', 'instituteSamples', 'samplings', 'samps'));
-
-        return view('result.add_result', compact('institute', 'subjects', 'samplingTimes',
-        'regulationStandards', 'parameters', 'regulations', 'instituteSamples', 'samplings','samps'));
+        return view('result.add_result', compact(
+            'institute', 'subjects', 'samplingTimes',
+            'regulationStandards', 'parameters', 'regulations', 'instituteSamples',
+            'samplings','samps', 'samplingTimeRegulations', 'results'));
     }
 
     public function data(Request $request)
