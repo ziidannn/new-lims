@@ -178,6 +178,8 @@
                             <th scope="col" width="20px"><b>Parameter</b></th>
                             <th scope="col" width="20px"><b>Sampling Time</b></th>
                             <th scope="col" width="20px"><b>Regulatory Standard</b></th>
+                            <th scope="col" width="20px"><b>Unit</b></th>
+                            <th scope="col" width="20px"><b>Methods</b></th>
                             <th scope="col" width="20px"><b>Action</b></th>
                         </tr>
                     </thead>
@@ -257,10 +259,10 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        // Check if row.category exists and has an id
+                        // Check if row.regulation exists and has an id
                         if (row.regulation && row.regulation.id) {
                             var html =
-                                `<a class="text-dark" title="${row.regulation.title}" href="">${row.regulation.title}</a>`;
+                                `<a class="text-primary" title="${row.regulation.title}" href="{{ url('coa/regulation/` + `') }}">${row.regulation.title}</a>`;
                             return html;
                         } else {
                             return ''; // Return empty string or handle the case where regulation.title is missing
@@ -277,7 +279,7 @@
                 {
                     render: function (data, type, row, meta) {
                         if (row.samplingTime) {
-                            var html = '<ul style="padding-left: 15px;">';
+                            var html = '<ul style="color: black; padding-left: 15px;">';
                             row.samplingTime.split(', ').forEach(function(time) {
                                 html += `<li>${time}</span></li>`;
                             });
@@ -291,7 +293,7 @@
                 {
                     render: function (data, type, row, meta) {
                         if (row.regulationStandards) {
-                            var html = '<ul style="padding-left: 15px;">';
+                            var html = '<ul style="color: green; padding-left: 15px;">';
                             row.regulationStandards.split(', ').forEach(function(title) {
                                 html += `<li>${title}</span></li>`;
                             });
@@ -328,6 +330,18 @@
                 //     },
                 //     className: "text-center"
                 // },
+                {
+                    render: function (data, type, row, meta) {
+                        return row.unit;
+                    },
+                    orderable: false
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        return row.method;
+                    },
+                    orderable: false
+                },
                 {
                     render: function (data, type, row, meta) {
                         var html = ''; {

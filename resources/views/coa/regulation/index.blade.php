@@ -234,7 +234,7 @@
                         // Check if row.category exists and has an id
                         if (row.subjects && row.subjects.id) {
                             var html =
-                                `<a class="text-dark" title="${row.subjects.name}" href="">${row.subjects.name}</a>`;
+                                `<a class="text-primary" title="${row.subjects.name}" href="">${row.subjects.name}</a>`;
                             return html;
                         } else {
                             return ''; // Return empty string or handle the case where regulation.title is missing

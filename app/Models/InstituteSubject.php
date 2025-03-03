@@ -15,8 +15,13 @@ class InstituteSubject extends Model
     protected $fillable = [
         'institute_id',
         'subject_id',
+        'regulation_id'
     ];
 
+    public function samplings()
+    {
+        return $this->hasMany(Sampling::class, 'institute_subject_id');
+    }
     public function institute()
     {
         return $this->belongsTo(Institute::class, 'institute_id');
@@ -28,5 +33,5 @@ class InstituteSubject extends Model
     public function subjects()
     {
         return $this->hasMany(InstituteSubject::class, 'institute_id');
-    } 
+    }
 }

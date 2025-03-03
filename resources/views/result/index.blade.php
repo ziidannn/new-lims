@@ -188,9 +188,7 @@
                 {
                     render: function (data, type, row, meta) {
                         var html = ''; {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('result/add_sampling/${row.id}') }}">
-                                    <i class="bx bx-plus icon-white"></i></a>
-                                    <a class="badge bg-warning badge-icon" title="List result" href="{{ url('result/list_result/${row.id}') }}">
+                            html = `<a class="badge bg-warning badge-icon" title="List result" href="{{ url('result/list_result/${row.id}') }}">
                                     <i class="bx bx-pencil"></i></a>`;
                         }
                         return html;

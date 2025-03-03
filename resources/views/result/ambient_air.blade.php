@@ -92,40 +92,40 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th><b>Sample No.</b></th>
-                                <th><b>Sampling Location</b></th>
-                                <th><b>Sample Description</b></th>
-                                <th><b>Date</b></th>
-                                <th><b>Time</b></th>
-                                <th><b>Sampling Method</b></th>
-                                <th><b>Date Received</b></th>
-                                <th><b>ITD</b></th>
+                                <th class="text-center"><b>Sample No.</b></th>
+                                <th class="text-center"><b>Sampling Location</b></th>
+                                <th class="text-center"><b>Sample Description</b></th>
+                                <th class="text-center"><b>Date</b></th>
+                                <th class="text-center"><b>Time</b></th>
+                                <th class="text-center"><b>Sampling Method</b></th>
+                                <th class="text-center"><b>Date Received</b></th>
+                                <th class="text-center"><b>ITD</b></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><input type="text" class="form-control w-100" name="no_sample"
+                                <td><input type="text" class="form-control text-center" name="no_sample"
                                         value="{{ $sampling->no_sample ?? '' }}"></td>
-                                <td><input type="text" class="form-control w-100" name="sampling_location"
+                                <td><input type="text" class="form-control text-center" name="sampling_location"
                                         value="{{ $sampling->sampling_location ?? '' }}"></td>
                                 <td>
                                     <input type="hidden" name="institute_subject_id" value="{{ $selectedSampleId }}">
-                                    <input type="text" class="form-control w-100" value="{{ $selectedSampleName }}"
+                                    <input type="text" class="form-control text-center" value="{{ $selectedSampleName }}"
                                         readonly>
                                 </td>
-                                <td><input type="date" class="form-control w-100" name="sampling_date"
+                                <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ $sampling->sampling_date ?? '' }}"></td>
-                                <td><input type="text" class="form-control w-100" name="sampling_time"
+                                <td><input type="text" class="form-control text-center" name="sampling_time"
                                         value="{{ $sampling->sampling_time ?? '' }}"></td>
-                                <td><input type="text" class="form-control w-100" name="sampling_method"
+                                <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab/24 Hours" readonly></td>
-                                <td><input type="date" class="form-control w-100" name="date_received"
+                                <td><input type="date" class="form-control text-center" name="date_received"
                                         value="{{ $sampling->date_received ?? '' }}"></td>
                                 <td>
-                                    <input type="date" class="form-control w-100" name="itd_start"
+                                    <input type="date" class="form-control text-center" name="itd_start"
                                         value="{{ $sampling->itd_start ?? '' }}">
                                     <span class="mx-2">to</span>
-                                    <input type="date" class="form-control w-100" name="itd_end"
+                                    <input type="date" class="form-control text-center" name="itd_end"
                                         value="{{ $sampling->itd_end ?? '' }}">
                                 </td>
                             </tr>
@@ -152,20 +152,20 @@
                 <div class="row">
                     <table class="table table-bordered">
                         <tr>
-                            <th><b>No</b></th>
-                            <th><b>Parameters</b></th>
-                            <th><b>Sampling Time</b></th>
-                            <th><b>Testing Result</b></th>
-                            <th><b>Regulatory Standard</b></th>
-                            <th><b>Unit</b></th>
-                            <th><b>Methods</b></th>
+                            <th class="text-center"><b>No</b></th>
+                            <th class="text-center"><b>Parameters</b></th>
+                            <th class="text-center"><b>Sampling Time</b></th>
+                            <th class="text-center"><b>Testing Result</b></th>
+                            <th class="text-center"><b>Regulatory Standard</b></th>
+                            <th class="text-center"><b>Unit</b></th>
+                            <th class="text-center"><b>Methods</b></th>
                         </tr>
                         @foreach($parameters as $key => $parameter)
                         <tr>
                             <td>{{ $key + 1 }}</td>
                             <td>
                                 <input type="hidden" name="name_parameter[]" value="{{ $parameter->id }}" readonly>
-                                <input type="text" class="form-control w-100" name="name_parameter[]" value="{{ $parameter->name }}" readonly>
+                                <input type="text" class="form-control text-center" name="name_parameter[]" value="{{ $parameter->name }}" readonly>
                             </td>
                             <td>
                                 @php
@@ -173,14 +173,14 @@
                                 @endphp
                                 @if ($samplingTimes->isNotEmpty())
                                     @foreach ($samplingTimes as $samplingTime)
-                                    <input type="text" class="form-control w-100" name="sampling_time_id[]" value="{{ $samplingTime->samplingTime->time }}" readonly>
+                                    <input type="text" class="form-control text-center" name="sampling_time_id[]" value="{{ $samplingTime->samplingTime->time }}" readonly>
                                     @endforeach
                                 @else
-                                    <input type="text" class="form-control w-100" name="sampling_time_id[]" value="">
+                                    <input type="text" class="form-control text-center" name="sampling_time_id[]" value="">
                                 @endif
                             </td>
                             <td>
-                                <textarea type="text" class="form-control w-100" name="testing_result[]"></textarea>
+                                <textarea type="text" class="form-control text-center" name="testing_result[]"></textarea>
                             </td>
                             <td>
                                 @php
@@ -188,17 +188,17 @@
                                 @endphp
                                 @if ($regulationStandards->isNotEmpty())
                                     @foreach ($regulationStandards as $rs)
-                                    <input type="text" class="form-control w-100" name="regulation_standard_id[]" value="{{ $rs->regulationStandards->title }}" readonly>
+                                    <input type="text" class="form-control text-center" name="regulation_standard_id[]" value="{{ $rs->regulationStandards->title }}" readonly>
                                     @endforeach
                                 @else
-                                    <input type="text" class="form-control w-100" name="regulation_standard_id[]" value="">
+                                    <input type="text" class="form-control text-center" name="regulation_standard_id[]" value="">
                                 @endif
                             </td>
                             <td>
-                                <input type="text" class="form-control w-100" name="unit[]" value="{{ $parameter->unit ?? '' }}" readonly>
+                                <input type="text" class="form-control text-center" name="unit[]" value="{{ $parameter->unit ?? '' }}" readonly>
                             </td>
                             <td>
-                                <input type="text" class="form-control w-100" name="method[]" value="{{ $parameter->method ?? '' }}" readonly>
+                                <input type="text" class="form-control text-center" name="method[]" value="{{ $parameter->method ?? '' }}" readonly>
                             </td>
                         </tr>
                         @endforeach

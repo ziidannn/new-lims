@@ -24,14 +24,17 @@ class Sampling extends Model
         'itd_end',
     ];
 
+    public function institute()
+    {
+        return $this->belongsTo(Institute::class, 'institute_id');
+    }
     public function description()
     {
         return $this->belongsTo(Subject::class, 'subject_id', 'id');
     }
-
     public function instituteSubject()
     {
-        return $this->belongsTo(InstituteSubject::class, 'sampling_id', 'id');
+        return $this->belongsTo(InstituteSubject::class, 'institute_subject_id', 'id');
     }
     public function parameter()
     {
