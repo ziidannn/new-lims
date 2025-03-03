@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'Resume')
+@section('title', 'Result')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -156,8 +156,8 @@
                 },
                 // {
                 //     render: function (data, type, row, meta) {
-                //         if (row.sample_descriptions && row.sample_descriptions.length > 0) {
-                //             var html = row.sample_descriptions.map(function(desc, index) {
+                //         if (row.subjects && row.subjects.length > 0) {
+                //             var html = row.subjects.map(function(desc, index) {
                 //                 return `<span class="badge bg-dark"
                 //                             style="border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
                 //                             ${desc.name}
@@ -171,10 +171,10 @@
                 // },
                 {
                     render: function (data, type, row, meta) {
-                        if (row.sample_descriptions && row.sample_descriptions.length > 0) {
+                        if (row.subjects && row.subjects.length > 0) {
                             // Gunakan list dengan bullet atau badge untuk membedakan setiap description
                             var html = '<ul style="padding-left: 15px;">';
-                            row.sample_descriptions.forEach(function (desc) {
+                            row.subjects.forEach(function (desc) {
                                 html +=
                                     `<li><span class="badge bg-dark">${desc.name}</span></li>`;
                             });
@@ -188,12 +188,9 @@
                 {
                     render: function (data, type, row, meta) {
                         var html = ''; {
-
-                            html = `
-                                <a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('resume/add_sampling/${row.id}') }}">
+                            html = `<a class="badge bg-dark badge-icon" title="Add Sampling" href="{{ url('result/add_sampling/${row.id}') }}">
                                     <i class="bx bx-plus icon-white"></i></a>
-                                    <a class="badge bg-warning badge-icon" title="List Resume" href="{{ url('resume/list_resume/${row.id}') }}">
-                            html = `<a class="badge bg-warning badge-icon" title="List Resume" href="{{ url('resume/list_resume/${row.id}') }}">
+                                    <a class="badge bg-warning badge-icon" title="List result" href="{{ url('result/list_result/${row.id}') }}">
                                     <i class="bx bx-pencil"></i></a>`;
                         }
                         return html;

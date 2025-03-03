@@ -18,30 +18,30 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "1",
                 "regulation_id" => "1",
-                "name" => "PPRI No. 22 tahun 2021 Lamp VII",
+                "name" => "Sulfur Dioxide (SO₂)*",
                 "unit" => "ug/m³",
                 "method" => "Lamp VII"
             ],
             [
                 "id" => "2",
-                "regulation_id" => "1",
-                "name" => "KepGub DKI Jakarta No. 551 Tahun 2001",
+                "regulation_id" => "2",
+                "name" => "Nitrogen Dioxide (NO₂)*",
                 "unit" => "ug/m³",
                 "method" => "No. 551 Tahun 2001"
             ],
             [
                 "id" => "3",
-                "regulation_id" => "1",
-                "name" => "PermenLHK No 11 Tahun 2021 Lamp I -  101 - 500 KW",
+                "regulation_id" => "3",
+                "name" => "24 Hours Noise",
                 "unit" => "ug/m³",
-                "method" => "Lamp I -  101 - 500 KW"
+                "method" => "101 - 500 KW"
             ],
             [
                 "id" => "4",
-                "regulation_id" => "1",
-                "name" => "Permenlhk P.15/MENLHK/SETJEN/KUM.1/4/2019 Lampiran IA - ISOKINETIK",
+                "regulation_id" => "4",
+                "name" => "Total Solid Particulate (TSP)",
                 "unit" => "ug/m³",
-                "method" => "MENLHK/SETJEN/KUM.1/4/2019"
+                "method" => "MENLHK/SETJEN"
             ]
         ];
 

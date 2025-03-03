@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Resume;
+use App\Models\Result;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ResumeSeeder extends Seeder
+class ResultSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -101,8 +101,8 @@ class ResumeSeeder extends Seeder
         ];
 
         foreach ($data as $x) {
-            if(!Resume::where('id', $x['id'])->first()){
-                $m = new Resume();
+            if(!Result::where('id', $x['id'])->first()){
+                $m = new Result();
                 $m->id = $x['id'];
                 $m->sample_description_id = $x['sample_description_id'];
                 $m->name_parameter = $x['name_parameter'];

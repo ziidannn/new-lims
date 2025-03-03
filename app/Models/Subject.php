@@ -19,9 +19,9 @@ class Subject extends Model
     {
         return $this->belongsToMany(Institute::class, 'institute_subjects', 'subject_id', 'institute_id');
     }
-    public function resume()
+    public function result()
     {
-        return $this->hasMany(Resume::class, 'subject_id', 'id');
+        return $this->hasMany(Result::class, 'subject_id', 'id');
     }
     public function instituteSampleDescriptions()
     {

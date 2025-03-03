@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AmbientAir;
-use App\Models\Location;
 use App\Models\Parameter;
 use App\Models\Regulation;
 use App\Models\RegulationStandard;
-use App\Models\Resume;
 use App\Models\Sampling;
 use App\Models\Subject;
 use App\Models\SamplingTime;

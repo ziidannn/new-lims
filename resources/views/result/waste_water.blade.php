@@ -1,6 +1,5 @@
 @extends('layouts.master')
-@section('content')
-@section('title', 'Add Resume')
+@section('title', 'Add Result')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
@@ -62,7 +61,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('resume.add_sample', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.add_sample', $institute->id) }}" method="POST">
         @php
         $sampling = \App\Models\Sampling::where('institute_id', $institute->id)->first();
         @endphp
@@ -110,8 +109,7 @@
                                 <td><input type="text" class="form-control w-100" name="sampling_location"
                                         value="{{ $sampling->sampling_location ?? '' }}"></td>
                                 <td>
-                                    <input type="hidden" name="institute_subject_id"
-                                        value="{{ $selectedSampleId }}">
+                                    <input type="hidden" name="institute_subject_id" value="{{ $selectedSampleId }}">
                                     <input type="text" class="form-control w-100" value="{{ $selectedSampleName }}"
                                         readonly>
                                 </td>
@@ -147,7 +145,7 @@
 <br>
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('resume.add_resume', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.waste_water', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
@@ -162,20 +160,47 @@
                             <th><b>Unit</b></th>
                             <th><b>Methods</b></th>
                         </tr>
-                        @foreach($samps as $sampling)
-                            @foreach($sampling->regulations as $regulation)
-                                @foreach($regulation->parameters as $parameter)
-                                    <tr>
-                                        <td>{{ $loop->parent->parent->iteration }}</td>
-                                        <td>{{ $parameter->name }}</td>
-                                        <td>{{ $sampling->sampling_time }}</td>
-                                        <td>{{ $parameter->pivot->testing_result }}</td>
-                                        <td>{{ $regulation->title }}</td>
-                                        <td>{{ $parameter->unit }}</td>
-                                        <td>{{ $parameter->method }}</td>
-                                    </tr>
-                                @endforeach
-                            @endforeach
+                        @foreach($parameters as $key => $parameter)
+                        <tr>
+                            <td>{{ $key + 1 }}</td>
+                            <td>
+                                <input type="hidden" name="name_parameter[]" value="{{ $parameter->id }}" readonly>
+                                <input type="text" class="form-control w-100" name="name_parameter[]" value="{{ $parameter->name }}" readonly>
+                            </td>
+                            <td>
+                                @php
+                                    $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
+                                @endphp
+                                @if ($samplingTimes->isNotEmpty())
+                                    @foreach ($samplingTimes as $samplingTime)
+                                    <input type="text" class="form-control w-100" name="sampling_time_id[]" value="{{ $samplingTime->samplingTime->time }}" readonly>
+                                    @endforeach
+                                @else
+                                    <input type="text" class="form-control w-100" name="sampling_time_id[]" value="">
+                                @endif
+                            </td>
+                            <td>
+                                <textarea type="text" class="form-control w-100" name="testing_result[]"></textarea>
+                            </td>
+                            <td>
+                                @php
+                                    $regulationStandards = $samplingTimeRegulations->where('parameter_id', $parameter->id);
+                                @endphp
+                                @if ($regulationStandards->isNotEmpty())
+                                    @foreach ($regulationStandards as $rs)
+                                    <input type="text" class="form-control w-100" name="regulation_standard_id[]" value="{{ $rs->regulationStandards->title }}" readonly>
+                                    @endforeach
+                                @else
+                                    <input type="text" class="form-control w-100" name="regulation_standard_id[]" value="">
+                                @endif
+                            </td>
+                            <td>
+                                <input type="text" class="form-control w-100" name="unit[]" value="{{ $parameter->unit ?? '' }}" readonly>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control w-100" name="method[]" value="{{ $parameter->method ?? '' }}" readonly>
+                            </td>
+                        </tr>
                         @endforeach
                     </table>
                 </div>

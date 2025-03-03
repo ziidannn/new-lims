@@ -17,7 +17,6 @@ class Institute extends Model
         'contact_name',
         'email',
         'phone',
-        'sample_taken_by',
         'sample_receive_date',
         'sample_analysis_date',
         'report_date'
@@ -27,8 +26,17 @@ class Institute extends Model
     {
         return $this->belongsToMany(Subject::class, 'institute_subjects', 'institute_id', 'subject_id');
     }
+    public function Regulations()
+    {
+        return $this->belongsToMany(Regulation::class, 'institute_regulations', 'institute_id', 'regulation_id');
+    }
     public function institute_subjects()
     {
         return $this->hasMany(InstituteSubject::class, 'institute_id');
     }
+    public function institute_regulations()
+    {
+        return $this->hasMany(InstituteRegulation::class, 'institute_id');
+    }
+
 }

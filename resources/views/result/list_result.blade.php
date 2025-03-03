@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'List Resume')
+@section('title', 'List Result')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -98,7 +98,7 @@
                 searchPlaceholder: 'Search..',
             },
             ajax: {
-                url: "{{ route('resume.getDataResume', $institute->id) }}", // Ambil data berdasarkan institute_id
+                url: "{{ route('result.getDataResult', $institute->id) }}", // Ambil data berdasarkan institute_id
                 data: function (d) {
                     d.search = $('input[type="search"]').val();
                 },
@@ -127,8 +127,20 @@
                 {
                     render: function (data, type, row, meta) {
                         var html = '';
-                        {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Resume" href="{{ url('resume/add_resume/${row.id}') }}">
+                        if (row.subject_id == 1) {
+                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('/result/ambient_air/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
+                        } else if (row.subject_id == 2) {
+                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('/result/noise/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
+                        } else if (row.subject_id == 3) {
+                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('/result/waste_water/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
+                        } else if (row.subject_id == 4) {
+                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('/result/workplace/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
+                        } else {
+                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('/result/add_result/${row.id}') }}">
                                     <i class="bx bx-plus icon-white"></i></a>`;
                         }
                         return html;

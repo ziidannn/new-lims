@@ -16,9 +16,9 @@ class SubjectSeeder extends Seeder
         //
         $data = [
             ["id" => "1", "name" => "Ambient Outdoor Air Quality"],
-            ["id" => "2", "name" => "Workplace Air Quality"],
-            ["id" => "3", "name" => "Noise"],
-            ["id" => "4", "name" => "Waste Water"]
+            ["id" => "2", "name" => "Noise"],
+            ["id" => "3", "name" => "Waste Water"],
+            ["id" => "4", "name" => "Workplace Air Quality"]
         ];
 
         foreach ($data as $x) {

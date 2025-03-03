@@ -190,9 +190,9 @@
                         {
                             html = `<a class="badge bg-dark badge-icon" title="Viwe Resume" href="/resume_coa/${row.id}">
                                     <i class="bx bx-printer"></i></a>
-                                    <a class="badge bg-warning badge-icon" title="Edit Sampling" href="/${row.id}">
+                                    <a class="badge bg-warning badge-icon" title="Edit Sampling" href="/institute/edit/${row.id}">
                                     <i class="bx bx-pencil"></i></a>
-                                    <a class="badge bg-danger badge-icon" title="Delete Sampling" style="cursor:pointer" onclick="DeleteId('${row.id}')">
+                                    <a class="badge bg-danger badge-icon" title="Delete Sampling" style="cursor:pointer" onclick="DeleteId('${row.id}', '${row.customer}')">
                                     <i class="bx bx-trash icon-white"></i></a>`;
                         }
                         return html;
@@ -218,7 +218,7 @@
             .then((willDelete) => {
                 if (willDelete) {
                     $.ajax({
-                        url: "",
+                        url: "{{ route('institute.delete') }}",
                         type: "DELETE",
                         data: {
                             "id": id,
