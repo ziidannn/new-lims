@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nama Institusi</title>
+
+    <title>{{ $customer ?? 'N/A' }}</title>
     <link rel="stylesheet" href="('assets/css/bootstrap_mpdf.css') ?>" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
@@ -15,7 +16,7 @@
             page-break-before: always;
         }
         table {
-          font-size: 11px;
+            font-size: 11px;
         }
         .table-bordered th, .table-bordered td {
             padding: 1px!important;
@@ -108,61 +109,72 @@
     <p class="certificate-title">CERTIFICATE OF ANALYSIS (COA)</p>
     <div class="text-center" style="font-size: 12px; margin-left: 90px; margin-top: -10px;">Certificate No.</div>
 </div>
-<div class="col-xs-110" style="margin-top: 10px; margin-left: 70px;">
+
+<div class="col-xs-110" style="margin-top: 30px; margin-left: 70px;">
     <table class="mt-2 table" style="font-size: 12px;">
         <tr>
             <td width="150px">Customer</td>
             <td>:</td>
-            <td colspan="2" width="150px" style="font-weight: bold;"></td>
+            <td colspan="2" width="150px" style="font-weight: bold;">{{ $customer ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td>Address</td>
             <td>:</td>
-            <td colspan="2"></td>
+            <td colspan="2">{{ $address ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td>Contact Name</td>
             <td>:</td>
-            <td colspan="2"></td>
+            <td colspan="2">{{ $contact_name ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td>Email</td>
             <td>:</td>
-            <td colspan="2"><a href="mailto:" style="color: blue; text-decoration: underline;"></a></td>
+            <td colspan="2"><a href="mailto:{{ $email }}" style="color: blue; text-decoration: underline;">{{ $email ?? 'N/A' }}</a></td>
         </tr>
         <tr>
             <td>Phone</td>
             <td>:</td>
-            <td colspan="2">+62</td>
+            <td colspan="2">{{ $phone ?? 'N/A' }}</td>
         </tr>
-        <tr>
+        <tr">
             <td>Subject</td>
             <td>:</td>
-            <td></td>
-            <td></td>
+            <td style="margin-top: 10px" colspan="5">
+            @if($subjects && $subjects->count() > 0)
+                <ul style="list-style-type: none;  padding-left: 0;">
+                @foreach($subjects as $subject)
+                    <li>- {{ $subject->name }}</li>
+                @endforeach
+                </ul>
+            @else
+                N/A
+            @endif
+            </td>
         </tr>
         <tr>
             <td>Sample taken by</td>
             <td>:</td>
-            <td colspan="2">PT. Delta Indonesia Laboratory</td>
+            <td colspan="2">{{ $sample_taken_by ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td>Sample Receive Date</td>
             <td>:</td>
-            <td colspan="2"></td>
+            <td colspan="2">{{ $sample_receive_date ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td style="padding-right: 50px;">Sample Analysis Date</td>
             <td style="padding-right: 10px;">:</td>
-            <td colspan="2"></td>
+            <td colspan="2">{{ $sample_analysis_date ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td>Report Date</td>
             <td>:</td>
-            <td colspan="2"></td>
+            <td colspan="2">{{ $report_date ?? 'N/A' }}</td>
         </tr>
     </table>
 </div>
+    
 <div style="width: 100%; margin-top: 50px;">
     <div align="left" style="width: 50%;float: left;"></div>
     <div style="width: 50%; float: right;">
