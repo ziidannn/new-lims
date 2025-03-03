@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('contact_name');
             $table->string('email');
             $table->string('phone');
-            $table->string('sample_taken_by')->nullable();
             $table->date('sample_receive_date')->nullable();
             $table->date('sample_analysis_date')->nullable();
             $table->date('report_date')->nullable();

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\AmbientAir;
 use App\Models\Location;
 use App\Models\Institute;
+use App\Models\InstituteSubject;
+use App\Models\Regulation;
 use App\Models\Sampling;
 use App\Models\Subject;
 use Illuminate\Http\Request;
@@ -29,7 +31,6 @@ class InstituteController extends Controller
                 'email' => ['required', 'email'],
                 'phone' => ['required'],
                 'subject_id' => ['required', 'array'], // Pastikan ini array
-                'sample_taken_by' => ['required'],
                 'sample_receive_date' => ['required'],
                 'sample_analysis_date' => ['required'],
                 'report_date' => ['required']
@@ -42,7 +43,6 @@ class InstituteController extends Controller
                 'contact_name' => $request->contact_name,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'sample_taken_by' => $request->sample_taken_by,
                 'sample_receive_date' => $request->sample_receive_date,
                 'sample_analysis_date' => $request->sample_analysis_date,
                 'report_date' => $request->report_date,
@@ -53,12 +53,29 @@ class InstituteController extends Controller
                 $Institute->Subjects()->attach($request->subject_id);
             }
 
+            // Simpan regulation_id ke tabel pivot
+            if ($request->has('regulation_id')) {
+                $Institute->Regulations()->attach($request->regulation_id);
+            }
+
             return redirect()->route('institute.index')->with('msg', 'Data berhasil ditambahkan');
         }
 
         $data = Institute::all();
         $description = Subject::orderBy('name')->get();
-        return view('institute.create', compact('data', 'description'));
+        $regulation = Regulation::orderBy('title')->get();
+        return view('institute.create', compact('data', 'description', 'regulation'));
+    }
+
+    public function getRegulationBySubjectIds(Request $request)
+    {
+        $subjectIds = $request->input('ids', []); // Ambil subject_id atau array kosong
+        if (empty($subjectIds)) {
+            return response()->json([]);
+        }
+
+        $regulations = Regulation::whereIn('subject_id', $subjectIds)->get();
+        return response()->json($regulations);
     }
 
     //Edit institute
@@ -74,7 +91,6 @@ class InstituteController extends Controller
                 'email' => ['required', 'email'],
                 'phone' => ['required'],
                 'subject_id' => ['required', 'array'], // Pastikan ini array
-                'sample_taken_by' => ['required'],
                 'sample_receive_date' => ['required'],
                 'sample_analysis_date' => ['required'],
                 'report_date' => ['required']
@@ -87,7 +103,6 @@ class InstituteController extends Controller
                 'contact_name' => $request->contact_name,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'sample_taken_by' => $request->sample_taken_by,
                 'sample_receive_date' => $request->sample_receive_date,
                 'sample_analysis_date' => $request->sample_analysis_date,
                 'report_date' => $request->report_date,
@@ -96,12 +111,56 @@ class InstituteController extends Controller
             // Update subject_id ke tabel pivot
             if ($request->has('subject_id')) {
                 $data->Subjects()->sync($request->subject_id);
+                // Update regulation_id based on subject_id
+                $regulationIds = Regulation::whereIn('subject_id', $request->subject_id)->pluck('id')->toArray();
+                $data->Regulations()->sync($regulationIds);
             }
 
             return redirect()->route('institute.index')->with('msg', 'Data berhasil diubah');
         }
 
-        return view('institute.edit', compact('data', 'description'));
+        $regulation = Regulation::whereIn('subject_id', $data->Subjects->pluck('id')->toArray())->get();
+
+        return view('institute.edit', compact('data', 'description', 'regulation'));
+    }
+
+    public function delete(Request $request)
+    {
+        $data = Institute::find($request->id);
+
+        if ($data) {
+            // Hapus entri terkait di in$instituteSubject
+            $instituteSubjects = InstituteSubject::where('institute_id', $data->id)->get();
+
+            foreach ($instituteSubjects as $instituteSubject) {
+                // Hapus Observasi yang terkait dengan in$instituteSubject
+                Sampling::where('institute_subject_id', $instituteSubject->id)->delete();
+            }
+
+            // Hapus in$instituteSubject
+            InstituteSubject::where('institute_id', $data->id)->delete();
+
+            // Hapus Observasi yang terkait dengan AuditPlan
+            Sampling::where('institute_id', $data->id)->delete();
+
+            // Hapus regulations yang terkait dengan Institute
+            $data->Regulations()->detach();
+
+            // Hapus AuditPlan itu sendiri
+            $data->delete();
+
+        // Email Pembatalan Auditing
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil dihapus!'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal dihapus! Data tidak ditemukan.'
+            ]);
+        }
     }
 
     //Data institute

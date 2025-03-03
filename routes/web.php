@@ -38,6 +38,7 @@ Route::group(['prefix' => 'institute'], function () {
     Route::any('/add', [InstituteController::class, 'add'])->name('institute.add');
     Route::any('/create', [InstituteController::class, 'create'])->name('institute.create');
     Route::any('/edit/{id}', [InstituteController::class, 'edit'])->name('institute.edit');
+    Route::get('/get_regulation_by_subject_ids', [InstituteController::class, 'getRegulationBySubjectIds'])->name('DOC.get_regulation_id_by_id');
 });
 
 Route::group(['prefix' => 'result'], function () {
@@ -45,6 +46,10 @@ Route::group(['prefix' => 'result'], function () {
     Route::get('/data', [ResultController::class, 'data'])->name('result.data');
     Route::delete('/delete', [ResultController::class, 'delete'])->name('result.delete');
     // Route::any('/result/create', [ResultController::class, 'create'])->name('result.create');
+    Route::any('/ambient_air/{id}', [ResultController::class, 'addAmbientAir'])->name('result.ambient_air');
+    Route::any('/noise/{id}', [ResultController::class, 'addNoise'])->name('result.noise');
+    Route::any('/waste_water/{id}', [ResultController::class, 'addWasteWater'])->name('result.waste_water');
+    Route::any('/workplace/{id}', [ResultController::class, 'addWorkplace'])->name('result.workplace');
     Route::any('/add_result/{id}', [ResultController::class, 'add_result'])->name('result.add_result');
     Route::any('/add_sample/{id}', [ResultController::class, 'add_sample'])->name('result.add_sample');
     Route::any('/list_result/{id}', [ResultController::class, 'list_result'])->name('result.list_result');

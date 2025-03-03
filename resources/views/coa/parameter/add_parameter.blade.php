@@ -66,7 +66,6 @@
                                     </select>
                                 </div>
                             </div>
-
                             <div class="col-lg-12">
                                 <label class="col-form-label">Sampling Time & Regulation Standard <i
                                         class="text-danger">*</i></label>
@@ -128,12 +127,12 @@
 
     </script>
     <script>
-document.getElementById('add_more').addEventListener('click', function () {
-    let container = document.getElementById('sampling_time_container');
-    let div = document.createElement('div');
-    div.classList.add('row', 'mb-2');
+        document.getElementById('add_more').addEventListener('click', function () {
+            let container = document.getElementById('sampling_time_container');
+            let div = document.createElement('div');
+            div.classList.add('row', 'mb-2');
 
-    div.innerHTML = `
+            div.innerHTML = `
         <div class="col-md-5">
             <select name="sampling_time_id[]" class="form-control" required>
                 <option value="">Select Sampling Time</option>
@@ -157,13 +156,14 @@ document.getElementById('add_more').addEventListener('click', function () {
         </div>
     `;
 
-    container.appendChild(div);
-});
+            container.appendChild(div);
+        });
 
-document.addEventListener('click', function (e) {
-    if (e.target.classList.contains('remove-row')) {
-        e.target.closest('.row').remove();
-    }
-});
-</script>
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-row')) {
+                e.target.closest('.row').remove();
+            }
+        });
+
+    </script>
     @endsection

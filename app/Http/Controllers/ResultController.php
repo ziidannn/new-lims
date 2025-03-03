@@ -136,7 +136,83 @@ class ResultController extends Controller
         $subjects = Subject::orderBy('name')->get();
         $results = Result::where('sampling_id', $id)->get();
 
-        return view('result.add_result', compact(
+        if ($id == 1) {
+            return view('result.ambient_air', compact(
+            'institute', 'subjects', 'samplingTimes',
+            'regulationStandards', 'parameters', 'regulations', 'instituteSamples',
+            'samplings','samps', 'samplingTimeRegulations', 'results'));
+        } elseif ($id == 2) {
+            return view('result.noise', compact(
+            'institute', 'subjects', 'samplingTimes',
+            'regulationStandards', 'parameters', 'regulations', 'instituteSamples',
+            'samplings','samps', 'samplingTimeRegulations', 'results'));
+        } elseif ($id == 3) {
+            return view('result.waste_water', compact(
+            'institute', 'subjects', 'samplingTimes',
+            'regulationStandards', 'parameters', 'regulations', 'instituteSamples',
+            'samplings','samps', 'samplingTimeRegulations', 'results'));
+        } elseif ($id == 4) {
+            return view('result.workplace', compact(
+            'institute', 'subjects', 'samplingTimes',
+            'regulationStandards', 'parameters', 'regulations', 'instituteSamples',
+            'samplings','samps', 'samplingTimeRegulations', 'results'));
+        }
+    }
+
+    public function addNoise(Request $request, $id)
+    {
+        if ($request->isMethod('POST')) {
+            $institute = Institute::findOrFail($id);
+            $samplings = Sampling::where('institute_id', $id)->get();
+
+            if ($request->has('testing_result')) {
+                foreach ($request->input('testing_result') as $key => $result) {
+                    Result::updateOrCreate(
+                        [
+                            'sampling_id' => $id,
+                            'name_parameter' => $request->input('parameters')[$key] ?? null,
+                        ],
+                        [
+                            'sampling_time' => $request->input('sampling_times')[$key] ?? null,
+                            'testing_result' => $result,
+                            'regulation' => $request->input('regulations')[$key] ?? null,
+                            'unit' => $request->input('units')[$key] ?? null,
+                            'method' => $request->input('methods')[$key] ?? null,
+                        ]
+                    );
+                }
+            }
+
+            return back()->with('msg', 'Data Result (' . $request->sampling_id . ') saved successfully');
+        }
+
+        $samplingTimes = SamplingTime::orderBy('time')->get();
+        $regulationStandards = RegulationStandard::orderBy('title')->get();
+
+        $regulations = Regulation::where('subject_id', $id)->get();
+        $regulationsIds = $regulations->pluck('id');
+
+        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $parametersIds = $parameters->pluck('id');
+
+        $instituteSamples = InstituteSubject::where('institute_id', $id)->get();
+        $instituteSamplesIds = $instituteSamples->pluck('id');
+
+        $samplings = Sampling::whereIn('institute_subject_id', $instituteSamplesIds)->get();
+        $samplingsIds = $samplings->pluck('id');
+        $samps = Sampling::whereIn('id', $samplingsIds)
+            ->with('regulations.parameters', 'sampling_times.regulation_standards')
+            ->get();
+
+        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+        ->with(['samplingTime', 'regulationStandards'])
+        ->get();
+
+        $institute = Institute::findOrFail($id);
+        $subjects = Subject::orderBy('name')->get();
+        $results = Result::whereIn('sampling_id', $samplingsIds)->get();
+
+        return view('result.noise', compact(
             'institute', 'subjects', 'samplingTimes',
             'regulationStandards', 'parameters', 'regulations', 'instituteSamples',
             'samplings','samps', 'samplingTimeRegulations', 'results'));

@@ -127,8 +127,20 @@
                 {
                     render: function (data, type, row, meta) {
                         var html = '';
-                        {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('result/add_result/${row.id}') }}">
+                        if (row.subject_id == 1) {
+                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('/result/ambient_air/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
+                        } else if (row.subject_id == 2) {
+                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('/result/noise/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
+                        } else if (row.subject_id == 3) {
+                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('/result/waste_water/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
+                        } else if (row.subject_id == 4) {
+                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('/result/workplace/${row.id}') }}">
+                                    <i class="bx bx-plus icon-white"></i></a>`;
+                        } else {
+                            html = `<a class="badge bg-dark badge-icon" title="Add Result" href="{{ url('/result/add_result/${row.id}') }}">
                                     <i class="bx bx-plus icon-white"></i></a>`;
                         }
                         return html;
