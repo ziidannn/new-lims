@@ -89,8 +89,8 @@ Route::middleware('auth')->group(function () {
 });
 
 //PDF
-Route::get('/generate-pdf/{customerId}', [PDFController::class, 'generatePdf'])->name('generate.pdf');
 Route::get('/resume_coa/{customerId}', [PDFController::class, 'previewPdf'])->name('preview.pdf');
+Route::get('/ambient_air/{customerId}', [PDFController::class, 'ambientAirPdf'])->name('ambient.air.pdf');
 
 
 Route::get('log-viewers', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['can:log-viewers.read']);

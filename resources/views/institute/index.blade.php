@@ -188,7 +188,7 @@
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-dark badge-icon" title="Viwe Resume" href="/resume_coa/${row.id}">
+                            html = `<a class="badge bg-dark badge-icon" title="Viwe Resume" href="/ambient_air/${row.id}">
                                     <i class="bx bx-printer"></i></a>
                                     <a class="badge bg-warning badge-icon" title="Edit Sampling" href="/institute/edit/${row.id}">
                                     <i class="bx bx-pencil"></i></a>
