@@ -11,20 +11,11 @@ class Institute extends Model
     protected $table = 'institutes';
     public $timestamps = true;
     public $incrementing = true;
-    protected $fillable = [
-        'customer',
-        'address',
-        'contact_name',
-        'email',
-        'phone',
-        'sample_receive_date',
-        'sample_analysis_date',
-        'report_date'
-    ];
+    
 
-    public function Subjects()
+        public function Subjects()
     {
-        return $this->belongsToMany(Subject::class, 'institute_subjects', 'institute_id', 'subject_id', 'regulation_id');
+        return $this->belongsToMany(Subject::class, 'institute_subjects', 'institute_id', 'subject_id');
     }
     public function Regulations()
     {

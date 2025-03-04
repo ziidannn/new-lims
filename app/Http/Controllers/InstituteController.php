@@ -50,12 +50,22 @@ class InstituteController extends Controller
 
             // Simpan subject_id ke tabel pivot
             if ($request->has('subject_id')) {
-                $Institute->Subjects()->attach($request->subject_id);
-            }
+                foreach ($request->subject_id as $subjectId) {
+                    // Simpan subject_id ke tabel pivot
+                    $Institute->Subjects()->attach($subjectId);
 
-            // Simpan regulation_id ke tabel pivot
-            if ($request->has('regulation_id')) {
-                $Institute->Regulations()->attach($request->regulation_id);
+                    // Ambil regulation_id berdasarkan subject_id
+                    $regulationIds = Regulation::where('subject_id', $subjectId)->pluck('id')->toArray();
+
+                    // Simpan regulation_id ke tabel pivot institute_subjects
+                    foreach ($regulationIds as $regulationId) {
+                        InstituteSubject::create([
+                            'institute_id' => $Institute->id,
+                            'subject_id' => $subjectId,
+                            'regulation_id' => $regulationId,
+                        ]);
+                    }
+                }
             }
 
             return redirect()->route('institute.index')->with('msg', 'Data berhasil ditambahkan');
@@ -69,10 +79,7 @@ class InstituteController extends Controller
 
     public function getRegulationBySubjectIds(Request $request)
     {
-        $subjectIds = $request->input('ids', []); // Ambil subject_id atau array kosong
-        if (empty($subjectIds)) {
-            return response()->json([]);
-        }
+        $subjectIds = $request->input('ids'); // Ambil subject_id atau array kosong
 
         $regulations = Regulation::whereIn('subject_id', $subjectIds)->get();
         return response()->json($regulations);
