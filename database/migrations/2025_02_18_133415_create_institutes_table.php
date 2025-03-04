@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('institutes', function (Blueprint $table) {
             $table->id();
-            $table->string('customer');
-            $table->string('address');
-            $table->string('contact_name');
-            $table->string('email');
-            $table->string('phone');
+            $table->string('no_coa');
+            // $table->unsignedBigInteger('direktur_id');
+            // $table->foreign('direktur_id')->references('id')->on('direkturs');
+            $table->unsignedBigInteger('customer_id');
+            $table->foreign('customer_id')->references('id')->on('customers');
             $table->date('sample_receive_date')->nullable();
             $table->date('sample_analysis_date')->nullable();
             $table->date('report_date')->nullable();

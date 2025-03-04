@@ -100,25 +100,6 @@
                                 @enderror
                             </div>
                         </div>
-                        <!-- <div class="col-lg-6 col-md-12">
-                            <label class="form-label" for="basicDate">Sampling Description<i class="text-danger">*</i></label>
-                            <div class="input-group input-group-merge has-validation">
-                                <select class="form-select @error('subject_id') is-invalid @enderror input-sm select2-modal"
-                                        name="subject_id[]" id="subject_id" multiple>
-                                    @foreach($description as $p)
-                                        <option value="{{ $p->id }}"
-                                            {{ (is_array(old('subject_id')) && in_array($p->id, old('subject_id')) ? "selected": "") }}>
-                                            {{ $p->id }} - {{ $p->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('subject_id')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
-                            </div>
-                        </div> -->
                         <div class="col-lg-6 col-md-12">
                             <label class="form-label" for="basicDate">Sample Receive Data<i
                                     class="text-danger">*</i></label>
@@ -162,12 +143,50 @@
                                 @enderror
                             </div>
                         </div>
+                        <!-- <div class="col-lg-6 col-md-12">
+                            <label class="form-label" for="basicDate">Sampling Description<i class="text-danger">*</i></label>
+                            <div class="input-group input-group-merge has-validation">
+                                <select class="form-select @error('subject_id') is-invalid @enderror input-sm select2-modal"
+                                        name="subject_id[]" id="subject_id" multiple>
+                                    @foreach($description as $p)
+                                        <option value="{{ $p->id }}"
+                                            {{ (is_array(old('subject_id')) && in_array($p->id, old('subject_id')) ? "selected": "") }}>
+                                            {{ $p->id }} - {{ $p->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('subject_id')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12">
+                            <label class="form-label" for="basicDate">Regulation<i class="text-danger">*</i></label>
+                            <div class="input-group input-group-merge has-validation">
+                                <select class="form-select @error('regulation_id') is-invalid @enderror input-sm select2-modal"
+                                        name="regulation_id[]" id="regulation_id" multiple>
+                                    @foreach($regulation as $rg)
+                                        <option value="{{ $rg->id }}"
+                                            {{ (is_array(old('regulation_id')) && in_array($rg->id, old('regulation_id')) ? "selected": "") }}>
+                                            {{ $rg->id }} - {{ $rg->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('regulation_id')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div> -->
                         <div class="col-lg-12">
                             <label class="col-form-label">Sample Description & Regulation</label>
                             <div id="subject_id_container">
                                 <div class="row mb-2">
                                     <div class="col-md-5">
-                                    <select name="subject_id[]" class="form-select input-sm select2-modal subject_id" required>
+                                    <select name="subject_id[]" class="form-select input-sm select2-modal" required>
                                         <option value="">Select Sample Description</option>
                                             @foreach ($description as $desc)
                                             <option value="{{ $desc->id }}">{{ $desc->name }}</option>
@@ -176,8 +195,7 @@
                                     </div>
 
                                     <div class="col-md-5">
-                                        <select name="regulation_id[]" class="form-select input-sm select2-modal"
-                                            required>
+                                        <select name="regulation_id[]" class="form-select input-sm select2-modal" required>
                                             <option value="">Select Regulation</option>
                                             @foreach ($regulation as $rg)
                                             <option value="{{ $rg->id }}">{{ $rg->title }}</option>
@@ -209,6 +227,44 @@
 
 @section('script')
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+<script>
+    $(document).ready(function () {
+        $('#subject_id').select2({
+            placeholder: "Select Sample Description",
+            allowClear: true
+        });
+
+        $('#regulation_id').select2({
+            placeholder: "Select Regulation",
+            allowClear: true
+        });
+    });
+</script>
+<script>
+    $(document).on('change', 'select[name="subject_id[]"]', function () {
+    let selectedSubject = $(this).val(); // Ambil subject_id yang dipilih
+    let regulationSelect = $(this).closest('.row').find('select[name="regulation_id[]"]'); // Cari dropdown regulation terkait
+
+    if (selectedSubject) {
+        $.ajax({
+            url: "{{ route('DOC.get_regulation_id_by_id') }}",
+            type: "GET",
+            data: { ids: [selectedSubject] }, // Kirim array subject_id
+            dataType: 'json',
+            success: function (results) {
+                let regulationOptions = '<option value="">Select Regulation</option>';
+                $.each(results, function (key, value) {
+                    regulationOptions += '<option value="' + value.id + '">' + value.title + '</option>';
+                });
+
+                regulationSelect.html(regulationOptions);
+            }
+        });
+    } else {
+        regulationSelect.html('<option value="">Select Regulation</option>'); // Kosongkan jika tidak ada yang dipilih
+    }
+});
+</script>
 <script>
     $(document).ready(function () {
         const selectElement = document.querySelector('#is_required');
@@ -302,30 +358,5 @@
         }
     });
 
-</script>
-<script>
-    $(document).on('change', 'select[name="subject_id[]"]', function () {
-    let selectedSubject = $(this).val(); // Ambil subject_id yang dipilih
-    let regulationSelect = $(this).closest('.row').find('select[name="regulation_id[]"]'); // Cari dropdown regulation terkait
-
-    if (selectedSubject) {
-        $.ajax({
-            url: "{{ route('DOC.get_regulation_id_by_id') }}",
-            type: "GET",
-            data: { ids: [selectedSubject] }, // Kirim array subject_id
-            dataType: 'json',
-            success: function (results) {
-                let regulationOptions = '<option value="">Select Regulation</option>';
-                $.each(results, function (key, value) {
-                    regulationOptions += '<option value="' + value.id + '">' + value.title + '</option>';
-                });
-
-                regulationSelect.html(regulationOptions);
-            }
-        });
-    } else {
-        regulationSelect.html('<option value="">Select Regulation</option>'); // Kosongkan jika tidak ada yang dipilih
-    }
-});
 </script>
 @endsection
