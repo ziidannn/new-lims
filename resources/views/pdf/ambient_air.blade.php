@@ -82,7 +82,6 @@
         </div>
     </div>  
 </header>
-
 <footer>
     <div style="text-align: left; padding-bottom: -5px; margin-bottom: 10;">
         <p style="font-size: 8px; margin: -5; font-weight: bold;">Ruko Prima Orchard No.C 2</p>
@@ -98,7 +97,6 @@
     </table>    
 </footer>
 {{-- End Footer --}}
-
 {{-- Ambient Air --}}
 <div class="page_break"></div>
 <div>
@@ -121,13 +119,13 @@
             @foreach($samplings as $sampling)
                 <tr>
                     <td style="border: 1px solid;">{{ $sampling->id }}</td>
-                    <td style="border: 1px solid;">{{ $sampling->location }}</td>
-                    <td style="border: 1px solid;">{{ $sampling->description }}</td>
+                    <td style="border: 1px solid;">{{ $sampling->sampling_location }}</td>
+                    <td style="border: 1px solid;">{{ $subjects->first()->name ?? 'Tidak ada subject' }}</td>
                     <td style="border: 1px solid;">{{ $sampling->sampling_date }}</td>
                     <td style="border: 1px solid;">{{ $sampling->sampling_time }}</td>
-                    <td style="border: 1px solid;">{{ $sampling->methods }}</td>
+                    <td style="border: 1px solid;">{{ $sampling->sampling_method }}</td>
                     <td style="border: 1px solid;">{{ $sampling->date_received }}</td>
-                    <td style="border: 1px solid;">{{ $sampling->interval_testing_date }}</td>
+                    <td style="border: 1px solid;">{{ $sampling->itd_start }} <br>to <br>{{ $sampling->itd_start }} </td>
                 </tr>
             @endforeach
         </table>
@@ -153,7 +151,7 @@
                     <td style="border: 1px solid;">{{ $index + 1 }}</td>
                     <td style="border: 1px solid;">{{ $parameter->name }}</td>
                     <td style="border: 1px solid;">
-                        @if($samplingTimeRegulation && $samplingTimeRegulation->samplingTime)
+                        @if($samplingTimeRegulation)
                             {{ $samplingTimeRegulation->samplingTime->time }}
                         @else
                             N/A

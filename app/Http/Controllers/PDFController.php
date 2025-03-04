@@ -46,30 +46,43 @@ class PDFController extends Controller
         if (!$institute) {
             return redirect()->back()->with('error', 'Institute not found.');
         }
-
-        $subjects = $institute->subjects;
-        $subjectIds = $subjects->pluck('id');
-
+    
+        // Ambil subject_id dari tabel institute_subjects yang sesuai dengan institute_id
+        $instituteSamples = InstituteSubject::where('institute_id', $id)->get();
+        $subjectIds = $instituteSamples->pluck('subject_id'); // Mengambil subject_id
+    
+        // Ambil data subjects berdasarkan subject_id yang telah diambil
+        $subjects = Subject::whereIn('id', $subjectIds)->get();
+    
+        // Ambil data regulations terkait dengan subjects yang terpilih
         $regulations = Regulation::whereIn('subject_id', $subjectIds)->get();
         $regulationIds = $regulations->pluck('id');
-
+    
+        // Ambil data parameters terkait dengan regulations
         $parameters = Parameter::whereIn('regulation_id', $regulationIds)->orderBy('name')->get();
         $parameterIds = $parameters->pluck('id');
-
+    
+        // Data tambahan untuk tampilan
         $regulationStandards = RegulationStandard::orderBy('title')->get();
         $samplingTimes = SamplingTime::orderBy('time')->get();
-        
-        $instituteSamples = InstituteSubject::where('institute_id', $id)->get();
+    
+        // Ambil data sampling berdasarkan institute_subjects
         $instituteSamplesIds = $instituteSamples->pluck('id');
         $samplings = Sampling::whereIn('institute_subject_id', $instituteSamplesIds)->get();
         $samplingIds = $samplings->pluck('subject_id');
+    
         $samps = Sampling::whereIn('id', $samplingIds)
             ->with('regulations.parameters', 'sampling_times.regulation_standards')
             ->get();
+    
+        // Ambil data sampling time regulations
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parameterIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
+    
+        // Ambil hasil terkait dengan sampling yang sudah ada
         $results = Result::whereIn('sampling_id', $samplingIds)->get();
+        
 
         $pdf = Pdf::loadView('pdf.ambient_air', compact(
             'regulations', 'subjects', 'parameters', 'institute',
