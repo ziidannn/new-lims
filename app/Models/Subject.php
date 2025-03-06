@@ -13,7 +13,10 @@ class Subject extends Model
     public $timestamps = true;
     public $incrementing = true;
 
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+        'subject_code'
+    ];
 
     public function institute()
     {

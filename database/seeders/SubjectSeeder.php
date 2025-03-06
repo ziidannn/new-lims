@@ -15,16 +15,48 @@ class SubjectSeeder extends Seeder
     {
         //
         $data = [
-            ["id" => "1", "name" => "Ambient Outdoor Air Quality"],
-            ["id" => "2", "name" => "Noise"],
-            ["id" => "3", "name" => "Waste Water"],
-            ["id" => "4", "name" => "Workplace Air Quality"]
+            [
+                "id" => "1",
+                "subject_code" => "01",
+                "name" => "Ambient Air"
+            ],
+            [
+                "id" => "2",
+                "subject_code" => "02", 
+                "name" => "Workplace Air"
+            ],
+            [
+                "id" => "3", 
+                "subject_code" => "03",
+                "name" => "Noise*"
+            ],
+            [
+                "id" => "4", 
+                "subject_code" => "04",
+                "name" => "Odor"
+            ],
+            [
+                "id" => "5", 
+                "subject_code" => "05",
+                "name" => "Illumination*"
+            ],
+            [
+                "id" => "6", 
+                "subject_code" => "06",
+                "name" => "Heat Stress"
+            ],
+            [
+                "id" => "7", 
+                "subject_code" => "07",
+                "name" => "Stationary Stack Source Emission"
+            ],
         ];
 
         foreach ($data as $x) {
             if(!Subject::where('id', $x['id'])->first()){
                 $m = new Subject();
                 $m->id = $x['id'];
+                $m->subject_code = $x['subject_code'];
                 $m->name = $x['name'];
                 $m->save();
             }

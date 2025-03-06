@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'Regulation')
+@section('title', 'Subject')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -28,7 +28,7 @@
 @endsection
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-        <li class="nav-item"><a class="nav-link" href="{{ route('coa.subject.index') }}">
+        <li class="nav-item"><a class="nav-link active" href="{{ route('coa.subject.index') }}">
             <i class="bx bx-add-to-queue me-1"></i>
                 Subject</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation.index') }}"><i
@@ -40,7 +40,7 @@
         <li class="nav-item"><a class="nav-link" href="{{ route('coa.sampling_time.index') }}"><i
                     class="bx bx-chart me-1"></i>
                 Sampling Time</a></li>
-        <li class="nav-item"><a class="nav-link active" href="{{ route('coa.regulation_standard.index') }}"><i
+        <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation_standard.index') }}"><i
                     class="bx bx-chart me-1"></i>
                 Regulation Standard</a></li>
     </ul>
@@ -50,9 +50,9 @@
         <div class="card-header">
             <div class="row">
                 <div class="col-md-3">
-                    <select id="select_description" class="form-control input-sm select2"
-                        data-placeholder="Description">
-                        <option value="">Select Description</option>
+                    <select id="select_subjects" class="form-control input-sm select2"
+                        data-placeholder="subjects">
+                        <option value="">Select subjects</option>
                     </select>
                 </div>
                 <div class="col-md d-flex justify-content-center justify-content-md-end">
@@ -66,31 +66,44 @@
                 <div class="offcanvas offcanvas-end @if($errors->all()) show @endif" tabindex="-1" id="newrecord"
                     aria-labelledby="offcanvasEndLabel">
                     <div class="offcanvas-header">
-                        <h5 id="offcanvasEndLabel" class="offcanvas-title">Add Regulation</h5>
+                        <h5 id="offcanvasEndLabel" class="offcanvas-title">Add New Subject</h5>
                         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
                             aria-label="Close"></button>
                     </div>
                     <div class="offcanvas-body my-auto mx-0 flex-grow-1">
-                        <form id="editForm" method="POST">
+                        <form class="add-new-record pt-0 row g-2 fv-plugins-bootstrap5 fv-plugins-framework"
+                            id="form-add-new-record" method="POST" action="">
                             @csrf
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="editSamplesubjects" class="form-label">Code Subject</label>
-                                    <select class="form-select" id="editSamplesubjects" name="subject_id" required>
-                                        <option value="">-- Select Sample subjects --</option>
-                                        @foreach($subjects as $p)
-                                        <option value="{{ $p->id }}">{{ $p->subject_code }} - {{ $p->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="editTitle" class="form-label">Title</label>
-                                    <input type="text" class="form-control" id="editTitle" name="title" required>
+                            <div class="col-sm-12 fv-plugins-icon-container">
+                                <label class="form-label" for="basicDate">Code Subject</label>
+                                <div class="input-group input-group-merge has-validation">
+                                    <input type="number" class="form-control @error('subject_code') is-invalid @enderror"
+                                        name="subject_code" id="subject_code" placeholder="Enter Code Subject"
+                                        value="{{ old('subject_code') }}">
+                                    @error('subject_code')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Update</button>
+                            <div class="col-sm-12 fv-plugins-icon-container">
+                                <label class="form-label" for="basicDate">Name Subject</label>
+                                <div class="input-group input-group-merge has-validation">
+                                    <textarea type="text" class="form-control @error('name')  is-invalid @enderror"
+                                        maxlength="120" name="name" placeholder="Input The New Subject"
+                                        value="{{ old('name') }}"></textarea>
+                                    @error('name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-sm-12 mt-4">
+                                <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">Create</button>
+                                <button type="reset" class="btn btn-outline-secondary"
+                                    data-bs-dismiss="offcanvas">Cancel</button>
                             </div>
                         </form>
                     </div>
@@ -99,7 +112,8 @@
                     <thead>
                         <tr>
                             <th><b>No</b></th>
-                            <th><b>Number</b></th>
+                            <th><b>Subject</b></th>
+                            <th><b>Code Subject</b></th>
                             <th><b>Action</b></th>
                         </tr>
                     </thead>
@@ -108,20 +122,27 @@
         </div>
     </div>
 </div>
-<!-- Modal for Edit Regulation Standard -->
+<!-- Modal for Edit Regulation -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Regulation Standard</h5>
+                <h5 class="modal-title" id="editModalLabel">Edit Subject</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editForm" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="editTitle" class="form-label">Title</label>
-                        <input type="text" class="form-control" id="editTitle" name="title" required>
+                        <label for="editSamplesubjects" class="form-label">Code Subject</label>
+                        <input type="hidden" id="editSamplesubjects" name="subject_id" required>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="editSubjectCode" name="subject_code" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSubjectName" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="editSubjectName" name="name" required>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -184,10 +205,10 @@
                 searchPlaceholder: 'Search..',
             },
             ajax: {
-                url: "{{ route('coa.regulation_standard.data_regulation_standard') }}",
+                url: "{{ route('coa.subject.data_subject') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
-                        d.select_description = $('#select_description').val()
+                        d.select_subjects = $('#select_subjects').val()
                 },
             },
             columnDefs: [{
@@ -203,18 +224,26 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.title;
+                        return row.name;
                     },
                     orderable: false
                 },
                 {
                     render: function (data, type, row, meta) {
+                        return `<span style="color: red; font-weight: bold;">${row.subject_code}</span>`;
+                    },
+                    orderable: false,
+                    className: "text-center"
+                },
+                {
+                    render: function (data, type, row, meta) {
                         return `
-                            <a class="badge bg-warning badge-icon edit-btn" title="Edit Regulation Standard"
-                            style="cursor:pointer" data-id="${row.id}" data-title="${row.title}">
+                            <a class="badge bg-warning badge-icon edit-btn" title="Edit Regulation"
+                            style="cursor:pointer" data-id="${row.id}" data-title="${row.title}"
+                            data-subject_id="${row.subject_id}">
                                 <i class="bx bx-pencil icon-white"></i>
                             </a>
-                            <a class="badge bg-danger badge-icon" title="Delete Regulation Standard" style="cursor:pointer"
+                            <a class="badge bg-danger badge-icon" title="Delete Regulation" style="cursor:pointer"
                             onclick="DeleteId('${row.id}', '${row.title}')">
                                 <i class='bx bx-trash icon-white'></i>
                             </a>`;
@@ -222,9 +251,24 @@
                     orderable: false,
                     className: "text-md-center"
                 }
+                // {
+                //     render: function (data, type, row, meta) {
+                //         var html = '';
+                //         {
+                //             html = `<a class="badge bg-warning badge-icon" title="Edit Regulation" style="cursor:pointer" href="{{ url('coa/regulation/edit_regulation/${row.id}') }}">
+                //                     <i class="bx bx-pencil icon-white"></i></a>
+                //                     <a class="badge bg-danger badge-icon" title="Delete Regulation" style="cursor:pointer"
+                //                     onclick="DeleteId(\'` + row.id + `\',\'` + row.title + `\')" >
+                //                     <i class='bx bx-trash icon-white'></i></a>`;
+                //         }
+                //         return html;
+                //     },
+                //     orderable: false,
+                //     className: "text-md-center"
+                // }
             ]
         });
-        $('#select_description').change(function () {
+        $('#select_subjects').change(function () {
             table.draw();
         });
     });
@@ -240,7 +284,7 @@
             .then((willDelete) => {
                 if (willDelete) {
                     $.ajax({
-                        url: "{{ route('coa.regulation_standard.delete_regulation_standard') }}",
+                        url: "{{ route('coa.subject.delete_subject') }}",
                         type: "DELETE",
                         data: {
                             "id": id,
@@ -267,11 +311,13 @@
     $(document).ready(function () {
         $(document).on('click', '.edit-btn', function () {
             let id = $(this).data('id');
+            let subject_id = $(this).data('subject_id');
             let title = $(this).data('title');
 
             // Set data ke dalam modal
             $('#editTitle').val(title);
-            $('#editForm').attr('action', `/coa/regulation_standard/update/${id}`);
+            $('#editSamplesubjects').val(subject_id);
+            $('#editForm').attr('action', `/coa/subject/update/${id}`);
 
             // Tampilkan modal
             $('#editModal').modal('show');
@@ -291,7 +337,7 @@
                 data: formData,
                 success: function (response) {
                     $('#editModal').modal('hide');
-                    swal("Success!", "Regulation Standard updated successfully.",
+                    swal("Success!", "Subject updated successfully.",
                     "success");
                     $('#datatable').DataTable().ajax.reload();
                 },

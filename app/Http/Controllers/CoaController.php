@@ -14,6 +14,86 @@ use Yajra\DataTables\Facades\DataTables;
 
 class CoaController extends Controller
 {
+
+    // Subject
+    public function subject()
+    {
+        $data = Subject::all();
+        return view('coa.subject.index', compact('data'));
+    }
+
+    public function create_subject(Request $request)
+{
+    if ($request->isMethod('post')) { // 'post' harus dalam lowercase
+        $this->validate($request, [
+            'subject_code' => 'required',
+            'name' => 'required',
+        ]);
+
+        $data = Subject::create([
+            'subject_code' => $request->subject_code,
+            'name' => $request->name,
+        ]);
+
+        return redirect()->route('coa.subject.index')->with('msg', 'Subject (' . $request->name . ') added successfully');
+    }
+
+    return view('coa.subject.create'); // Tidak perlu mengirimkan $data ke view
+}
+
+
+    // Data_Subject
+    public function data_subject(Request $request)
+    {
+        $data = Subject::all();
+        return DataTables::of($data)
+            ->filter(function ($instance) use ($request) {
+                if (!empty($request->get('search'))) {
+                    $search = $request->get('search');
+                    $instance->where(function ($w) use ($search) {
+                        $w->orWhere('subject_code', 'LIKE', "%$search%")
+                            ->orWhere('name', 'LIKE', "%$search%");
+                    });
+                }
+            })
+            ->make(true);
+    }
+
+    // Edit_Subject
+    public function edit_subject(Request $request, $id)
+    {
+        $data = Subject::findOrFail($id);
+        if ($request->isMethod('POST')) {
+            $this->validate($request, [
+                'subject_code' => 'required',
+                'name' => 'required',
+            ]);
+            $data->update([
+                'subject_code' => $request->subject_code,
+                'name' => $request->name,
+            ]);
+            return redirect()->route('coa.subject.index')->with('msg', 'Subject updated successfully.');
+        }
+        return view('coa.subject.edit', compact('data'));
+    }
+
+    // Delete_Subject
+    public function delete_subject(Request $request){
+        $data = Subject::find($request->id);
+        if($data){
+            $data->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Successfully deleted!'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete! Data not found'
+            ]);
+        }
+    }
+
     //regulation
     public function index(Request $request)
     {

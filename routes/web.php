@@ -65,11 +65,18 @@ Route::group(['prefix' => 'result'], function () {
 
 Route::group(['prefix' => 'manage_coa'], function () {
     Route::group(['prefix' => 'coa'], function () {
+        //regulation
         Route::any('/regulation', [CoaController::class, 'index'])->name('coa.regulation.index')->middleware('auth');
         Route::get('/data_regulation', [CoaController::class, 'data_regulation'])->name('coa.regulation.data_regulation');
         Route::delete('/regulation/delete_regulation', [CoaController::class, 'delete_regulation'])->name('coa.regulation.delete_regulation');
         Route::any('/regulation/update/{id}', [CoaController::class, 'edit_regulation'])->name('coa.regulation.update');
-        // Route::any('/regulation/edit_regulation/{id}', [CoaController::class, 'edit_regulation'])->name('coa.regulation.edit');
+
+        //subject
+        Route::get('/subject', [CoaController::class, 'subject'])->name('coa.subject.index')->middleware('auth');
+        Route::get('/data_subject', [CoaController::class, 'data_subject'])->name('coa.subject.data_subject');
+        Route::post('/subject', [CoaController::class, 'create_subject'])->name('coa.subject.store');
+        Route::any('/subject/{id}/update', [CoaController::class, 'edit_subject'])->name('coa.subject.update');
+        Route::delete('/subject/delete_subject', [CoaController::class, 'delete_subject'])->name('coa.subject.delete_subject');
 
         //parameter
         Route::any('/parameter', [CoaController::class, 'parameter'])->name('coa.parameter.index')->middleware('auth');
