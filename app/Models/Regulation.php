@@ -15,6 +15,7 @@ class Regulation extends Model
 
     protected $fillable = [
         'title',
+        'regulation_code',
         'subject_id'
     ];
     public function subjects()

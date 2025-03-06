@@ -32,6 +32,9 @@
 @endsection
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
+        <li class="nav-item"><a class="nav-link" href="{{ route('coa.subject.index') }}">
+            <i class="bx bx-add-to-queue me-1"></i>
+                Subject</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation.index') }}"><i
                     class="bx bx-add-to-queue me-1"></i>
                 Regulation</a></li>

@@ -28,6 +28,9 @@
 @endsection
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
+        <li class="nav-item"><a class="nav-link" href="{{ route('coa.subject.index') }}">
+            <i class="bx bx-add-to-queue me-1"></i>
+                Subject</a></li></a></li>
         <li class="nav-item"><a class="nav-link active" href="{{ route('coa.regulation.index') }}"><i
                     class="bx bx-add-to-queue me-1"></i>
                 Regulation</a></li>
@@ -47,9 +50,11 @@
         <div class="card-header">
             <div class="row">
                 <div class="col-md-3">
-                    <select id="select_subjects" class="form-control input-sm select2"
-                        data-placeholder="subjects">
+                    <select id="select_subjects" class="form-control input-sm select2" data-placeholder="subjects">
                         <option value="">Select subjects</option>
+                        @foreach($subjects as $subject)
+                            <option value="{{ $subject->id }}">{{ $subject->subject_code }} - {{ $subject->name }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md d-flex justify-content-center justify-content-md-end">
@@ -63,7 +68,7 @@
                 <div class="offcanvas offcanvas-end @if($errors->all()) show @endif" tabindex="-1" id="newrecord"
                     aria-labelledby="offcanvasEndLabel">
                     <div class="offcanvas-header">
-                        <h5 id="offcanvasEndLabel" class="offcanvas-title">Add Regulation</h5>
+                        <h5 id="offcanvasEndLabel" class="offcanvas-title">Add New Regulation</h5>
                         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
                             aria-label="Close"></button>
                     </div>
@@ -118,6 +123,7 @@
                         <tr>
                             <th><b>No</b></th>
                             <th><b>Subject</b></th>
+                            <th><b>Code Regulation</b></th>
                             <th><b>Regulation</b></th>
                             <th><b>Action</b></th>
                         </tr>
@@ -143,7 +149,7 @@
                         <select class="form-select" id="editSamplesubjects" name="subject_id" required>
                             <option value="">-- Select Sample subjects --</option>
                             @foreach($subjects as $p)
-                            <option value="{{ $p->id }}">{{ $p->id }} - {{ $p->name }}</option>
+                            <option value="{{ $p->id }}">{{ $p->subject_code }} - {{ $p->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -234,12 +240,19 @@
                         // Check if row.category exists and has an id
                         if (row.subjects && row.subjects.id) {
                             var html =
-                                `<a class="text-primary" title="${row.subjects.name}" href="">${row.subjects.name}</a>`;
+                                `<a class="text-primary" title="${row.subjects.name}" href=""><b>${row.subjects.name}</b></a>`;
                             return html;
                         } else {
                             return ''; // Return empty string or handle the case where regulation.title is missing
                         }
                     },
+                    className: "text-center"
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        return `<span class="text-success fw-bold text-center">${row.regulation_code}</span>`;
+                    },
+                    orderable: false,
                     className: "text-center"
                 },
                 {

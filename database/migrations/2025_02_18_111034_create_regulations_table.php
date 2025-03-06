@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('regulations', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->string('regulation_code');
+            $table->text('title');
             $table->unsignedBigInteger('subject_id')->nullable();
             $table->foreign('subject_id')->references('id')->on('subjects');
             $table->timestamp('created_at')->nullable();
