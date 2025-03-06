@@ -15,7 +15,6 @@ class InstituteSubject extends Model
     protected $fillable = [
         'institute_id',
         'subject_id',
-        'regulation_id'
     ];
 
     public function samplings()
@@ -29,9 +28,5 @@ class InstituteSubject extends Model
     public function Subject()
     {
         return $this->belongsTo(Subject::class, 'subject_id','id');
-    }
-    public function subjects()
-    {
-        return $this->hasMany(InstituteSubject::class, 'institute_id');
     }
 }

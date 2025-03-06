@@ -22,19 +22,33 @@
                 <div data-i18n="Dashboards">Dashboard</div>
             </a>
         </li>
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Resume</span>
+        </li>
         @can('setting/manage_account/users.read')
-        <li class="menu-item {{ request()->segment(1) == 'institute' ? 'active' : '' }}">
-            <a href="{{ route('institute.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-buildings"></i>
-                <div data-i18n="institute">Institute</div>
+        <li class="menu-item {{ request()->segment(1) == 'customer' ? 'active' : '' }}">
+            <a href="{{ route('customer.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user-plus"></i>
+                <div data-i18n="customer">Customer</div>
             </a>
         </li>
         @endcan
         @can('setting/manage_account/users.read')
+        <li class="menu-item {{ request()->segment(1) == 'institute' ? 'active' : '' }}">
+            <a href="{{ route('institute.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-message-add"></i>
+                <div data-i18n="institute">COA</div>
+            </a>
+        </li>
+        @endcan
+        <li class="menu-header small text-uppercase">
+            <span class="menu-header-text">Analysis</span>
+        </li>
+        @can('setting/manage_account/users.read')
         <li class="menu-item {{ request()->segment(1) == 'result' ? 'active' : '' }}">
             <a href="{{ route('result.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-file-find"></i>
-                <div data-i18n="result">Result</div>
+                <i class="menu-icon tf-icons bx bx-analyse"></i>
+                <div data-i18n="result">Final Analys</div>
             </a>
         </li>
         @endcan
@@ -79,16 +93,22 @@
                         @endcan
                     </ul>
                 </li>
+                <li class="menu-item {{ request()->segment(2) == 'manage_coa' ? 'open active' : '' }}">
+                    <a href="" class="menu-link menu-toggle">
+                        <div>Manage Coa</div>
+                    </a>
+                    <ul class="menu-sub">
+                        @can('setting/manage_account/users.read')
+                        <li class="menu-item {{ request()->segment(1) == 'coa' ? 'active' : '' }}">
+                            <a href="{{ route('coa.regulation.index') }}" class="menu-link">
+                                <div data-i18n="coa">COA</div>
+                            </a>
+                        </li>
+                        @endcan
+                    </ul>
+                </li>
                 @endcan
             </ul>
-        </li>
-        @endcan
-        @can('setting/manage_account/users.read')
-        <li class="menu-item {{ request()->segment(1) == 'coa' ? 'active' : '' }}">
-            <a href="{{ route('coa.regulation.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-copyright"></i>
-                <div data-i18n="coa">Manage COA</div>
-            </a>
         </li>
         @endcan
     </ul>
