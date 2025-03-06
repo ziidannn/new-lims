@@ -118,7 +118,7 @@
                     render: function (data, type, row, meta) {
                         console.log(row); // Debug data di browser console
                         if (row.subject) {
-                            return `<span class="badge bg-secondary">${row.subject.name}</span>`;
+                            return `<span class="badge bg-dark">${row.subject.name}</span>`;
                         } else {
                             return '-';
                         }
@@ -128,16 +128,16 @@
                     render: function (data, type, row, meta) {
                         var html = '';
                         if (row.subject_id == 1) {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Ambient Air" href="{{ url('/result/ambient_air/${row.subject_id}') }}">
+                            html = `<a class="badge bg-warning badge-icon" title="Add Ambient Air" href="{{ url('/result/ambient_air/${row.subject_id}') }}">
                                     <i class="bx bx-pencil icon-white"></i></a>`;
                         } else if (row.subject_id == 2) {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Noise" href="{{ url('/result/noise/${row.subject_id}') }}">
+                            html = `<a class="badge bg-warning badge-icon" title="Add Noise" href="{{ url('/result/noise/${row.subject_id}') }}">
                                     <i class="bx bx-pencil icon-white"></i></a>`;
                         } else if (row.subject_id == 3) {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Waste Water" href="{{ url('/result/waste_water/${row.subject_id}') }}">
+                            html = `<a class="badge bg-warning badge-icon" title="Add Waste Water" href="{{ url('/result/waste_water/${row.subject_id}') }}">
                                     <i class="bx bx-pencil icon-white"></i></a>`;
                         } else if (row.subject_id == 4) {
-                            html = `<a class="badge bg-dark badge-icon" title="Add Workplace" href="{{ url('/result/workplace/${row.subject_id}') }}">
+                            html = `<a class="badge bg-warning badge-icon" title="Add Workplace" href="{{ url('/result/workplace/${row.subject_id}') }}">
                                     <i class="bx bx-pencil icon-white"></i></a>`;
                         }
                         return html;

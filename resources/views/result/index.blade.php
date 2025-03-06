@@ -30,29 +30,19 @@
     <div class="card-datatable table-responsive">
         <div class="card-header">
             <div class="row">
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <select id="select_description" class="form-control input-sm select2"
                         data-placeholder="Description">
                         <option value="">Select Description</option>
-
                     </select>
-                </div>
-                <!-- <div class="col-md d-flex justify-content-center justify-content-md-end">
-                        <a class="btn btn-primary btn-block btn-mail" title="Add new"
-                            href="{{ route('institute.create')}}">
-                            <i data-feather="plus"></i>+ Add
-                        </a>
-                    </div> -->
+                </div> -->
                 <table class="table" id="datatable">
                     <thead>
                         <tr>
-                            <th scope="col" width=""><b>No</b></th>
-                            <th scope="col" width=""><b>Customer</b></th>
-                            <th scope="col" width=""><b>Contact Name</b></th>
-                            <th scope="col" width=""><b>Email</b></th>
-                            <th scope="col" width=""><b>Phone</b></th>
-                            <th scope="col" width=""><b>Description</b></th>
-                            <th scope="col" width=""><b>Action</b></th>
+                            <th><b>No</b></th>
+                            <th><b>Kode Coa</b></th>
+                            <th><b>Description</b></th>
+                            <th><b>Action</b></th>
                         </tr>
                     </thead>
                 </table>
@@ -131,44 +121,12 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.customer;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        return row.contact_name;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        var html = "<span title='" + row.email + "'>" + row.email +
-                            "</span>";
+                        var html = "<code><span title='" + row.no_coa + "' style='font-size: 18px; color:rgb(30, 55, 23);'>"
+                                    + row.no_coa + "</span></code>";
                         return html;
                     },
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        return row.phone;
-                    },
                     orderable: false
                 },
-                // {
-                //     render: function (data, type, row, meta) {
-                //         if (row.subjects && row.subjects.length > 0) {
-                //             var html = row.subjects.map(function(desc, index) {
-                //                 return `<span class="badge bg-dark"
-                //                             style="border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
-                //                             ${desc.name}
-                //                         </span>`;
-                //             }).join('');
-                //             return html;
-                //         } else {
-                //             return '-';
-                //         }
-                //     }
-                // },
                 {
                     render: function (data, type, row, meta) {
                         if (row.subjects && row.subjects.length > 0) {

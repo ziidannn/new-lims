@@ -93,51 +93,57 @@
                         <thead>
                             <tr>
                                 <th class="text-center"><b>Sample No.</b></th>
-                                <th class="text-center"><b>Sampling Location</b></th>
-                                <th class="text-center"><b>Sample Description</b></th>
-                                <th class="text-center"><b>Date</b></th>
-                                <th class="text-center"><b>Time</b></th>
-                                <th class="text-center"><b>Sampling Method</b></th>
-                                <th class="text-center"><b>Date Received</b></th>
-                                <th class="text-center"><b>ITD</b></th>
+                                <th class="text-center"><b>Samp Location</b></th>
+                                <th class="text-center"><b>Sample Desc</b></th>
+                                <th class="text-center"><b>Samp Date</b></th>
+                                <th class="text-center"><b>Samp Time</b></th>
+                                <th class="text-center"><b>Samp Method</b></th>
+                                <th class="text-center"><b>Received</b></th>
+                                <th class="text-center"><b>Int Test Date</b></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><input type="text" class="form-control text-center" name="no_sample"
-                                        value="{{ $sampling->no_sample ?? '' }}"></td>
-                                <td><input type="text" class="form-control text-center" name="sampling_location"
-                                        value="{{ $sampling->sampling_location ?? '' }}"></td>
-                                <td>
-                                    <input type="hidden" name="institute_subject_id" value="{{ $selectedSampleId }}">
-                                    <input type="text" class="form-control text-center" value="{{ $selectedSampleName }}"
-                                        readonly>
-                                </td>
-                                <td><input type="date" class="form-control text-center" name="sampling_date"
-                                        value="{{ $sampling->sampling_date ?? '' }}"></td>
-                                <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ $sampling->sampling_time ?? '' }}"></td>
-                                <td><input type="text" class="form-control text-center" name="sampling_method"
-                                        value="Grab/24 Hours" readonly></td>
-                                <td><input type="date" class="form-control text-center" name="date_received"
-                                        value="{{ $sampling->date_received ?? '' }}"></td>
-                                <td>
-                                    <input type="date" class="form-control text-center" name="itd_start"
-                                        value="{{ $sampling->itd_start ?? '' }}">
-                                    <span class="mx-2">to</span>
-                                    <input type="date" class="form-control text-center" name="itd_end"
-                                        value="{{ $sampling->itd_end ?? '' }}">
-                                </td>
-                            </tr>
+                        <tr>
+                            <td><input type="text" class="form-control text-center" name="no_sample"
+                                    value="{{ old('no_sample', $institute->no_coa ?? '') }}"></td>
+
+                            <td><input type="text" class="form-control text-center" name="sampling_location"
+                                    value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
+
+                            <td>
+                                <input type="hidden" name="institute_subject_id" value="{{ old('institute_subject_id', $selectedSampleId) }}">
+                                <input type="text" class="form-control text-center"
+                                    value="{{ old('selected_sample_name', $selectedSampleName) }}" readonly>
+                            </td>
+
+                            <td><input type="date" class="form-control text-center" name="sampling_date"
+                                    value="{{ old('sampling_date', $sampling->sampling_date ?? '') }}"></td>
+
+                            <td><input type="text" class="form-control" name="sampling_time"
+                                    value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
+
+                            <td><input type="text" class="form-control text-center" name="sampling_method"
+                                    value="Grab/24 Hours" readonly></td>
+
+                            <td><input type="date" class="form-control text-center" name="date_received"
+                                    value="{{ old('date_received', $sampling->date_received ?? '') }}"></td>
+                            <td>
+                                <input type="date" class="form-control text-center" name="itd_start"
+                                    value="{{ old('itd_start', $sampling->itd_start ?? '') }}">
+                                <span><center><b>to</b></center></span>
+                                <input type="date" class="form-control text-center" name="itd_end"
+                                    value="{{ old('itd_end', $sampling->itd_end ?? '') }}">
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="card-footer text-end" style="margin-top: -30px;">
                 <button class="btn btn-primary me-1" type="submit">Save</button>
-                <a href="{{ url()->previous() }}">
+                <!-- <a href="{{ url()->previous() }}">
                     <span class="btn btn-outline-secondary">Back</span>
-                </a>
+                </a> -->
             </div>
     </form>
 </div>
@@ -206,9 +212,9 @@
                 </div>
                 <div class="card-footer text-end" style="margin-top: -10px;">
                     <button class="btn btn-primary me-1" type="submit">Save</button>
-                    <a href="{{ url()->previous() }}">
+                    <!-- <a href="{{ url()->previous() }}">
                         <span class="btn btn-outline-secondary">Back</span>
-                    </a>
+                    </a> -->
                 </div>
             </div>
         </div>

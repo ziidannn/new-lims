@@ -32,5 +32,8 @@ class Institute extends Model
     {
         return $this->hasMany(InstituteSubject::class, 'institute_id');
     }
-
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
 }

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('content')
-@section('title', 'Institute')
+@section('title', 'COA')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css')}}">
@@ -31,12 +31,12 @@
     <div class="card-datatable table-responsive">
         <div class="card-header">
                 <div class="row">
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <select id="select_description" class="form-control input-sm select2" data-placeholder="Description">
                             <option value="">Select Description</option>
 
                         </select>
-                    </div>
+                    </div> -->
                     <div class="col-md d-flex justify-content-center justify-content-md-end">
                         <a class="btn btn-primary btn-block btn-mail" title="Add new"
                             href="{{ route('institute.create')}}">
@@ -46,13 +46,13 @@
                     <table class="table" id="datatable">
                         <thead>
                             <tr>
-                                <th scope="col" width=""><b>No</b></th>
-                                <th scope="col" width=""><b>Customer</b></th>
-                                <th scope="col" width=""><b>Contact Name</b></th>
-                                <th scope="col" width=""><b>Email</b></th>
-                                <th scope="col" width=""><b>Phone</b></th>
-                                <th scope="col" width=""><b>Description</b></th>
-                                <th scope="col" width=""><b>Action</b></th>
+                                <th><b>No</b></th>
+                                <th>Kode Coa</th>
+                                <th><b>Customer</b></th>
+                                <th><b>Email</b></th>
+                                <th><b>Phone</b></th>
+                                <th><b>Description</b></th>
+                                <th><b>Action</b></th>
                             </tr>
                         </thead>
                     </table>
@@ -131,26 +131,31 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.customer;
+                        var html = "<code><span title='" + row.no_coa + "' style='font-size: 16px; color: #dc3545;'>"
+                                    + row.no_coa + "</span></code>";
+                        return html;
                     },
                     orderable: false
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.contact_name;
-                    },
-                    orderable: false
-                },
-                {
-                    render: function (data, type, row, meta) {
-                        var html = "<span title='" + row.email + "'>" + row.email +
-                            "</span>";
+                        var html = "<span title='" + row.customer.name + "' style='font-size: 16px; color:rgb(80, 83, 94);'>"
+                                    + row.customer.name + "</span>";
                         return html;
                     },
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return row.phone;
+                        var html = "<span title='" + row.customer.email + "' style='font-size: 16px; font-style: italic; color: #dc3545;'>"
+                                    + row.customer.email + "</span>";
+                        return html;
+                    },
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        var html = "<code><span title='" + row.customer.phone + "' style='font-size: 16px;'>"
+                                    + row.customer.phone + "</span></code>";
+                        return html;
                     },
                     orderable: false
                 },
@@ -188,12 +193,14 @@
                     render: function (data, type, row, meta) {
                         var html = '';
                         {
-                            html = `<a class="badge bg-dark badge-icon" title="Viwe Resume" href="/ambient_air/${row.id}">
+                            html = `
+                                    <a class="badge bg-dark badge-icon" title="View Resume" href="/ambient_air/${row.id}">
                                     <i class="bx bx-printer"></i></a>
-                                    <a class="badge bg-warning badge-icon" title="Edit Sampling" href="/institute/edit/${row.id}">
+                                    <a class="badge bg-warning badge-icon" title="Edit" href="/institute/edit/${row.id}">
                                     <i class="bx bx-pencil"></i></a>
-                                    <a class="badge bg-danger badge-icon" title="Delete Sampling" style="cursor:pointer" onclick="DeleteId('${row.id}', '${row.customer}')">
-                                    <i class="bx bx-trash icon-white"></i></a>`;
+                                    <a class="badge bg-danger badge-icon" title="Delete" style="cursor:pointer" onclick="DeleteId('${row.id}', '${row.no_coa}')">
+                                    <i class="bx bx-trash icon-white"></i></a>
+                                    `;
                         }
                         return html;
                     },

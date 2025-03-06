@@ -46,41 +46,63 @@ class ResultController extends Controller
 
     public function add_sample(Request $request, $id) {
         if ($request->isMethod('POST')) {
+            // Cek apakah institute_id valid
             $institute = Institute::findOrFail($id);
-            $sampling = Sampling::where('institute_id', $id)->get();
 
+            // Validasi data (buat institute_subject_id nullable)
             $validatedData = $request->validate([
                 'no_sample' => ['required'],
                 'sampling_location' => ['required'],
-                'institute_subject_id' => ['required', 'integer'],
-                'sampling_date' => ['required'],
+                'institute_subject_id' => ['nullable', 'integer'],
+                'sampling_date' => ['required', 'date'],
                 'sampling_time' => ['required'],
                 'sampling_method' => ['required'],
-                'date_received' => ['required'],
+                'date_received' => ['required', 'date'],
                 'itd_start' => ['required'],
                 'itd_end' => ['required'],
             ]);
 
-            $validatedData['institute_id'] = $id;
+            // Periksa apakah institute_subject_id valid atau tidak
+            $instituteSubject = InstituteSubject::where('id', $request->institute_subject_id)
+                ->where('institute_id', $id)
+                ->first();
 
-            if ($sampling->isNotEmpty()) {
-                foreach ($sampling as $sample) {
-                    $sample->update($validatedData);
-                }
-                $message = "Data Sample ({$request->no_sample}) updated successfully";
-            } else {
-                $sampling = Sampling::create($validatedData);
-                $message = "Data Sample ({$request->no_sample}) saved successfully";
+            // Jika institute_subject_id tidak valid, set NULL
+            if (!$instituteSubject) {
+                $validatedData['institute_subject_id'] = null;
             }
 
-            return back()->with('msg', $message);
+            // Tambahkan institute_id dari URL
+            $validatedData['institute_id'] = $id;
+
+            // **Cek apakah data sudah ada di tabel samplings untuk institute ini**
+            $existingSample = Sampling::where('institute_id', $id)
+                ->where('no_sample', $request->no_sample)
+                ->first();
+
+            if ($existingSample) {
+                // Jika data sudah ada → UPDATE
+                $existingSample->update($validatedData);
+                $message = "Data Sample ({$request->no_sample}) updated successfully!";
+                $alertType = 'warning'; // Notifikasi warna kuning untuk update
+            } else {
+                // Jika belum ada → CREATE baru
+                Sampling::create($validatedData);
+                $message = "Data Sample ({$request->no_sample}) saved successfully!";
+                $alertType = 'success'; // Notifikasi warna hijau untuk create baru
+            }
+
+            // Flash message untuk notifikasi
+            return back()->with(['msg' => $message, 'alertType' => $alertType]);
         }
 
-        $samplings = Sampling::all();
+        // Data untuk ditampilkan di view
+        $samplings = Sampling::where('institute_id', $id)->get();
         $institute = Institute::findOrFail($id);
         $subjects = Subject::orderBy('name')->get();
         $parameters = Parameter::orderBy('name')->get();
-        return view('result.add_result', compact('samplings','institute', 'subjects','parameters'));
+
+        return view('result.add_result', compact('samplings', 'institute', 'subjects', 'parameters'));
     }
 
     public function addAmbientAir(Request $request, $id)

@@ -80,18 +80,9 @@
                     $samplingsIdsArray = $samplingsIds->toArray();
                     $selectedSampleId = reset($samplingsIdsArray); // Get the first ID from the list
                     $selectedSampleName = $sampleNames[$selectedSampleId] ?? 'N/A';
-                    $regulationIds = \App\Models\Sampling::whereIn('institute_subject_id', $instituteSamplesIds)
-                        ->pluck('regulation_id', 'subject_id')
-                        ->toArray();
+
                     @endphp
                     <b><i>{{ $selectedSampleName }}</i></b>
-                    <br>
-                    <b>Regulation IDs:</b>
-                    <ul>
-                        @foreach($regulationIds as $subjectId => $regulationId)
-                        <li>Subject ID: {{ $subjectId }}, Regulation ID: {{ $regulationId }}</li>
-                        @endforeach
-                    </ul></ul>
                 </h4>
             </div>
             <div class="card-body">
@@ -148,9 +139,9 @@
             </div>
             <div class="card-footer text-end" style="margin-top: -30px;">
                 <button class="btn btn-primary me-1" type="submit">Save</button>
-                <a href="{{ url()->previous() }}">
+                <!-- <a href="{{ url()->previous() }}">
                     <span class="btn btn-outline-secondary">Back</span>
-                </a>
+                </a> -->
             </div>
     </form>
 </div>
@@ -305,9 +296,9 @@
                 </div>
                 <div class="card-footer text-end" style="margin-top: -10px;">
                     <button class="btn btn-primary me-1" type="submit">Save</button>
-                    <a href="{{ url()->previous() }}">
+                    <!-- <a href="{{ url()->previous() }}">
                         <span class="btn btn-outline-secondary">Back</span>
-                    </a>
+                    </a> -->
                 </div>
             </div>
         </div>

@@ -36,15 +36,5 @@ class Sampling extends Model
     {
         return $this->belongsTo(InstituteSubject::class, 'institute_subject_id', 'id');
     }
-    public function parameter()
-    {
-        return $this->belongsTo(Parameter::class, 'parameter_id', 'id');
-    }
-
-    // Relasi ke Regulations
-    public function regulation()
-    {
-        return $this->belongsTo(Regulation::class, 'regulation_id', 'id');
-    }
 }
 
