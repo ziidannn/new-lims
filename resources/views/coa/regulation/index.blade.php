@@ -79,17 +79,15 @@
                             <div class="col-sm-12 fv-plugins-icon-container">
                                 <label class="form-label" for="basicDate">Sample subjects</label>
                                 <div class="input-group input-group-merge has-validation">
-                                    <select
-                                        class="form-select @error('subject_id') is-invalid @enderror input-sm select2-modal"
-                                        name="subject_id" id="subject_id">
-                                        <option value="">-- Select Subject --</option>
-                                        @foreach($subjects as $p)
-                                        <option value="{{ $p->id }}"
-                                            {{ old('subject_id') == $p->id ? 'selected' : '' }}>
-                                            {{ $p->id }} - {{ $p->name }}
-                                        </option>
-                                        @endforeach
-                                    </select>
+                                    <div class="mb-3">
+                                        <label for="editSamplesubjects" class="form-label">Code Subject</label>
+                                        <select class="form-select" id="editSamplesubjects" name="subject_id" required>
+                                            <option value="">-- Select Sample subjects --</option>
+                                            @foreach($subjects as $p)
+                                            <option value="{{ $p->id }}">{{ $p->subject_code }} - {{ $p->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                     @error('subject_id')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -155,7 +153,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="editTitle" class="form-label">Title</label>
-                        <input type="text" class="form-control" id="editTitle" name="title" required>
+                        <textarea type="text" class="form-control" id="editTitle" name="title" required maxlength="120"
+                            placeholder="Input The New Criteria"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

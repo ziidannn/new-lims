@@ -461,7 +461,8 @@ class CoaController extends Controller
         }
 
         $data = RegulationStandard::all();
-        return view('coa.regulation_standard.index', compact('data'));
+        $subjects = Subject::orderBy('name')->get();
+        return view('coa.regulation_standard.index', compact('data', 'subjects'));
     }
 
     public function edit_regulation_standard(Request $request, $id)

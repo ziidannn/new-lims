@@ -15,13 +15,72 @@ class ParameterSeeder extends Seeder
     {
         //
         $data = [
+            // Parameter for Regulation code 011 
             [
                 "id" => "1",
                 "regulation_id" => "1",
                 "name" => "Sulfur Dioxide (SO₂)*",
                 "unit" => "ug/m³",
-                "method" => "Lamp VII"
+                "method" => "SNI 7119-7:2017"
             ],
+            [
+                "id" => "2",
+                "regulation_id" => "1",
+                "name" => "Sulfur Dioxide (SO₂)*",
+                "unit" => "ug/m³",
+                "method" => "IK 7.4.19 (Direct Reading)"
+            ],
+            [
+                "id" => "3",
+                "regulation_id" => "1",
+                "name" => "Sulfur Dioxide (SO₂)*",
+                "unit" => "ug/m³",
+                "method" => "SNI 19-7119.2-2005"
+            ],
+            [
+                "id" => "4",
+                "regulation_id" => "1",
+                "name" => "Sulfur Dioxide (SO₂)*",
+                "unit" => "ug/m³",
+                "method" => "SNI 7119-8:2017"
+            ],
+            [
+                "id" => "5",
+                "regulation_id" => "1",
+                "name" => "Sulfur Dioxide (SO₂)*",
+                "unit" => "ug/m³",
+                "method" => "Gas Chromatography"
+            ],
+            [
+                "id" => "6",
+                "regulation_id" => "1",
+                "name" => "Sulfur Dioxide (SO₂)*",
+                "unit" => "ug/m³",
+                "method" => "SNI 7119.3:2017"
+            ],
+            [
+                "id" => "7",
+                "regulation_id" => "1",
+                "name" => "Sulfur Dioxide (SO₂)*",
+                "unit" => "ug/m³",
+                "method" => "Direct Reading"
+            ],
+            [
+                "id" => "8",
+                "regulation_id" => "1",
+                "name" => "Sulfur Dioxide (SO₂)*",
+                "unit" => "ug/m³",
+                "method" => "Direct Reading"
+            ],
+            [
+                "id" => "9",
+                "regulation_id" => "1",
+                "name" => "Sulfur Dioxide (SO₂)*",
+                "unit" => "ug/m³",
+                "method" => "ICP-OES"
+            ],
+            
+            
             [
                 "id" => "2",
                 "regulation_id" => "2",
