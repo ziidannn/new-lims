@@ -8,12 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class Institute extends Model
 {
     use HasFactory;
-    protected $table = 'institutes';
     public $timestamps = true;
     public $incrementing = true;
-    
+    protected $table = 'institutes';
+    protected $fillable = [
+        'no_coa',
+        'direktur_id',
+        'customer_id',
+        'sample_receive_date',
+        'sample_analysis_date',
+        'report_date',
+    ];
 
-        public function Subjects()
+    public function Subjects()
     {
         return $this->belongsToMany(Subject::class, 'institute_subjects', 'institute_id', 'subject_id');
     }
