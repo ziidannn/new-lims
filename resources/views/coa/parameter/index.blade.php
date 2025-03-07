@@ -348,7 +348,7 @@
                 {
                     render: function (data, type, row, meta) {
                         var html = ''; {
-                            html = `<a class="badge bg-warning badge-icon" title="Edit parameter" style="cursor:pointer" href="{{ url('coa/parameter/edit_parameter/${row.id}') }}">
+                            html = `<a class="badge bg-warning badge-icon" title="Edit parameter" style="cursor:pointer" href="{{ url('manage_coa/coa/parameter/edit_parameter/${row.id}') }}">
                                     <i class="bx bx-pencil icon-white"></i></a>
                                     <a class="badge bg-danger badge-icon" title="Delete parameter" style="cursor:pointer"
                                     onclick="DeleteId(\'` + row.id + `\',\'` + row.title + `\')" >

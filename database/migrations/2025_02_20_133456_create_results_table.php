@@ -17,12 +17,15 @@ return new class extends Migration
             $table->foreign('sampling_id')->references('id')->on('samplings');
             $table->unsignedBigInteger('parameter_id')->nullable();
             $table->foreign('parameter_id')->references('id')->on('parameters');
-            $table->string('name_parameter')->nullable();
-            $table->string('sampling_time')->nullable();
+            $table->unsignedBigInteger('sampling_time_id')->nullable();
+            $table->foreign('sampling_time_id')->references('id')->on('sampling_times');
+            $table->unsignedBigInteger('regulation_standard_id')->nullable();
+            $table->foreign('regulation_standard_id')->references('id')->on('regulation_standards');
             $table->string('testing_result')->nullable()->nullable();
-            $table->string('regulation')->nullable();
             $table->string('unit')->nullable();
             $table->string('method')->nullable();
+            $table->string('time')->nullable();
+            $table->string('regulatory_standard')->nullable();
             $table->string('noise')->nullable();
             $table->string('leq')->nullable();
             $table->string('ls')->nullable();

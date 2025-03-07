@@ -20,10 +20,6 @@ class InstituteRegulation extends Model
     {
         return $this->belongsTo(InstituteSubject::class, 'institute_subject_id');
     }
-    public function Subject()
-    {
-        return $this->belongsTo(Subject::class, 'subject_id','id');
-    }
     public function regulation()
     {
         return $this->belongsTo(Regulation::class, 'regulation_id');

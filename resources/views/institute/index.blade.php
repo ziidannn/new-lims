@@ -177,12 +177,19 @@
                 {
                     render: function (data, type, row, meta) {
                         if (row.subjects && row.subjects.length > 0) {
-                            // Gunakan list dengan bullet atau badge untuk membedakan setiap description
+                            // Gunakan Set untuk menyimpan subject_id yang unik
+                            var uniqueSubjects = new Set();
+
+                            // Bangun HTML hanya untuk data yang unik
                             var html = '<ul style="padding-left: 15px;">';
-                            row.subjects.forEach(function(desc) {
-                                html += `<li><span class="badge bg-dark">${desc.name}</span></li>`;
+                            row.subjects.forEach(function(subject) {
+                                if (!uniqueSubjects.has(subject.id)) {
+                                    uniqueSubjects.add(subject.id);
+                                    html += `<li><span class="badge bg-dark">${subject.name}</span></li>`;
+                                }
                             });
                             html += '</ul>';
+
                             return html;
                         } else {
                             return '-';
