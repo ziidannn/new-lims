@@ -74,15 +74,7 @@
                         <form id="editForm" method="POST">
                             @csrf
                             <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="editSamplesubjects" class="form-label">Code Subject</label>
-                                    <select class="form-select" id="editSamplesubjects" name="subject_id" required>
-                                        <option value="">-- Select Sample subjects --</option>
-                                        @foreach($subjects as $p)
-                                        <option value="{{ $p->id }}">{{ $p->subject_code }} - {{ $p->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                
                                 <div class="mb-3">
                                     <label for="editTitle" class="form-label">Title</label>
                                     <input type="text" class="form-control" id="editTitle" name="title" required>
