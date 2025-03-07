@@ -177,7 +177,7 @@
                     <thead>
                         <tr>
                             <th scope="col" width="10px"><b>No</b></th>
-                            <th scope="col" width="20px"><b>Regulation</b></th>
+                            <th scope="col" width="20px"><b>Code Regulation</b></th>
                             <th scope="col" width="20px"><b>Parameter</b></th>
                             <th scope="col" width="20px"><b>Sampling Time</b></th>
                             <th scope="col" width="20px"><b>Regulatory Standard</b></th>
@@ -262,15 +262,9 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        // Check if row.regulation exists and has an id
-                        if (row.regulation && row.regulation.id) {
-                            var html =
-                                `<a class="text-primary" title="${row.regulation.title}" href="{{ url('coa/regulation/` + `') }}">${row.regulation.title}</a>`;
-                            return html;
-                        } else {
-                            return ''; // Return empty string or handle the case where regulation.title is missing
-                        }
+                        return `<span style="color: red; font-weight: bold;">${row.regulation.regulation_code}</span>`;
                     },
+                    orderable: false,
                     className: "text-center"
                 },
                 {

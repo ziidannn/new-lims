@@ -218,7 +218,7 @@ class CoaController extends Controller
         }
 
         $data = Parameter::all();
-        $regulation = Regulation::orderBy('title')->get();
+        $regulation = Regulation::all();
         $samplingTime = SamplingTime::orderBy('time')->get();
         $regulationStandards = RegulationStandard::orderBy('title')->get();
 
@@ -339,7 +339,7 @@ class CoaController extends Controller
     public function data_parameter(Request $request)
     {
         $data = Parameter::with([
-            'regulation:id,title',
+            'regulation:id,title,regulation_code',
             'samplingTimeRegulations.samplingTime:id,time',
             'samplingTimeRegulations.regulationStandards:id,title'
         ])->select('*')->orderBy("id")->get();
