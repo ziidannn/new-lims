@@ -15,5 +15,4 @@ class RegulationStandard extends Model
     protected $fillable = [
         'title',
     ];
-
 }

@@ -68,7 +68,7 @@
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
-                <h4 class="card-title mb-0">@yield('title')
+                <h5 class="card-title mb-0">@yield('title')
                     @php
                     $subjects = \App\Models\InstituteSubject::where('institute_id', $institute->id)
                     ->pluck('subject_id')
@@ -80,7 +80,12 @@
                     $selectedSampleName = $sampleNames[$selectedSampleId] ?? 'N/A';
                     @endphp
                     <b><i>{{ $selectedSampleName }}</i>
-                    </b></h4>
+                    </b></h5>
+                    @if ($regulations->isNotEmpty())
+                        @foreach ($regulations as $regulation)
+                        <i class="fw-bold">{{ $regulation->title ?? 'No Name Available' }}</i>
+                        @endforeach
+                    @endif
             </div>
             <div class="card-body">
                 <div class="card-options"><a class="card-options-collapse" href="#" data-bs-toggle="card-collapse"><i
@@ -202,7 +207,8 @@
                                 <td>
                                     @foreach ($samplingTimes as $samplingTime)
                                     <input type="text" class="form-control text-center testing-result"
-                                        name="testing_result[{{ $parameter->id }}][]" value="{{ old('testing_result', ) }}" required>
+                                        name="testing_result[{{ $parameter->id }}][]"
+                                        value="{{ old('testing_result') }}" required>
                                     @endforeach
                                 </td>
                                 <td>
@@ -239,7 +245,6 @@
         </div>
     </form>
 </div>
-
 </div>
 </div>
 @endsection

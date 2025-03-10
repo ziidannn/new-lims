@@ -121,8 +121,8 @@ class ResultController extends Controller
         if (!$instituteSubject) {
             return abort(404, 'Institute Subject not found');
         }
+
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
@@ -133,12 +133,11 @@ class ResultController extends Controller
                 }
 
                 foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    // Pastikan regulation_standard_id dan testing_result tersedia
                     $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
                     $testingResult = $request->testing_result[$parameterId][$index] ?? null;
 
                     if ($regulationStandardId === null || $testingResult === null) {
-                        continue; // Skip jika data tidak lengkap
+                        continue;
                     }
 
                     Result::updateOrCreate(
@@ -160,37 +159,26 @@ class ResultController extends Controller
             return redirect()->route('result.ambient_air', $institute->id)->with('msg', 'Results saved successfully!');
         }
 
-        $samplingTimes = SamplingTime::orderBy('time')->get();
-        $regulationStandards = RegulationStandard::orderBy('title')->get();
-
-        // Ambil institute_subject_id berdasarkan institute_id
-        $instituteSamples = InstituteSubject::where('institute_id', $id)->get();
-        $instituteSamplesIds = $instituteSamples->pluck('id');
-
-        // Ambil regulation_id berdasarkan institute_subject_id dari institute_regulations
-        $regulationsIds = InstituteRegulation::whereIn('institute_subject_id', $instituteSamplesIds)
+        // Ambil regulation_id yang hanya berelasi dengan institute_subject yang sesuai
+        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
+        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
 
-        // Ambil parameter_id berdasarkan regulation_id yang valid
+        // Ambil parameter hanya yang sesuai dengan regulation_id yang valid
         $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
         $parametersIds = $parameters->pluck('id');
 
-        // Ambil data samplings berdasarkan institute_subject_id
-        $samplings = Sampling::whereIn('institute_subject_id', $instituteSamplesIds)->get();
-        $samplingsIds = $samplings->pluck('subject_id');
-
-        // Ambil SamplingTimeRegulation berdasarkan parameter_id yang sesuai
+        // Ambil SamplingTimeRegulation hanya yang berkaitan dengan parameter_id terkait
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
 
+        $result = Result::where('sampling_id', $instituteSubject->id)->get();
+
         return view('result.ambient_air', compact(
-            'institute', 'samplingTimes', 'regulationStandards', 'instituteSamples',
-            'instituteSamplesIds', 'regulationsIds', 'parameters', 'parametersIds', 'samplings',
-            'samplingsIds', 'samplingTimeRegulations'
+            'institute', 'parameters', 'samplingTimeRegulations', 'result','regulations'
         ));
     }
-
 
     public function addNoise(Request $request, $id)
     {
@@ -225,27 +213,24 @@ class ResultController extends Controller
             return back()->with('msg', 'Data Result saved successfully');
         }
 
-        $samplingTimes = SamplingTime::orderBy('time')->get();
-        $regulationStandards = RegulationStandard::orderBy('title')->get();
-        $regulations = Regulation::where('subject_id', $id)->get();
-        $regulationsIds = $regulations->pluck('id');
+        // Ambil regulation_id yang hanya berelasi dengan institute_subject yang sesuai
+        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+            ->pluck('regulation_id');
 
+        // Ambil parameter hanya yang sesuai dengan regulation_id yang valid
         $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
         $parametersIds = $parameters->pluck('id');
 
-        $instituteSamples = InstituteSubject::where('institute_id', $id)->get();
-        $instituteSamplesIds = $instituteSamples->pluck('id');
-
-        $samplings = Sampling::whereIn('institute_subject_id', $instituteSamplesIds)->get();
-        $samplingsIds = $samplings->pluck('subject_id');
-
+        // Ambil SamplingTimeRegulation hanya yang berkaitan dengan parameter_id terkait
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-        ->with(['samplingTime', 'regulationStandards'])
-        ->get();
+            ->with(['samplingTime', 'regulationStandards'])
+            ->get();
+
+        $result = Result::where('sampling_id', $instituteSubject->id)->get();
 
         return view('result.noise', compact(
             'institute', 'samplingTimes', 'regulationStandards', 'parameters',
-            'regulations', 'samplings', 'samplingTimeRegulations'
+            'regulations', 'samplings', 'samplingTimeRegulations', 'result'
         ));
     }
 

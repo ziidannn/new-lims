@@ -15,5 +15,4 @@ class SamplingTime extends Model
     protected $fillable = [
         'time',
     ];
-
 }

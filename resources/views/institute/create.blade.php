@@ -157,7 +157,7 @@
                                         <select name="subject_id[]" class="form-select input-sm select2-modal" required>
                                             <option value="">Select Sample Description</option>
                                             @foreach ($description as $desc)
-                                            <option value="{{ $desc->id }}">{{ $desc->name }}</option>
+                                            <option value="{{ $desc->id }}">({{ $desc->subject_code }}) - {{ $desc->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -167,7 +167,7 @@
                                             required>
                                             <option value="">Select Regulation</option>
                                             @foreach ($regulation as $rg)
-                                            <option value="{{ $rg->id }}">{{ $rg->title }}</option>
+                                            <option value="{{ $rg->id }}">({{ $rg->regulation_code }}) - {{ $rg->title }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -222,8 +222,8 @@
                 success: function (results) {
                     let regulationOptions = '<option value="">Select Regulation</option>';
                     $.each(results, function (key, value) {
-                        regulationOptions += '<option value="' + value.id + '">' + value
-                            .title + '</option>';
+                        regulationOptions += '<option value="' + value.id + '"><strong>' +
+                        value.regulation_code + '</strong> - ' + value.title + '</option>';
                     });
 
                     regulationSelect.html(regulationOptions);
@@ -252,7 +252,7 @@
                     <select name="subject_id[]" class="form-select input-sm select2-modal" required>
                         <option value="">Select Sample Description</option>
                         @foreach ($description as $desc)
-                            <option value="{{ $desc->id }}">{{ $desc->name }}</option>
+                            <option value="{{ $desc->id }}">({{ $desc->subject_code }}) - {{ $desc->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -261,7 +261,7 @@
                     <select name="regulation_id[]" class="form-select input-sm select2-modal" required>
                         <option value="">Select Regulation </option>
                         @foreach ($regulation as $rg)
-                            <option value="{{ $rg->id }}">{{ $rg->title }}</option>
+                            <option value="{{ $rg->id }}">({{ $rg->regulation_code }}) - {{ $rg->title }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -301,7 +301,7 @@
             <select name="subject_id[]" class="form-select input-sm select2-modal" required>
                 <option value="">Select Sample Description</option>
                 @foreach ($description as $desc)
-                    <option value="{{ $desc->id }}">{{ $desc->name }}</option>
+                    <option value="{{ $desc->id }}">({{ $desc->subject_code }}) - {{ $desc->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -310,7 +310,7 @@
             <select name="regulation_id[]" class="form-select input-sm select2-modal" required>
                 <option value="">Select Regulation </option>
                 @foreach ($regulation as $rg)
-                    <option value="{{ $rg->id }}">{{ $rg->title }}</option>
+                    <option value="{{ $rg->id }}">({{ $rg->regulation_code }}) - {{ $rg->title }}</option>
                 @endforeach
             </select>
         </div>
