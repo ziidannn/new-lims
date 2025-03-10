@@ -62,85 +62,66 @@
     </div>
     @endif
     <form class="card" action="{{ route('result.add_sample', $institute->id) }}" method="POST">
-        @php
-        $sampling = \App\Models\Sampling::where('institute_id', $institute->id)->first();
-        @endphp
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
-                <h5 class="card-title mb-0">@yield('title')
-                    @php
-                    $subjects = \App\Models\InstituteSubject::where('institute_id', $institute->id)
-                    ->pluck('subject_id')
-                    ->toArray();
-                    $sampleNames = \App\Models\Subject::whereIn('id', $subjects)
-                    ->pluck('name', 'id')
-                    ->toArray();
-                    $selectedSampleId = reset($subjects); // Get the first ID from the list
-                    $selectedSampleName = $sampleNames[$selectedSampleId] ?? 'N/A';
-                    @endphp
-                    <b><i>{{ $selectedSampleName }}</i>
-                    </b></h5>
-                    @if ($regulations->isNotEmpty())
-                        @foreach ($regulations as $regulation)
-                        <i class="fw-bold">{{ $regulation->title ?? 'No Name Available' }}</i>
-                        @endforeach
+                <h4 class="card-title mb-0">@yield('title')
+                    @if ($subject)
+                    <i class="fw-bold">{{ $subject->name }}</i>
+                    @else
+                    <i class="fw-bold">No Name Available</i>
                     @endif
+                </h4>
+                @if ($regulations->isNotEmpty())
+                    @foreach ($regulations as $regulation)
+                        <i class="fw-bold" style="font-size: 1.1rem; color: darkred;">{{ $regulation->title ?? 'No Name Available' }}</i>
+                    @endforeach
+                @endif
             </div>
             <div class="card-body">
                 <div class="card-options"><a class="card-options-collapse" href="#" data-bs-toggle="card-collapse"><i
                             class="fe fe-chevron-up"></i></a><a class="card-options-remove" href="#"
                         data-bs-toggle="card-remove"><i class="fe fe-x"></i></a>
-                    <hr>
                 </div>
                 <div class="row">
                     <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th class="text-center"><b>Sample No.</b></th>
-                                <th class="text-center"><b>Samp Location</b></th>
-                                <th class="text-center"><b>Sample Desc</b></th>
-                                <th class="text-center"><b>Samp Date</b></th>
-                                <th class="text-center"><b>Samp Time</b></th>
-                                <th class="text-center"><b>Samp Method</b></th>
-                                <th class="text-center"><b>Received</b></th>
-                                <th class="text-center"><b>Int Test Date</b></th>
+                                <th class="text-center"><b>Sampling Location</b></th>
+                                <th class="text-center"><b>Sample Description</b></th>
+                                <th class="text-center"><b>Date</b></th>
+                                <th class="text-center"><b>Time</b></th>
+                                <th class="text-center"><b>Sampling Method</b></th>
+                                <th class="text-center"><b>Date Received</b></th>
+                                <th class="text-center"><b>Interval Testing Date</b></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td><input type="text" class="form-control text-center" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}"></td>
-
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
                                         value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
-
                                 <td>
+                                    <input type="hidden" name="institute_id" value="{{ $institute->id }}">
                                     <input type="hidden" name="institute_subject_id"
-                                        value="{{ old('institute_subject_id', $selectedSampleId) }}">
+                                        value="{{ $instituteSubject->id }}">
                                     <input type="text" class="form-control text-center"
-                                        style="background-color:rgb(248, 246, 246);"
-                                        value="{{ old('institute_subject_id', $selectedSampleName) }}" readonly>
+                                        value="{{ $instituteSubject->subject->name }}" readonly>
                                 </td>
-
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ old('sampling_date', $sampling->sampling_date ?? '') }}"></td>
-
-                                <td><input type="text" class="form-control" name="sampling_time"
+                                <td><input type="text" class="form-control text-center" name="sampling_time"
                                         value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
-
-                                <td><input type="text" class="form-control text-center"
-                                        style="background-color:rgb(248, 246, 246);" name="sampling_method"
+                                <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab/24 Hours" readonly></td>
-
                                 <td><input type="date" class="form-control text-center" name="date_received"
                                         value="{{ old('date_received', $sampling->date_received ?? '') }}"></td>
                                 <td>
                                     <input type="date" class="form-control text-center" name="itd_start"
                                         value="{{ old('itd_start', $sampling->itd_start ?? '') }}">
-                                    <span>
-                                        <center><b>to</b></center>
-                                    </span>
+                                    <span class="mx-2">to</span>
                                     <input type="date" class="form-control text-center" name="itd_end"
                                         value="{{ old('itd_end', $sampling->itd_end ?? '') }}">
                                 </td>
@@ -240,10 +221,77 @@
                         </tr>
                         @endforeach
                     </table>
+                    <table class="table table-bordered">
+                        <tr>
+                            <td colspan="3">
+                                <label class="mb-1" style="font-size: 18px; font-weight: bold; display: block;">Ambient
+                                    Environmental Condition</label>
+
+                                <!-- Tabel tanpa garis -->
+                                <table style="border-collapse: collapse; width: 100%;">
+                                    <tr style="border: none;">
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="coordinate">Coordinate:</label></td>
+                                        <td style="border: none;">
+                                            <input type="text" class="form-control" maxlength="120" name="coordinate"
+                                                placeholder="Input Coordinate" value="{{ old('coordinate') }}">
+                                            <input type="hidden" name="result_id" value=""></td>
+                                    </tr>
+                                    <tr style="border: none;">
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="temperature">Temperature:</label></td>
+                                        <td style="border: none;"><input type="text" class="form-control"
+                                                maxlength="120" name="temperature" placeholder="Input Temperature"
+                                                value="{{ old('temperature') }}"></td>
+                                    </tr>
+                                    <tr style="border: none;">
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="pressure">Pressure:</label></td>
+                                        <td style="border: none;"><input type="text" class="form-control"
+                                                maxlength="120" name="pressure" placeholder="Input Pressure"
+                                                value="{{ old('pressure') }}"></td>
+                                    </tr>
+                                    <tr style="border: none;">
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="humidity">Humidity:</label></td>
+                                        <td style="border: none;"><input type="text" class="form-control"
+                                                maxlength="120" name="humidity" placeholder="Input Humidity"
+                                                value="{{ old('humidity') }}"></td>
+                                    </tr>
+                                    <tr style="border: none;">
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="wind_speed">Wind Speed:</label></td>
+                                        <td style="border: none;"><input type="text" class="form-control"
+                                                maxlength="120" name="wind_speed" placeholder="Input Wind Speed"
+                                                value="{{ old('wind_speed') }}"></td>
+                                    </tr>
+                                    <tr style="border: none;">
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="wind_direction">Wind Direction:</label></td>
+                                        <td style="border: none;"><input type="text" class="form-control"
+                                                maxlength="120" name="wind_direction" placeholder="Input Wind Direction"
+                                                value="{{ old('wind_direction') }}"></td>
+                                    </tr>
+                                    <tr style="border: none;">
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="weather">Weather:</label></td>
+                                        <td style="border: none;"><input type="text" class="form-control"
+                                                maxlength="120" name="weather" placeholder="Input Weather"
+                                                value="{{ old('weather') }}"></td>
+                                    </tr>
+                                </table>
+                                <div class="card-footer text-end">
+                                    <button class="btn btn-primary me-1" type="submit">Save</button>
+                                    <!-- <a href="{{ url()->previous() }}">
+                                        <span class="btn btn-outline-secondary">Back</span>
+                                    </a> -->
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
-    </form>
 </div>
 </div>
 </div>

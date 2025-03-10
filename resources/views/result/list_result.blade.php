@@ -147,20 +147,20 @@
                     render: function (data, type, row, meta) {
                         var html = '';
 
-                        if (row.institute_subject && row.institute_subject.subject) {
-                            var subjectId = row.institute_subject.subject.id; // Ambil subject_id dengan benar
+                        if (row.institute_subject && row.institute_subject.id) {
+                            var instituteSubjectId = row.institute_subject.id; // Gunakan institute_subject.id
 
-                            if (subjectId == 1) {
-                                html = `<a class="badge bg-warning badge-icon" title="Add Ambient Air" href="/result/ambient_air/${subjectId}">
+                            if (row.institute_subject.subject.id == 1) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Ambient Air" href="/result/ambient_air/${instituteSubjectId}">
                                         <i class="bx bx-pencil icon-white"></i></a>`;
-                            } else if (subjectId == 2) {
-                                html = `<a class="badge bg-warning badge-icon" title="Add Waste Water" href="/result/waste_water/${subjectId}">
+                            } else if (row.institute_subject.subject.id == 2) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Waste Water" href="/result/waste_water/${instituteSubjectId}">
                                         <i class="bx bx-pencil icon-white"></i></a>`;
-                            } else if (subjectId == 3) {
-                                html = `<a class="badge bg-warning badge-icon" title="Add Noise" href="/result/noise/${subjectId}">
+                            } else if (row.institute_subject.subject.id == 3) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Noise" href="/result/noise/${instituteSubjectId}">
                                         <i class="bx bx-pencil icon-white"></i></a>`;
-                            } else if (subjectId == 4) {
-                                html = `<a class="badge bg-warning badge-icon" title="Add Workplace" href="/result/workplace/${subjectId}">
+                            } else if (row.institute_subject.subject.id == 4) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Workplace" href="/result/workplace/${instituteSubjectId}">
                                         <i class="bx bx-pencil icon-white"></i></a>`;
                             }
                         } else {

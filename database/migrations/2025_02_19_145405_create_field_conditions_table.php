@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('field_conditions', function (Blueprint $table) {
             $table->id();
-            $table->string(column: 'coordinate'); // Bisa disesuaikan dengan format koordinat
-            $table->float('temperature');
-            $table->integer('pressure');
-            $table->integer('humidity');
-            $table->float('wind_speed');
-            $table->integer('wind_direction');
-            $table->string('weather'); // Bisa diubah jika membutuhkan lebih banyak informasi
+            $table->unsignedBigInteger('result_id')->nullable();
+            $table->foreign('result_id')->references('id')->on('results')->nullable();
+            $table->string(column: 'coordinate')->nullable; // Bisa disesuaikan dengan format koordinat
+            $table->float('temperature')->nullable;
+            $table->integer('pressure')->nullable;
+            $table->integer('humidity')->nullable;
+            $table->float('wind_speed')->nullable;
+            $table->integer('wind_direction')->nullable;
+            $table->string('weather')->nullable; // Bisa diubah jika membutuhkan lebih banyak informasi
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
         });
