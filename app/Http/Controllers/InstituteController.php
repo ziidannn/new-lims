@@ -51,15 +51,22 @@ class InstituteController extends Controller
                         'subject_id' => $subjectId,
                     ]);
 
-                    // Ambil regulation_id berdasarkan subject_id
-                    $regulationIds = Regulation::where('subject_id', $subjectId)->pluck('id')->toArray();
+                    // Pastikan regulation_id yang dipilih oleh user tersedia
+                    if ($request->has('regulation_id')) {
+                        foreach ($request->regulation_id as $regulationId) {
+                            // Cek apakah regulation_id ini memang berelasi dengan subject_id yang dipilih
+                            $isValidRegulation = Regulation::where('id', $regulationId)
+                                ->where('subject_id', $subjectId)
+                                ->exists();
 
-                    // Simpan regulation_id ke tabel institute_regulations
-                    foreach ($regulationIds as $regulationId) {
-                        InstituteRegulation::create([
-                            'institute_subject_id' => $instituteSubject->id,
-                            'regulation_id' => $regulationId,
-                        ]);
+                            if ($isValidRegulation) {
+                                // Simpan regulation_id ke tabel institute_regulations
+                                InstituteRegulation::create([
+                                    'institute_subject_id' => $instituteSubject->id,
+                                    'regulation_id' => $regulationId,
+                                ]);
+                            }
+                        }
                     }
                 }
             }
@@ -155,16 +162,16 @@ class InstituteController extends Controller
         $data = Institute::findOrFail($request->id);
 
         if ($data) {
-            // **1. Hapus institute_regulations terlebih dahulu**
-            InstituteRegulation::whereIn(
-                'institute_subject_id',
-                InstituteSubject::where('institute_id', $data->id)->pluck('id')
-            )->delete();
+            // **Hapus data terkait terlebih dahulu**
+            foreach ($data->instituteSubjects as $subject) {
+                // Hapus institute_regulations terkait
+                $subject->instituteRegulations()->delete();
+            }
 
-            // **2. Hapus institute_subjects setelah institute_regulations terhapus**
-            InstituteSubject::where('institute_id', $data->id)->delete();
+            // Hapus institute_subjects setelah regulations terhapus
+            $data->instituteSubjects()->delete();
 
-            // **3. Hapus data utama Institute**
+            // Hapus institute
             $data->delete();
 
             return response()->json([

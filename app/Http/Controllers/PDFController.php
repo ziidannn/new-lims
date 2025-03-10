@@ -13,6 +13,7 @@ use App\Models\Sampling;
 use App\Models\RegulationStandard;
 use App\Models\InstituteSubject;
 use App\Models\Result;
+use App\Models\InstituteRegulation;
 
 class PDFController extends Controller
 {
@@ -40,56 +41,82 @@ class PDFController extends Controller
     }
 
     // Ambient Air PDF
-    public function ambientAirPdf($id)
-    {
-        $institute = Institute::with('subjects')->find($id);
-        if (!$institute) {
-            return redirect()->back()->with('error', 'Institute not found.');
-        }
-    
-        // Ambil subject_id dari tabel institute_subjects yang sesuai dengan institute_id
-        $instituteSamples = InstituteSubject::where('institute_id', $id)->get();
-        $subjectIds = $instituteSamples->pluck('subject_id'); // Mengambil subject_id
-    
-        // Ambil data subjects berdasarkan subject_id yang telah diambil
-        $subjects = Subject::whereIn('id', $subjectIds)->get();
-    
-        // Ambil data regulations terkait dengan subjects yang terpilih
-        $regulations = Regulation::whereIn('subject_id', $subjectIds)->get();
-        $regulationIds = $regulations->pluck('id');
-    
-        // Ambil data parameters terkait dengan regulations
-        $parameters = Parameter::whereIn('regulation_id', $regulationIds)->orderBy('name')->get();
-        $parameterIds = $parameters->pluck('id');
-    
-        // Data tambahan untuk tampilan
-        $regulationStandards = RegulationStandard::orderBy('title')->get();
-        $samplingTimes = SamplingTime::orderBy('time')->get();
-    
-        // Ambil data sampling berdasarkan institute_subjects
-        $instituteSamplesIds = $instituteSamples->pluck('id');
-        $samplings = Sampling::whereIn('institute_subject_id', $instituteSamplesIds)->get();
-        $samplingIds = $samplings->pluck('subject_id');
-    
-        $samps = Sampling::whereIn('id', $samplingIds)
-            ->with('regulations.parameters', 'sampling_times.regulation_standards')
-            ->get();
-    
-        // Ambil data sampling time regulations
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parameterIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-    
-        // Ambil hasil terkait dengan sampling yang sudah ada
-        $results = Result::whereIn('sampling_id', $samplingIds)->get();
-        
+    // public function ambientAirPdf($id)
+    // {
+    //     $institute = Institute::with('subjects')->find($id);
+    //     if (!$institute) {
+    //         return redirect()->back()->with('error', 'Institute not found.');
+    //     }
 
-        $pdf = Pdf::loadView('pdf.ambient_air', compact(
-            'regulations', 'subjects', 'parameters', 'institute',
-            'samplingTimes', 'regulationStandards', 'samplingTimeRegulations',
-            'samplings', 'samps', 'results'
-        ));
-        return $pdf->stream('Ambient_Air_Report' . $id . '.pdf');
+    //     // Ambil subject_id dari tabel institute_subjects yang sesuai dengan institute_id
+    //     $instituteSamples = InstituteSubject::where('institute_id', $id)->get();
+    //     $subjectIds = $instituteSamples->pluck('subject_id'); // Mengambil subject_id
+
+    //     // Ambil data subjects berdasarkan subject_id yang telah diambil
+    //     $subjects = Subject::whereIn('id', $subjectIds)->get();
+
+    //     // Ambil data regulations terkait dengan subjects yang terpilih
+    //     $regulations = Regulation::whereIn('subject_id', $subjectIds)->get();
+    //     $regulationIds = $regulations->pluck('id');
+
+    //     // Ambil data parameters terkait dengan regulations
+    //     $parameters = Parameter::whereIn('regulation_id', $regulationIds)->orderBy('name')->get();
+    //     $parameterIds = $parameters->pluck('id');
+
+    //     // Data tambahan untuk tampilan
+    //     $regulationStandards = RegulationStandard::orderBy('title')->get();
+    //     $samplingTimes = SamplingTime::orderBy('time')->get();
+
+    //     // Ambil data sampling berdasarkan institute_subjects
+    //     $instituteSamplesIds = $instituteSamples->pluck('id');
+    //     $samplings = Sampling::whereIn('institute_subject_id', $instituteSamplesIds)->get();
+    //     $samplingIds = $samplings->pluck('subject_id');
+
+    //     $samps = Sampling::whereIn('id', $samplingIds)
+    //         ->with('regulations.parameters', 'sampling_times.regulation_standards')
+    //         ->get();
+
+    //     // Ambil data sampling time regulations
+    //     $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parameterIds)
+    //         ->with(['samplingTime', 'regulationStandards'])
+    //         ->get();
+
+    //     // Ambil hasil terkait dengan sampling yang sudah ada
+    //     $results = Result::whereIn('sampling_id', $samplingIds)->get();
+
+
+    //     $pdf = Pdf::loadView('pdf.ambient_air', compact(
+    //         'regulations', 'subjects', 'parameters', 'institute',
+    //         'samplingTimes', 'regulationStandards', 'samplingTimeRegulations',
+    //         'samplings', 'samps', 'results'
+    //     ));
+    //     return $pdf->stream('Ambient_Air_Report' . $id . '.pdf');
+    // }
+
+    public function ambientAirPdf($id)
+{
+    // Ambil data institute beserta relasi subjects
+    $institute = Institute::with('subjects')->find($id);
+    if (!$institute) {
+        return redirect()->back()->with('error', 'Institute not found.');
     }
+
+    // Ambil data InstituteRegulation dengan filter berdasarkan institute_id melalui relasi instituteSubject
+    $data = InstituteRegulation::whereHas('instituteSubject', function ($query) use ($id) {
+            $query->where('institute_id', $id);
+        })
+        ->with(['instituteSubject.subject', 'regulation']) // Memuat relasi yang dibutuhkan
+        ->get()
+        ->unique(function ($item) {
+            return $item->institute_subject_id . '-' . $item->regulation_id;
+        }) // Menghapus data yang duplikat berdasarkan kombinasi subject & regulation
+        ->values(); // Reset index array
+
+    // Generate PDF menggunakan view 'pdf.ambient_air'
+    $pdf = Pdf::loadView('pdf.ambient_air', compact('data', 'institute'));
+
+    return $pdf->stream('Ambient_Air_Report' . $id . '.pdf');
+}
+
 }
 

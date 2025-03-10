@@ -29,4 +29,8 @@ class InstituteSubject extends Model
     {
         return $this->belongsTo(Subject::class, 'subject_id','id');
     }
+    public function instituteRegulations()
+    {
+        return $this->hasMany(InstituteRegulation::class, 'institute_subject_id');
+    }
 }

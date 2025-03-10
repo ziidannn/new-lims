@@ -25,6 +25,13 @@
         color: white;
     }
 
+    .badge-truncate {
+    display: inline-block;
+    max-width: 800px; /* Sesuaikan ukuran */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
 </style>
 @endsection
 <div class="card">
@@ -37,7 +44,8 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Description</th>
+                                <th>Sample Description</th>
+                                <th>Regulation</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -117,8 +125,19 @@
                 {
                     render: function (data, type, row, meta) {
                         console.log(row); // Debug data di browser console
-                        if (row.subject) {
-                            return `<span class="badge bg-dark">${row.subject.name}</span>`;
+                        if (row.institute_subject && row.institute_subject.subject) {
+                            return `<span class="badge bg-dark">${row.institute_subject.subject.name}</span>`;
+                        } else {
+                            return '-';
+                        }
+                    }
+                },
+                {
+                    render: function (data, type, row, meta) {
+                        console.log(row); // Debug di browser console
+
+                        if (row.regulation) {
+                            return `<span title="${row.regulation.title}">${row.regulation.title}</span>`;
                         } else {
                             return '-';
                         }
@@ -127,19 +146,27 @@
                 {
                     render: function (data, type, row, meta) {
                         var html = '';
-                        if (row.subject_id == 1) {
-                            html = `<a class="badge bg-warning badge-icon" title="Add Ambient Air" href="{{ url('/result/ambient_air/${row.subject_id}') }}">
-                                    <i class="bx bx-pencil icon-white"></i></a>`;
-                        } else if (row.subject_id == 2) {
-                            html = `<a class="badge bg-warning badge-icon" title="Add Noise" href="{{ url('/result/noise/${row.subject_id}') }}">
-                                    <i class="bx bx-pencil icon-white"></i></a>`;
-                        } else if (row.subject_id == 3) {
-                            html = `<a class="badge bg-warning badge-icon" title="Add Waste Water" href="{{ url('/result/waste_water/${row.subject_id}') }}">
-                                    <i class="bx bx-pencil icon-white"></i></a>`;
-                        } else if (row.subject_id == 4) {
-                            html = `<a class="badge bg-warning badge-icon" title="Add Workplace" href="{{ url('/result/workplace/${row.subject_id}') }}">
-                                    <i class="bx bx-pencil icon-white"></i></a>`;
+
+                        if (row.institute_subject && row.institute_subject.subject) {
+                            var subjectId = row.institute_subject.subject.id; // Ambil subject_id dengan benar
+
+                            if (subjectId == 1) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Ambient Air" href="/result/ambient_air/${subjectId}">
+                                        <i class="bx bx-pencil icon-white"></i></a>`;
+                            } else if (subjectId == 2) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Waste Water" href="/result/waste_water/${subjectId}">
+                                        <i class="bx bx-pencil icon-white"></i></a>`;
+                            } else if (subjectId == 3) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Noise" href="/result/noise/${subjectId}">
+                                        <i class="bx bx-pencil icon-white"></i></a>`;
+                            } else if (subjectId == 4) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Workplace" href="/result/workplace/${subjectId}">
+                                        <i class="bx bx-pencil icon-white"></i></a>`;
+                            }
+                        } else {
+                            html = '-';
                         }
+
                         return html;
                     },
                     orderable: false,

@@ -15,7 +15,7 @@ class ParameterSeeder extends Seeder
     {
         //
         $data = [
-// Parameter for Regulation code 011 
+// Parameter for Regulation code 011
             [
                 "id" => "1",
                 "regulation_id" => "1",
@@ -26,7 +26,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "2",
                 "regulation_id" => "1",
-                "name" => "Sulphur Dioxide (SO₂)*",
+                "name" => "Carbon Monoxide (CO)*",
                 "unit" => "µg/Nm3",
                 "method" => "IK 7.4.19 (Direct Reading)"
             ],
@@ -143,7 +143,7 @@ class ParameterSeeder extends Seeder
                 "unit" => "µg/Nm3",
                 "method" => "ICP-OES"
             ],
-// Parameter for Regulation code 013 
+// Parameter for Regulation code 013
             [
                 "id" => "19",
                 "regulation_id" => "3",
