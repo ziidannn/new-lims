@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('parameter_id')->nullable();
             $table->foreign('parameter_id')->references('id')->on('parameters');
             $table->unsignedBigInteger('sampling_time_id')->nullable();
-            $table->foreign('sampling_time_id')->references('id')->on('sampling_times');
+            $table->foreign('sampling_time_id')->references('id')->on('sampling_times')->nullable();
             $table->unsignedBigInteger('regulation_standard_id')->nullable();
             $table->foreign('regulation_standard_id')->references('id')->on('regulation_standards');
             $table->timestamp('created_at')->nullable();

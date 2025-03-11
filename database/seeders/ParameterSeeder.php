@@ -776,13 +776,13 @@ class ParameterSeeder extends Seeder
                 "unit" => "dBA",
                 "method" => "SNI 8427:2017"
             ],
-            [
-                "id" => "108",
-                "regulation_id" => "12",
-                "name" => "",
-                "unit" => "dBA",
-                "method" => "SNI 8427:2017"
-            ],
+            // [
+            //     "id" => "108",
+            //     "regulation_id" => "12",
+            //     "name" => "",
+            //     "unit" => "dBA",
+            //     "method" => "SNI 8427:2017"
+            // ],
 // Parameter for Regulation code 032
             [
                 "id" => "109",
@@ -799,13 +799,13 @@ class ParameterSeeder extends Seeder
                 "unit" => "dBA",
                 "method" => "SNI 8427:2017"
             ],
-            [
-                "id" => "111",
-                "regulation_id" => "14",
-                "name" => "",
-                "unit" => "dBA",
-                "method" => "SNI 8427:2017"
-            ],
+            // [
+            //     "id" => "111",
+            //     "regulation_id" => "14",
+            //     "name" => "",
+            //     "unit" => "dBA",
+            //     "method" => "SNI 8427:2017"
+            // ],
 // Parameter for Regulation code 033
             [
                 "id" => "112",
