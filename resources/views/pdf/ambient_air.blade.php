@@ -116,18 +116,16 @@
                 <td style="border: 1px solid; font-weight: bold;">DATE RECEIVED</td>
                 <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
             </tr>
-            @foreach($samplings as $sampling)
                 <tr>
-                    <td style="border: 1px solid;">{{ $sampling->id }}</td>
-                    <td style="border: 1px solid;">{{ $sampling->sampling_location }}</td>
-                    <td style="border: 1px solid;">{{ $subjects->first()->name ?? 'Tidak ada subject' }}</td>
-                    <td style="border: 1px solid;">{{ $sampling->sampling_date }}</td>
-                    <td style="border: 1px solid;">{{ $sampling->sampling_time }}</td>
-                    <td style="border: 1px solid;">{{ $sampling->sampling_method }}</td>
-                    <td style="border: 1px solid;">{{ $sampling->date_received }}</td>
-                    <td style="border: 1px solid;">{{ $sampling->itd_start }} <br>to <br>{{ $sampling->itd_start }} </td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"><br>to <br></td>
                 </tr>
-            @endforeach
         </table>
     </div>
     {{-- Start Parameters --}}
@@ -142,39 +140,16 @@
                 <td style="border: 1px solid; font-weight: bold;">Unit</td>
                 <td style="border: 1px solid; font-weight: bold;">Methods</td>
             </tr>    
-            @foreach($parameters as $index => $parameter)
-                @php
-                    $samplingTimeRegulation = $samplingTimeRegulations->where('parameter_id', $parameter->id)->first();
-                    $result = $results->where('parameter_id', $parameter->id)->first();
-                @endphp
+            
                 <tr>
-                    <td style="border: 1px solid;">{{ $index + 1 }}</td>
-                    <td style="border: 1px solid;">{{ $parameter->name }}</td>
-                    <td style="border: 1px solid;">
-                        @if($samplingTimeRegulation)
-                            {{ $samplingTimeRegulation->samplingTime->time }}
-                        @else
-                            N/A
-                        @endif
-                    </td>
-                    <td style="border: 1px solid;">
-                        @if($result)
-                            {{ $result->value }}
-                        @else
-                            N/A
-                        @endif
-                    </td>
-                    <td style="border: 1px solid;">
-                        @if($samplingTimeRegulation)
-                            {{ $samplingTimeRegulation->regulationStandards->pluck('title')->implode('<br>') }}
-                        @else
-                            N/A
-                        @endif
-                    </td>
-                    <td style="border: 1px solid;">{{ $parameter->unit }}</td>
-                    <td style="border: 1px solid;">{{ $parameter->method }}</td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
+                    <td style="border: 1px solid;"></td>
                 </tr>
-            @endforeach
         </table>
     </div>
     {{-- End Parameters --}}
@@ -233,11 +208,7 @@
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 0%;">**</td>
-                <td style="width: 95%;">
-                    @foreach($regulations as $regulation)
-                        {{ $regulation->title }}
-                    @endforeach
-                </td>
+                <td style="width: 95%;"></td>
             </tr>
         </table>
     </div>

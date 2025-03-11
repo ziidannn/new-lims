@@ -20,6 +20,8 @@ class SamplingTimeSeeder extends Seeder
             ["id" => "3", "time" => "8 Hours"],
             ["id" => "4", "time" => "24 Hours"],
             ["id" => "5", "time" => "1 Years"],
+            ["id" => "6", "time" => "30 Dyas"],
+            ["id" => "7", "time" => "-"],
         ];
 
         foreach ($data as $x) {
