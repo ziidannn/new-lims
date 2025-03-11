@@ -62,27 +62,15 @@
     </div>
     @endif
     <form class="card" action="{{ route('result.add_sample', $institute->id) }}" method="POST">
-        @php
-        $sampling = \App\Models\Sampling::where('institute_id', $institute->id)->first();
-        @endphp
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
                 <h4 class="card-title mb-0">@yield('title')
-                    @php
-                    $instituteSamples = \App\Models\InstituteSubject::where('institute_id', $institute->id)->get();
-                    $instituteSamplesIds = $instituteSamples->pluck('id');
-                    $samplings = \App\Models\Sampling::whereIn('institute_subject_id', $instituteSamplesIds)->get();
-                    $samplingsIds = $samplings->pluck('subject_id');
-                    $sampleNames = \App\Models\Subject::whereIn('id', $samplingsIds)
-                    ->pluck('name', 'id')
-                    ->toArray();
-                    $samplingsIdsArray = $samplingsIds->toArray();
-                    $selectedSampleId = reset($samplingsIdsArray); // Get the first ID from the list
-                    $selectedSampleName = $sampleNames[$selectedSampleId] ?? 'N/A';
-
-                    @endphp
-                    <b><i>{{ $selectedSampleName }}</i></b>
+                @if ($subject)
+                    <i class="fw-bold">{{ $subject->name }}</i>
+                @else
+                    <i class="fw-bold">No Name Available</i>
+                @endif
                 </h4>
             </div>
             <div class="card-body">
@@ -108,14 +96,13 @@
                         <tbody>
                             <tr>
                                 <td><input type="text" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $sampling->no_sample ?? '') }}"></td>
+                                        value="{{ old('no_sample', $institute->no_coa ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
                                         value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
                                 <td>
                                     <input type="hidden" name="institute_id" value="{{ $institute->id }}">
-                                    <input type="hidden" name="institute_subject_id" value="{{ $selectedSampleId }}">
-                                    <input type="text" class="form-control text-center" value="{{ $selectedSampleName }}"
-                                        readonly>
+                                    <input type="hidden" name="institute_subject_id" value="{{ $instituteSubject->id }}">
+                                    <input type="text" class="form-control text-center" value="{{ $instituteSubject->subject->name }}" readonly>
                                 </td>
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ old('sampling_date', $sampling->sampling_date ?? '') }}"></td>
@@ -154,6 +141,11 @@
         <div class="col-xl-12">
             <div class="card-body">
                 <div class="row">
+                    @if ($regulations->isNotEmpty())
+                        @foreach ($regulations as $regulation)
+                        <i class="fw-bold">{{ $regulation->title ?? 'No Name Available' }}</i>
+                        @endforeach
+                    @endif
                     <table class="table table-bordered">
                         <tr>
                             <th class="text-center"><b>No</b></th>
@@ -173,7 +165,7 @@
                             <td>{{ $key + 1 }}</td>
                             <td>
                                 <input type="text" class="form-control text-center" name="sampling_location[]"
-                                    value="{{ old('sampling_location', $sampling->sampling_location ?? '') }} Upwind">
+                                    value="{{ old('sampling_location') }} Upwind">
                             </td>
                             <td>
                                 <input type="text" class="form-control text-center" value="L1" readonly>
@@ -185,83 +177,22 @@
                                 <input type="text" class="form-control text-center" value="L7" readonly>
                             </td>
                             <td>
-                                <input type="text" class="form-control text-center" name="noise[L1][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L2][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L3][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L4][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L5][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L6][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L7][]" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
                             </td>
                             <td>
-                                <input type="text" class="form-control text-center" name="leq[L1][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L2][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L3][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L4][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L5][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L6][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L7][]" value="-" readonly>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="ls" value="-">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="lm" value="-">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="lsm" value="-">
-                            </td>
-                            <td>
-                                @php
-                                    $regulationStandards = $samplingTimeRegulations->where('parameter_id', $parameter->id);
-                                @endphp
-                                @if ($regulationStandards->isNotEmpty())
-                                    @foreach ($regulationStandards as $rs)
-                                    <input type="text" class="form-control text-center" name="regulation_standard_id[]" value="{{ $rs->regulationStandards->title }}" readonly>
-                                    @endforeach
-                                @else
-                                    <input type="text" class="form-control text-center" name="regulation_standard_id[]" value="70" readonly>
-                                @endif
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="unit[]" value="{{ $parameter->unit ?? '' }}" readonly>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="method[]" value="{{ $parameter->method ?? '' }}" readonly>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{{ $key + 2 }}</td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="sampling_location[]"
-                                    value="{{ old('sampling_location', $sampling->sampling_location ?? '') }} Downwind">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" value="L1" readonly>
-                                <input type="text" class="form-control text-center" value="L2" readonly>
-                                <input type="text" class="form-control text-center" value="L3" readonly>
-                                <input type="text" class="form-control text-center" value="L4" readonly>
-                                <input type="text" class="form-control text-center" value="L5" readonly>
-                                <input type="text" class="form-control text-center" value="L6" readonly>
-                                <input type="text" class="form-control text-center" value="L7" readonly>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="noise[L1][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L2][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L3][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L4][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L5][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L6][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise[L7][]" value="-" readonly>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="leq[L1][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L2][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L3][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L4][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L5][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L6][]" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq[L7][]" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
                             </td>
                             <td>
                                 <input type="text" class="form-control text-center" name="ls" value="-">

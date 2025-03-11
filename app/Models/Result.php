@@ -38,4 +38,8 @@ class Result extends Model
     {
         return $this->belongsTo(Sampling::class, 'sampling_id');
     }
+    public function result()
+    {
+        return $this->hasOne(Result::class, 'parameter_id', 'parameter_id');
+    }
 }

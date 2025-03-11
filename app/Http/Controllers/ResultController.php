@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FieldCondition;
 use App\Models\Institute;
 use App\Models\InstituteRegulation;
 use App\Models\InstituteSubject;
@@ -53,10 +54,10 @@ class ResultController extends Controller
 
     public function add_sample(Request $request, $id) {
         if ($request->isMethod('POST')) {
-            // Cek apakah institute_id valid
-            $institute = Institute::findOrFail($id);
+            $instituteSubject = InstituteSubject::findOrFail($id);
+            $institute = Institute::findOrFail($instituteSubject->institute_id);
 
-            // Validasi data (buat institute_subject_id nullable)
+            // Validasi data
             $validatedData = $request->validate([
                 'no_sample' => ['required'],
                 'sampling_location' => ['required'],
@@ -71,11 +72,11 @@ class ResultController extends Controller
 
             // Periksa apakah institute_subject_id valid atau tidak
             if ($request->filled('institute_subject_id')) {
-                $instituteSubject = InstituteSubject::where('id', $request->institute_subject_id)
+                $instituteSubjectExists = InstituteSubject::where('id', $request->institute_subject_id)
                     ->where('institute_id', $id)
                     ->exists();
 
-                if ($instituteSubject) {
+                if ($instituteSubjectExists) {
                     $validatedData['institute_subject_id'] = $request->institute_subject_id;
                 }
             }
@@ -99,30 +100,33 @@ class ResultController extends Controller
                 $message = "Data Coa ({$request->no_sample}) saved successfully!";
                 $alertType = 'success'; // Notifikasi warna hijau untuk create baru
             }
-            // dd($validatedData);
 
-            // Flash message untuk notifikasi
             return back()->with(['msg' => $message, 'alertType' => $alertType]);
         }
 
-        // Data untuk ditampilkan di view
+        // **Bagian GET request** (tidak membutuhkan `$instituteSubject`)
         $samplings = Sampling::where('institute_id', $id)->get();
         $institute = Institute::findOrFail($id);
         $subjects = Subject::orderBy('name')->get();
         $parameters = Parameter::orderBy('name')->get();
+        $instituteSubjects = InstituteSubject::where('institute_id', $id)->get();
 
-        return view('result.add_result', compact('samplings', 'institute', 'subjects', 'parameters'));
+        return view('result.add_result', compact(
+            'samplings', 'institute', 'subjects',
+            'parameters', 'instituteSubjects'));
     }
 
     public function addAmbientAir(Request $request, $id)
     {
-        $instituteSubject = InstituteSubject::where('subject_id', $id)->first();
-
-        if (!$instituteSubject) {
-            return abort(404, 'Institute Subject not found');
-        }
-
+        $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
+
+        // ✅ Periksa apakah ada data Sampling dengan institute_subject_id terkait
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
+
+        if (!$sampling) {
+            return back()->withErrors(['msg' => 'Sampling belum tersedia untuk institute_subject ini.']);
+        }
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
@@ -140,9 +144,10 @@ class ResultController extends Controller
                         continue;
                     }
 
-                    Result::updateOrCreate(
+                    // ✅ Simpan atau update Result
+                    $result = Result::updateOrCreate(
                         [
-                            'sampling_id' => $id,
+                            'sampling_id' => $sampling->id,
                             'parameter_id' => $parameterId,
                             'sampling_time_id' => $samplingTimeId,
                             'regulation_standard_id' => $regulationStandardId
@@ -153,43 +158,71 @@ class ResultController extends Controller
                             'method' => $request->method[$parameterId] ?? null,
                         ]
                     );
+
+                    if ($result && $result->id) {
+                        // ✅ Cek apakah FieldCondition sudah ada
+                        $fieldCondition = FieldCondition::where('result_id', $result->id)->first();
+
+                        if ($fieldCondition) {
+                            // 🔹 Jika sudah ada, update saja datanya
+                            $fieldCondition->update([
+                                'coordinate' => $request->coordinate ?? $fieldCondition->coordinate,
+                                'temperature' => $request->temperature ?? $fieldCondition->temperature,
+                                'pressure' => $request->pressure ?? $fieldCondition->pressure,
+                                'humidity' => $request->humidity ?? $fieldCondition->humidity,
+                                'wind_speed' => $request->wind_speed ?? $fieldCondition->wind_speed,
+                                'wind_direction' => $request->wind_direction ?? $fieldCondition->wind_direction,
+                                'weather' => $request->weather ?? $fieldCondition->weather,
+                            ]);
+                        } else {
+                            // 🔹 Jika belum ada, buat baru
+                            FieldCondition::create([
+                                'result_id' => $result->id,
+                                'coordinate' => $request->coordinate ?? null,
+                                'temperature' => $request->temperature ?? null,
+                                'pressure' => $request->pressure ?? null,
+                                'humidity' => $request->humidity ?? null,
+                                'wind_speed' => $request->wind_speed ?? null,
+                                'wind_direction' => $request->wind_direction ?? null,
+                                'weather' => $request->weather ?? null,
+                            ]);
+                        }
+                    }
                 }
             }
 
             return redirect()->route('result.ambient_air', $institute->id)->with('msg', 'Results saved successfully!');
         }
 
-        // Ambil regulation_id yang hanya berelasi dengan institute_subject yang sesuai
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-
-        // Ambil parameter hanya yang sesuai dengan regulation_id yang valid
         $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
         $parametersIds = $parameters->pluck('id');
-
-        // Ambil SamplingTimeRegulation hanya yang berkaitan dengan parameter_id terkait
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-
-        $result = Result::where('sampling_id', $instituteSubject->id)->get();
+        $results = Result::where('sampling_id', $sampling->id)
+            ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
+            ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
+            ->get()
+            ->groupBy(function ($item) {
+                return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+            });
 
         return view('result.ambient_air', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'result','regulations'
+            'institute', 'parameters', 'samplingTimeRegulations', 'results',
+            'regulations', 'subject', 'instituteSubject', 'sampling'
         ));
     }
 
     public function addNoise(Request $request, $id)
     {
-        $instituteSubject = InstituteSubject::where('subject_id', $id)->first();
-
-        if (!$instituteSubject) {
-            return abort(404, 'Institute Subject not found');
-        }
+        $instituteSubject = InstituteSubject::findOrFail($id);
 
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
         if ($request->isMethod('POST')) {
             if ($request->has('testing_result')) {
@@ -213,9 +246,15 @@ class ResultController extends Controller
             return back()->with('msg', 'Data Result saved successfully');
         }
 
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+
+        // Ambil data Sampling **hanya satu** berdasarkan institute_subject_id
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
+
         // Ambil regulation_id yang hanya berelasi dengan institute_subject yang sesuai
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
+        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
 
         // Ambil parameter hanya yang sesuai dengan regulation_id yang valid
         $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
@@ -229,8 +268,8 @@ class ResultController extends Controller
         $result = Result::where('sampling_id', $instituteSubject->id)->get();
 
         return view('result.noise', compact(
-            'institute', 'samplingTimes', 'regulationStandards', 'parameters',
-            'regulations', 'samplings', 'samplingTimeRegulations', 'result'
+            'institute',  'parameters', 'regulations',
+            'samplingTimeRegulations', 'result', 'subject', 'instituteSubject', 'sampling'
         ));
     }
 
