@@ -144,7 +144,7 @@ class ResultController extends Controller
                         continue;
                     }
 
-                    // ✅ Simpan Result dulu
+                    // ✅ Simpan atau update Result
                     $result = Result::updateOrCreate(
                         [
                             'sampling_id' => $sampling->id,
@@ -159,18 +159,34 @@ class ResultController extends Controller
                         ]
                     );
 
-                    // ✅ Simpan FieldCondition setelah Result berhasil dibuat
                     if ($result && $result->id) {
-                        FieldCondition::create([
-                            'result_id' => $result->id, // Pastikan Result sudah tersimpan
-                            'coordinate' => $request->coordinate ?? null,
-                            'temperature' => $request->temperature ?? null,
-                            'pressure' => $request->pressure ?? null,
-                            'humidity' => $request->humidity ?? null,
-                            'wind_speed' => $request->wind_speed ?? null,
-                            'wind_direction' => $request->wind_direction ?? null,
-                            'weather' => $request->weather ?? null,
-                        ]);
+                        // ✅ Cek apakah FieldCondition sudah ada
+                        $fieldCondition = FieldCondition::where('result_id', $result->id)->first();
+
+                        if ($fieldCondition) {
+                            // 🔹 Jika sudah ada, update saja datanya
+                            $fieldCondition->update([
+                                'coordinate' => $request->coordinate ?? $fieldCondition->coordinate,
+                                'temperature' => $request->temperature ?? $fieldCondition->temperature,
+                                'pressure' => $request->pressure ?? $fieldCondition->pressure,
+                                'humidity' => $request->humidity ?? $fieldCondition->humidity,
+                                'wind_speed' => $request->wind_speed ?? $fieldCondition->wind_speed,
+                                'wind_direction' => $request->wind_direction ?? $fieldCondition->wind_direction,
+                                'weather' => $request->weather ?? $fieldCondition->weather,
+                            ]);
+                        } else {
+                            // 🔹 Jika belum ada, buat baru
+                            FieldCondition::create([
+                                'result_id' => $result->id,
+                                'coordinate' => $request->coordinate ?? null,
+                                'temperature' => $request->temperature ?? null,
+                                'pressure' => $request->pressure ?? null,
+                                'humidity' => $request->humidity ?? null,
+                                'wind_speed' => $request->wind_speed ?? null,
+                                'wind_direction' => $request->wind_direction ?? null,
+                                'weather' => $request->weather ?? null,
+                            ]);
+                        }
                     }
                 }
             }
@@ -188,10 +204,16 @@ class ResultController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $result = Result::where('sampling_id', $instituteSubject->id)->get();
+        $results = Result::where('sampling_id', $sampling->id)
+            ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
+            ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
+            ->get()
+            ->groupBy(function ($item) {
+                return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+            });
 
         return view('result.ambient_air', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'result',
+            'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'sampling'
         ));
     }

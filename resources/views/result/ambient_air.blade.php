@@ -186,11 +186,16 @@
                                     @endforeach
                                 </td>
                                 <td>
-                                    @foreach ($samplingTimes as $samplingTime)
+                                @foreach ($samplingTimes as $samplingTime)
+                                    @php
+                                        $key = "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
+                                        $resultData = $results[$key] ?? null;
+                                    @endphp
+
                                     <input type="text" class="form-control text-center testing-result"
                                         name="testing_result[{{ $parameter->id }}][]"
-                                        value="{{ old('testing_result') }}" required>
-                                    @endforeach
+                                        value="{{ $resultData ? $resultData->first()->testing_result : old('testing_result') }}" required>
+                                @endforeach
                                 </td>
                                 <td>
                                     @foreach ($samplingTimes as $samplingTime)
