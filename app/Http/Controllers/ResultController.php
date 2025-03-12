@@ -52,59 +52,51 @@ class ResultController extends Controller
         return response()->json(['data' => $data]);
     }
 
-    public function add_sample(Request $request, $id) {
+    public function add_sample(Request $request, $id)
+    {
         if ($request->isMethod('POST')) {
             $instituteSubject = InstituteSubject::findOrFail($id);
             $institute = Institute::findOrFail($instituteSubject->institute_id);
 
             // Validasi data
             $validatedData = $request->validate([
-                'no_sample' => ['required'],
-                'sampling_location' => ['required'],
-                'institute_subject_id' => ['required', 'integer'],
-                'sampling_date' => ['required', 'date'],
-                'sampling_time' => ['required'],
-                'sampling_method' => ['required'],
-                'date_received' => ['required', 'date'],
-                'itd_start' => ['required'],
-                'itd_end' => ['required'],
+                'samples.*.no_sample' => ['required'],
+                'samples.*.sampling_location' => ['required'],
+                'samples.*.institute_subject_id' => ['required', 'integer'],
+                'samples.*.sampling_date' => ['required', 'date'],
+                'samples.*.sampling_time' => ['required'],
+                'samples.*.sampling_method' => ['required'],
+                'samples.*.date_received' => ['required', 'date'],
+                'samples.*.itd_start' => ['required'],
+                'samples.*.itd_end' => ['required'],
             ]);
 
-            // Periksa apakah institute_subject_id valid atau tidak
-            if ($request->filled('institute_subject_id')) {
-                $instituteSubjectExists = InstituteSubject::where('id', $request->institute_subject_id)
-                    ->where('institute_id', $id)
-                    ->exists();
+            foreach ($request->samples as $sampleData) {
+                // Tambahkan institute_id dari URL
+                $sampleData['institute_id'] = $id;
 
-                if ($instituteSubjectExists) {
-                    $validatedData['institute_subject_id'] = $request->institute_subject_id;
+                // Cek apakah data sudah ada di tabel `samplings`
+                $existingSample = Sampling::where('institute_id', $id)
+                    ->where('no_sample', $sampleData['no_sample'])
+                    ->first();
+
+                if ($existingSample) {
+                    // Jika data sudah ada → UPDATE
+                    $existingSample->update($sampleData);
+                    $message = "Data Coa ({$sampleData['no_sample']}) updated successfully!";
+                    $alertType = 'warning'; // Notifikasi warna kuning untuk update
+                } else {
+                    // Jika belum ada → CREATE baru
+                    Sampling::create($sampleData);
+                    $message = "Data Coa ({$sampleData['no_sample']}) saved successfully!";
+                    $alertType = 'success'; // Notifikasi warna hijau untuk create baru
                 }
-            }
-
-            // Tambahkan institute_id dari URL
-            $validatedData['institute_id'] = $id;
-
-            // **Cek apakah data sudah ada di tabel samplings untuk institute ini**
-            $existingSample = Sampling::where('institute_id', $id)
-                ->where('no_sample', $request->no_sample)
-                ->first();
-
-            if ($existingSample) {
-                // Jika data sudah ada → UPDATE
-                $existingSample->update($validatedData);
-                $message = "Data Coa ({$request->no_sample}) updated successfully!";
-                $alertType = 'warning'; // Notifikasi warna kuning untuk update
-            } else {
-                // Jika belum ada → CREATE baru
-                Sampling::create($validatedData);
-                $message = "Data Coa ({$request->no_sample}) saved successfully!";
-                $alertType = 'success'; // Notifikasi warna hijau untuk create baru
             }
 
             return back()->with(['msg' => $message, 'alertType' => $alertType]);
         }
 
-        // **Bagian GET request** (tidak membutuhkan `$instituteSubject`)
+        // GET request
         $samplings = Sampling::where('institute_id', $id)->get();
         $institute = Institute::findOrFail($id);
         $subjects = Subject::orderBy('name')->get();
@@ -115,6 +107,7 @@ class ResultController extends Controller
             'samplings', 'institute', 'subjects',
             'parameters', 'instituteSubjects'));
     }
+
 
     public function addAmbientAir(Request $request, $id)
     {
