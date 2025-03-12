@@ -17,7 +17,7 @@ class FieldCondition extends Model
         'temperature',
         'pressure',
         'humidity',
-        'wind_speed ',
+        'wind_speed',
         'wind_direction',
         'weather',
     ];

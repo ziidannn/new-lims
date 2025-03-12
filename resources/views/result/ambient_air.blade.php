@@ -235,54 +235,54 @@
                                 <!-- Tabel tanpa garis -->
                                 <table style="border-collapse: collapse; width: 100%;">
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="coordinate">Coordinate:</label></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="coordinate">Coordinate:</label></td>
                                         <td style="border: none;">
                                             <input type="text" class="form-control" maxlength="120" name="coordinate"
-                                                placeholder="Input Coordinate" value="{{ old('coordinate') }}">
-                                            <input type="hidden" name="result_id" value=""></td>
+                                                placeholder="Input Coordinate" value="{{ old('coordinate', $fieldCondition->coordinate ?? '') }}">
+                                            <input type="hidden" name="result_id" value="{{ $fieldCondition->result_id ?? '' }}">
+                                        </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="temperature">Temperature:</label></td>
-                                        <td style="border: none;"><input type="text" class="form-control"
-                                                maxlength="120" name="temperature" placeholder="Input Temperature"
-                                                value="{{ old('temperature') }}"></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="temperature">Temperature:</label></td>
+                                        <td style="border: none;">
+                                            <input type="text" class="form-control" maxlength="120" name="temperature"
+                                                placeholder="Input Temperature" value="{{ old('temperature', $fieldCondition->temperature ?? '') }}">
+                                        </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="pressure">Pressure:</label></td>
-                                        <td style="border: none;"><input type="text" class="form-control"
-                                                maxlength="120" name="pressure" placeholder="Input Pressure"
-                                                value="{{ old('pressure') }}"></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="pressure">Pressure:</label></td>
+                                        <td style="border: none;">
+                                            <input type="text" class="form-control" maxlength="120" name="pressure"
+                                                placeholder="Input Pressure" value="{{ old('pressure', $fieldCondition->pressure ?? '') }}">
+                                        </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="humidity">Humidity:</label></td>
-                                        <td style="border: none;"><input type="text" class="form-control"
-                                                maxlength="120" name="humidity" placeholder="Input Humidity"
-                                                value="{{ old('humidity') }}"></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="humidity">Humidity:</label></td>
+                                        <td style="border: none;">
+                                            <input type="text" class="form-control" maxlength="120" name="humidity"
+                                                placeholder="Input Humidity" value="{{ old('humidity', $fieldCondition->humidity ?? '') }}">
+                                        </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="wind_speed">Wind Speed:</label></td>
-                                        <td style="border: none;"><input type="text" class="form-control"
-                                                maxlength="120" name="wind_speed" placeholder="Input Wind Speed"
-                                                value="{{ old('wind_speed') }}"></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="wind_speed">Wind Speed:</label></td>
+                                        <td style="border: none;">
+                                            <input type="text" class="form-control" maxlength="120" name="wind_speed"
+                                                placeholder="Input Wind Speed" value="{{ old('wind_speed', $fieldCondition->wind_speed ?? '') }}">
+                                        </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="wind_direction">Wind Direction:</label></td>
-                                        <td style="border: none;"><input type="text" class="form-control"
-                                                maxlength="120" name="wind_direction" placeholder="Input Wind Direction"
-                                                value="{{ old('wind_direction') }}"></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="wind_direction">Wind Direction:</label></td>
+                                        <td style="border: none;">
+                                            <input type="text" class="form-control" maxlength="120" name="wind_direction"
+                                                placeholder="Input Wind Direction" value="{{ old('wind_direction', $fieldCondition->wind_direction ?? '') }}">
+                                        </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="weather">Weather:</label></td>
-                                        <td style="border: none;"><input type="text" class="form-control"
-                                                maxlength="120" name="weather" placeholder="Input Weather"
-                                                value="{{ old('weather') }}"></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="weather">Weather:</label></td>
+                                        <td style="border: none;">
+                                            <input type="text" class="form-control" maxlength="120" name="weather"
+                                                placeholder="Input Weather" value="{{ old('weather', $fieldCondition->weather ?? '') }}">
+                                        </td>
                                     </tr>
                                 </table>
                                 <div class="card-footer text-end">
