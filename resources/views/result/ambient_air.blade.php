@@ -117,7 +117,7 @@
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab/24 Hours" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
-                                        value="{{ old('date_received', $sampling->date_received ?? '') }}"></td>
+                                        value="{{ old('date_received',   ?? '') }}"></td>
                                 <td>
                                     <input type="date" class="form-control text-center" name="itd_start"
                                         value="{{ old('itd_start', $sampling->itd_start ?? '') }}">

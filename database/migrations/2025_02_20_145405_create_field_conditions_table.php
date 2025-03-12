@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('field_conditions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('result_id')->nullable();
-            $table->foreign('result_id')->references('id')->on('results')->nullable();
+            $table->foreign('result_id')->references('id')->on('results')->onDelete('cascade'); // Perbaikan foreign key
             $table->string(column: 'coordinate')->nullable(); // Bisa disesuaikan dengan format koordinat
             $table->string('temperature')->nullable();
             $table->string('pressure')->nullable();
