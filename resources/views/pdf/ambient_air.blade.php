@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $subject ?? 'N/A' }}</title>
+    <title>{{ $institute->customer->name ?? 'N/A' }} - {{ $institute->subjects->pluck('name')->implode(', ') ?? 'N/A' }}</title>
     <link rel="stylesheet" href="('assets/css/bootstrap_mpdf.css') ?>" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
@@ -97,12 +97,96 @@
     </table>    
 </footer>
 {{-- End Footer --}}
+<div class="text-center certificate-container" style="margin-top: 45px;">
+    <p class="certificate-title">CERTIFICATE OF ANALYSIS (COA)</p>
+    <div class="text-center" style="font-size: 12px; margin-left: 90px; margin-top: -10px;">Certificate No. {{ $institute->no_coa ?? 'N/A' }}</div>
+</div>
+
+<div class="col-xs-110" style="margin-top: 30px; margin-left: 70px;">
+    <table class="mt-2 table" style="font-size: 12px;">
+        <tr>
+            <td width="150px">Customer</td>
+            <td>:</td>
+            <td colspan="2" style="font-weight: bold;">{{ $customer->name ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td>Address</td>
+            <td>:</td>
+            <td colspan="2">{{ $customer->address ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td>Contact Name</td>
+            <td>:</td>
+            <td colspan="2">{{ $customer->contact_name ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>:</td>
+            <td colspan="2"><a href="mailto:{{ $customer->email ?? 'N/A' }}" style="color: blue; text-decoration: underline;">{{ $customer->email ?? 'N/A' }}</a></td>
+        </tr>
+        <tr>
+            <td>Phone</td>
+            <td>:</td>
+            <td colspan="2">{{ $customer->phone ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td>Subject</td>
+            <td>:</td>
+            <td style="margin-top: 10px" colspan="5">
+            <ul style="list-style-type: none; padding-left: 0;">
+                @foreach($instituteSubjects as $instituteSubject)
+                <li>- {{ $instituteSubject->subject->name ?? 'N/A' }}</li>
+                @endforeach
+            </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>Sample taken by</td>
+            <td>:</td>
+            <td colspan="5">
+                <li> PT. Delta Indonesia Laboratory</li>
+                <li> Customer</li>
+                <li> Third Party</li>
+            </td>
+        </tr>
+        <tr>
+            <td>Sample Receive Date</td>
+            <td>:</td>
+            <td colspan="2">{{ \Carbon\Carbon::parse($institute->sample_receive_date)->format('F d, Y') ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td style="padding-right: 50px;">Sample Analysis Date</td>
+            <td style="padding-right: 10px;">:</td>
+            <td colspan="2">{{ \Carbon\Carbon::parse($institute->sample_analysis_date)->format('F d, Y') ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td>Report Date</td>
+            <td>:</td>
+            <td colspan="2">{{ \Carbon\Carbon::parse($institute->report_date)->format('F d, Y') ?? 'N/A' }}</td>
+        </tr>
+    </table>
+</div>
+    
+<div style="width: 100%; margin-top: 50px;">
+    <div align="left" style="width: 50%;float: left;"></div>
+    <div style="width: 50%; float: right;">
+        <div style="text-align: right;">
+            <p style="font-size: 12px;">This Certificate of Analysis consist of {nb} pages</p>
+            <p style="font-size: 12px;">Bekasi, </p>
+            <img src="assets/img/company_profile/stamp/cap_dil.png" alt="" width="150px" height="100px">
+            <br>
+            <p style="font-size: 12px; font-weight: bold; text-decoration: underline; margin-bottom: -2px;"></p>
+            <p style="font-size: 12px; font-weight: bold; margin-right: 40px;">President Director</p>
+        </div>
+    </div>
+</div>
+{{-- End Resume --}}
 {{-- Ambient Air --}}
 <div class="page_break"></div>
 <div>
     <div class="text-center certificate-container" style="margin-top: 20px;">
         <p class="certificate-title">CERTIFICATE OF ANALYSIS (COA)</p>
-        <div class="text-center" style="font-size: 12px; margin-left: 90px; margin-top: -10px;">Certificate No.</div>
+        <div class="text-center" style="font-size: 12px; margin-left: 90px; margin-top: -10px;">Certificate No. {{ $institute->no_coa ?? 'N/A' }}</div>
     </div>
     <div style="margin-top: 5px;"> <!-- Adjusted margin-top to add space between the title and the table -->
         <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center;">
@@ -117,14 +201,17 @@
                 <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
             </tr>
                 <tr>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"><br>to <br></td>
+                    @foreach($samplings as $sampling)
+                    <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to 
+                                                <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
+                    @endforeach
                 </tr>
         </table>
     </div>
@@ -208,7 +295,11 @@
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 0%;">**</td>
-                <td style="width: 95%;"></td>
+                <td style="width: 95%;">
+                    @foreach($data as $regulation)
+                        {{ $regulation->regulation->title  ?? 'N/A' }}<br>
+                    @endforeach
+                </td>
             </tr>
         </table>
     </div>

@@ -105,6 +105,7 @@
     </table>    
 </footer>
 {{-- End Footer --}}
+
 <div class="text-center certificate-container" style="margin-top: 45px;">
     <p class="certificate-title">CERTIFICATE OF ANALYSIS (COA)</p>
     <div class="text-center" style="font-size: 12px; margin-left: 90px; margin-top: -10px;">Certificate No.</div>

@@ -14,109 +14,66 @@ use App\Models\RegulationStandard;
 use App\Models\InstituteSubject;
 use App\Models\Result;
 use App\Models\InstituteRegulation;
+use App\Models\Customer;
 
 class PDFController extends Controller
 {
     // Resume COA PDF
-    public function previewPdf($id)
-    {
-        $institute = Institute::with('Subjects')->find($id);
-        if (!$institute) {
-            return redirect()->back()->with('error', 'Institute not found.');
-        }
-        $data = [
-            'customer' => $institute->customer,
-            'address' => $institute->address,
-            'contact_name' => $institute->contact_name,
-            'email' => $institute->email,
-            'phone' => $institute->phone,
-            'sample_taken_by' => $institute->sample_taken_by,
-            'sample_receive_date' => $institute->sample_receive_date,
-            'sample_analysis_date' => $institute->sample_analysis_date,
-            'report_date' => $institute->report_date,
-            'subjects' => $institute->subjects
-        ];
-        $pdf = Pdf::loadView('pdf.resume_coa', $data);
-        return $pdf->stream('Resume Institute ' . $institute->customer . ".pdf");
-    }
-
-    // Ambient Air PDF
-    // public function ambientAirPdf($id)
+    // public function previewPdf($id)
     // {
-    //     $institute = Institute::with('subjects')->find($id);
+    //     $institute = Institute::with('Subjects')->find($id);
     //     if (!$institute) {
     //         return redirect()->back()->with('error', 'Institute not found.');
     //     }
-
-    //     // Ambil subject_id dari tabel institute_subjects yang sesuai dengan institute_id
-    //     $instituteSamples = InstituteSubject::where('institute_id', $id)->get();
-    //     $subjectIds = $instituteSamples->pluck('subject_id'); // Mengambil subject_id
-
-    //     // Ambil data subjects berdasarkan subject_id yang telah diambil
-    //     $subjects = Subject::whereIn('id', $subjectIds)->get();
-
-    //     // Ambil data regulations terkait dengan subjects yang terpilih
-    //     $regulations = Regulation::whereIn('subject_id', $subjectIds)->get();
-    //     $regulationIds = $regulations->pluck('id');
-
-    //     // Ambil data parameters terkait dengan regulations
-    //     $parameters = Parameter::whereIn('regulation_id', $regulationIds)->orderBy('name')->get();
-    //     $parameterIds = $parameters->pluck('id');
-
-    //     // Data tambahan untuk tampilan
-    //     $regulationStandards = RegulationStandard::orderBy('title')->get();
-    //     $samplingTimes = SamplingTime::orderBy('time')->get();
-
-    //     // Ambil data sampling berdasarkan institute_subjects
-    //     $instituteSamplesIds = $instituteSamples->pluck('id');
-    //     $samplings = Sampling::whereIn('institute_subject_id', $instituteSamplesIds)->get();
-    //     $samplingIds = $samplings->pluck('subject_id');
-
-    //     $samps = Sampling::whereIn('id', $samplingIds)
-    //         ->with('regulations.parameters', 'sampling_times.regulation_standards')
-    //         ->get();
-
-    //     // Ambil data sampling time regulations
-    //     $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parameterIds)
-    //         ->with(['samplingTime', 'regulationStandards'])
-    //         ->get();
-
-    //     // Ambil hasil terkait dengan sampling yang sudah ada
-    //     $results = Result::whereIn('sampling_id', $samplingIds)->get();
-
-
-    //     $pdf = Pdf::loadView('pdf.ambient_air', compact(
-    //         'regulations', 'subjects', 'parameters', 'institute',
-    //         'samplingTimes', 'regulationStandards', 'samplingTimeRegulations',
-    //         'samplings', 'samps', 'results'
-    //     ));
-    //     return $pdf->stream('Ambient_Air_Report' . $id . '.pdf');
+    //     $data = [
+    //         'customer' => $institute->customer,
+    //         'address' => $institute->address,
+    //         'contact_name' => $institute->contact_name,
+    //         'email' => $institute->email,
+    //         'phone' => $institute->phone,
+    //         'sample_taken_by' => $institute->sample_taken_by,
+    //         'sample_receive_date' => $institute->sample_receive_date,
+    //         'sample_analysis_date' => $institute->sample_analysis_date,
+    //         'report_date' => $institute->report_date,
+    //         'subjects' => $institute->subjects
+    //     ];
+    //     $pdf = Pdf::loadView('pdf.resume_coa', $data);
+    //     return $pdf->stream('Resume Institute ' . $institute->customer . ".pdf");
     // }
 
+
     public function ambientAirPdf($id)
-{
-    // Ambil data institute beserta relasi subjects
-    $institute = Institute::with('subjects')->find($id);
-    if (!$institute) {
-        return redirect()->back()->with('error', 'Institute not found.');
+    {
+        // Ambil data institute beserta relasi subjects
+        $institute = Institute::with('subjects')->find($id);
+        if (!$institute) {
+            return redirect()->back()->with('error', 'Institute not found.');
+        }
+        // Ambil data InstituteRegulation dengan filter berdasarkan institute_id melalui relasi instituteSubject
+        $data = InstituteRegulation::whereHas('instituteSubject', function ($query) use ($id) {
+                $query->where('institute_id', $id);
+            })
+            ->with(['instituteSubject.subject', 'regulation']) // Memuat relasi yang dibutuhkan
+            ->get()
+            ->unique(function ($item) {
+                return $item->institute_subject_id . '-' . $item->regulation_id;
+            }) // Menghapus data yang duplikat berdasarkan kombinasi subject & regulation
+            ->values(); // Reset index array
+        // Ambil data InstituteSubject berdasarkan institute_id
+        $instituteSubjects = InstituteSubject::where('institute_id', $id)
+        ->with('subject') // Load relasi subject
+        ->get();
+        // Ambil data Sampling berdasarkan institute_id                                                                                                                                                                                                                                                     
+        $samplings = Sampling::where('institute_id', $id)
+        ->with(['instituteSubject.subject']) // Load relasi jika diperlukan
+        ->get();
+        // Ambil data Customer berdasarkan institute_id
+        $customer = Customer::find($id);
+
+        // Generate PDF menggunakan view 'pdf.ambient_air'
+        $pdf = Pdf::loadView('pdf.ambient_air', compact('data', 'institute', 'samplings', 'instituteSubjects', 'customer'));
+        return $pdf->stream('Ambient_Air_Report' . $id . '.pdf');
     }
-
-    // Ambil data InstituteRegulation dengan filter berdasarkan institute_id melalui relasi instituteSubject
-    $data = InstituteRegulation::whereHas('instituteSubject', function ($query) use ($id) {
-            $query->where('institute_id', $id);
-        })
-        ->with(['instituteSubject.subject', 'regulation']) // Memuat relasi yang dibutuhkan
-        ->get()
-        ->unique(function ($item) {
-            return $item->institute_subject_id . '-' . $item->regulation_id;
-        }) // Menghapus data yang duplikat berdasarkan kombinasi subject & regulation
-        ->values(); // Reset index array
-
-    // Generate PDF menggunakan view 'pdf.ambient_air'
-    $pdf = Pdf::loadView('pdf.ambient_air', compact('data', 'institute'));
-
-    return $pdf->stream('Ambient_Air_Report' . $id . '.pdf');
-}
 
 }
 
