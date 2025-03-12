@@ -15,15 +15,15 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('result_id')->nullable();
             $table->foreign('result_id')->references('id')->on('results')->onDelete('cascade'); // Perbaikan foreign key
-            $table->string('coordinate')->nullable(); 
+            $table->string(column: 'coordinate')->nullable(); // Bisa disesuaikan dengan format koordinat
             $table->string('temperature')->nullable();
             $table->string('pressure')->nullable();
             $table->string('humidity')->nullable();
             $table->string('wind_speed')->nullable();
             $table->string('wind_direction')->nullable();
-            $table->string('weather')->nullable(); 
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate(); // Perbaikan untuk updated_at
+            $table->string('weather')->nullable(); // Bisa diubah jika membutuhkan lebih banyak informasi
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
         });
     }
 
