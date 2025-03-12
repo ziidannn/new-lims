@@ -177,31 +177,31 @@
                                 <input type="text" class="form-control text-center" value="L7" readonly>
                             </td>
                             <td>
-                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="noise" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="noise">
+                                <input type="text" class="form-control text-center" name="noise">
+                                <input type="text" class="form-control text-center" name="noise">
+                                <input type="text" class="form-control text-center" name="noise">
+                                <input type="text" class="form-control text-center" name="noise">
+                                <input type="text" class="form-control text-center" name="noise">
+                                <input type="text" class="form-control text-center" name="noise">
                             </td>
                             <td>
-                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
-                                <input type="text" class="form-control text-center" name="leq" value="-" readonly>
+                                <input type="text" class="form-control text-center" name="leq">
+                                <input type="text" class="form-control text-center" name="leq">
+                                <input type="text" class="form-control text-center" name="leq">
+                                <input type="text" class="form-control text-center" name="leq">
+                                <input type="text" class="form-control text-center" name="leq">
+                                <input type="text" class="form-control text-center" name="leq">
+                                <input type="text" class="form-control text-center" name="leq">
                             </td>
                             <td>
-                                <input type="text" class="form-control text-center" name="ls" value="-">
+                                <input type="text" class="form-control text-center" name="ls">
                             </td>
                             <td>
-                                <input type="text" class="form-control text-center" name="lm" value="-">
+                                <input type="text" class="form-control text-center" name="lm">
                             </td>
                             <td>
-                                <input type="text" class="form-control text-center" name="lsm" value="-">
+                                <input type="text" class="form-control text-center" name="lsm">
                             </td>
                             <td>
                                 @php
