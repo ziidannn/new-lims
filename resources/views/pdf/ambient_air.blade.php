@@ -107,27 +107,27 @@
         <tr>
             <td width="150px">Customer</td>
             <td>:</td>
-            <td colspan="2" style="font-weight: bold;">{{ $customer->name ?? 'N/A' }}</td>
+            <td colspan="2" style="font-weight: bold;">{{$institute->customer->name ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td>Address</td>
             <td>:</td>
-            <td colspan="2">{{ $customer->address ?? 'N/A' }}</td>
+            <td colspan="2">{{ $institute->customer->address ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td>Contact Name</td>
             <td>:</td>
-            <td colspan="2">{{ $customer->contact_name ?? 'N/A' }}</td>
+            <td colspan="2">{{ $institute->customer->contact_name ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td>Email</td>
             <td>:</td>
-            <td colspan="2"><a href="mailto:{{ $customer->email ?? 'N/A' }}" style="color: blue; text-decoration: underline;">{{ $customer->email ?? 'N/A' }}</a></td>
+            <td colspan="2"><a href="mailto:{{ $institute->customer->email ?? 'N/A' }}" style="color: blue; text-decoration: underline;">{{ $institute->customer->email ?? 'N/A' }}</a></td>
         </tr>
         <tr>
             <td>Phone</td>
             <td>:</td>
-            <td colspan="2">{{ $customer->phone ?? 'N/A' }}</td>
+            <td colspan="2">{{ $institute->customer->phone ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td>Subject</td>
