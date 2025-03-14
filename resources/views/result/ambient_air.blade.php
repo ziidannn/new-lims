@@ -73,9 +73,10 @@
                     @endif
                 </h4>
                 @if ($regulations->isNotEmpty())
-                    @foreach ($regulations as $regulation)
-                        <i class="fw-bold" style="font-size: 1.1rem; color: darkred;">{{ $regulation->title ?? 'No Name Available' }}</i>
-                    @endforeach
+                @foreach ($regulations as $regulation)
+                <i class="fw-bold"
+                    style="font-size: 1.1rem; color: darkred;">{{ $regulation->title ?? 'No Name Available' }}</i>
+                @endforeach
                 @endif
             </div>
             <div class="card-body">
@@ -100,7 +101,9 @@
                         <tbody>
                             <tr>
                                 <td><input type="text" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $institute->no_coa ?? '') }}"></td>
+                                        value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
+                                    <input type="number" class="form-control text-center" name="no_sample">
+                                </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
                                         value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
                                 <td>
@@ -117,7 +120,7 @@
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab/24 Hours" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
-                                        value="{{ old('date_received',   ?? '') }}"></td>
+                                        value="{{ old('date_received', $sampling->date_received ?? '') }}"></td>
                                 <td>
                                     <input type="date" class="form-control text-center" name="itd_start"
                                         value="{{ old('itd_start', $sampling->itd_start ?? '') }}">
@@ -128,10 +131,61 @@
                             </tr>
                         </tbody>
                     </table>
+
+                    <p></p>
+
+                    <table class="table table-bordered" id="optionalTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th class="text-center"><b>Sample No.</b></th>
+                                <th class="text-center"><b>Sampling Location</b></th>
+                                <th class="text-center"><b>Sample Description</b></th>
+                                <th class="text-center"><b>Date</b></th>
+                                <th class="text-center"><b>Time</b></th>
+                                <th class="text-center"><b>Sampling Method</b></th>
+                                <th class="text-center"><b>Date Received</b></th>
+                                <th class="text-center"><b>Interval Testing Date</b></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" class="form-control text-center" name="no_sample_2"
+                                        value="{{ old('no_sample_2', $institute->no_coa ?? '') }}"></td>
+                                <td><input type="text" class="form-control text-center" name="sampling_location_2"
+                                        value="{{ old('sampling_location_2', $sampling->sampling_location ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="hidden" name="institute_id" value="{{ $institute->id }}">
+                                    <input type="hidden" name="institute_subject_id"
+                                        value="{{ $instituteSubject->id }}">
+                                    <input type="text" class="form-control text-center"
+                                        value="{{ $instituteSubject->subject->name }}" readonly>
+                                </td>
+                                <td><input type="date" class="form-control text-center" name="sampling_date_2"
+                                        value="{{ old('sampling_date_2', $sampling->sampling_date ?? '') }}"></td>
+                                <td><input type="text" class="form-control text-center" name="sampling_time_2"
+                                        value="{{ old('sampling_time_2', $sampling->sampling_time ?? '') }}"></td>
+                                <td><input type="text" class="form-control text-center" name="sampling_method_2"
+                                        value="Grab/24 Hours" readonly></td>
+                                <td><input type="date" class="form-control text-center" name="date_received_2"
+                                        value="{{ old('date_received_2', $sampling->date_received ?? '') }}"></td>
+                                <td>
+                                    <input type="date" class="form-control text-center" name="itd_start_2"
+                                        value="{{ old('itd_start_2', $sampling->itd_start ?? '') }}">
+                                    <span class="mx-2">to</span>
+                                    <input type="date" class="form-control text-center" name="itd_end_2"
+                                        value="{{ old('itd_end_2', $sampling->itd_end ?? '') }}">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="card-footer text-end" style="margin-top: -30px;">
-                <button class="btn btn-primary me-1" type="submit">Save</button>
+                <button type="button" class="btn btn-primary me-1" id="toggleTableBtn">
+                    Create Sampling Location
+                </button>
+                <button class="btn btn-success me-1" type="submit">Save</button>
                 <a href="{{ route('result.list_result',$institute->id) }}">
                     <span class="btn btn-outline-secondary">Back</span>
                 </a>
@@ -186,16 +240,18 @@
                                     @endforeach
                                 </td>
                                 <td>
-                                @foreach ($samplingTimes as $samplingTime)
+                                    @foreach ($samplingTimes as $samplingTime)
                                     @php
-                                        $key = "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
-                                        $resultData = $results[$key] ?? null;
+                                    $key =
+                                    "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
+                                    $resultData = $results[$key] ?? null;
                                     @endphp
 
                                     <input type="text" class="form-control text-center testing-result"
                                         name="testing_result[{{ $parameter->id }}][]"
-                                        value="{{ $resultData ? $resultData->first()->testing_result : old('testing_result') }}" required>
-                                @endforeach
+                                        value="{{ $resultData ? $resultData->first()->testing_result : old('testing_result') }}"
+                                        required>
+                                    @endforeach
                                 </td>
                                 <td>
                                     @foreach ($samplingTimes as $samplingTime)
@@ -235,53 +291,68 @@
                                 <!-- Tabel tanpa garis -->
                                 <table style="border-collapse: collapse; width: 100%;">
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="coordinate">Coordinate:</label></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="coordinate">Coordinate:</label></td>
                                         <td style="border: none;">
                                             <input type="text" class="form-control" maxlength="120" name="coordinate"
-                                                placeholder="Input Coordinate" value="{{ old('coordinate', $fieldCondition->coordinate ?? '') }}">
-                                            <input type="hidden" name="result_id" value="{{ $fieldCondition->result_id ?? '' }}">
+                                                placeholder="Input Coordinate"
+                                                value="{{ old('coordinate', $fieldCondition->coordinate ?? '') }}">
+                                            <input type="hidden" name="result_id"
+                                                value="{{ $fieldCondition->result_id ?? '' }}">
                                         </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="temperature">Temperature:</label></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="temperature">Temperature:</label></td>
                                         <td style="border: none;">
                                             <input type="text" class="form-control" maxlength="120" name="temperature"
-                                                placeholder="Input Temperature" value="{{ old('temperature', $fieldCondition->temperature ?? '') }}">
+                                                placeholder="Input Temperature"
+                                                value="{{ old('temperature', $fieldCondition->temperature ?? '') }}">
                                         </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="pressure">Pressure:</label></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="pressure">Pressure:</label></td>
                                         <td style="border: none;">
                                             <input type="text" class="form-control" maxlength="120" name="pressure"
-                                                placeholder="Input Pressure" value="{{ old('pressure', $fieldCondition->pressure ?? '') }}">
+                                                placeholder="Input Pressure"
+                                                value="{{ old('pressure', $fieldCondition->pressure ?? '') }}">
                                         </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="humidity">Humidity:</label></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="humidity">Humidity:</label></td>
                                         <td style="border: none;">
                                             <input type="text" class="form-control" maxlength="120" name="humidity"
-                                                placeholder="Input Humidity" value="{{ old('humidity', $fieldCondition->humidity ?? '') }}">
+                                                placeholder="Input Humidity"
+                                                value="{{ old('humidity', $fieldCondition->humidity ?? '') }}">
                                         </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="wind_speed">Wind Speed:</label></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="wind_speed">Wind Speed:</label></td>
                                         <td style="border: none;">
                                             <input type="text" class="form-control" maxlength="120" name="wind_speed"
-                                                placeholder="Input Wind Speed" value="{{ old('wind_speed', $fieldCondition->wind_speed ?? '') }}">
+                                                placeholder="Input Wind Speed"
+                                                value="{{ old('wind_speed', $fieldCondition->wind_speed ?? '') }}">
                                         </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="wind_direction">Wind Direction:</label></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="wind_direction">Wind Direction:</label></td>
                                         <td style="border: none;">
-                                            <input type="text" class="form-control" maxlength="120" name="wind_direction"
-                                                placeholder="Input Wind Direction" value="{{ old('wind_direction', $fieldCondition->wind_direction ?? '') }}">
+                                            <input type="text" class="form-control" maxlength="120"
+                                                name="wind_direction" placeholder="Input Wind Direction"
+                                                value="{{ old('wind_direction', $fieldCondition->wind_direction ?? '') }}">
                                         </td>
                                     </tr>
                                     <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label" for="weather">Weather:</label></td>
+                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
+                                                for="weather">Weather:</label></td>
                                         <td style="border: none;">
                                             <input type="text" class="form-control" maxlength="120" name="weather"
-                                                placeholder="Input Weather" value="{{ old('weather', $fieldCondition->weather ?? '') }}">
+                                                placeholder="Input Weather"
+                                                value="{{ old('weather', $fieldCondition->weather ?? '') }}">
                                         </td>
                                     </tr>
                                 </table>
@@ -294,10 +365,11 @@
                             </td>
                         </tr>
                     </table>
-                    <div class="card-footer text-center">
-                        <button type="button" class="btn btn-primary me-1" id="toggleTables">Create Data Analysis</button>
+                    <!-- <div class="card-footer text-center">
+                        <button type="button" class="btn btn-primary me-1" id="toggleTables">Create Data
+                            Analysis</button>
                         <div id="tableContainer"></div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -333,18 +405,18 @@
 
 </script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    let toggleBtn = document.getElementById("toggleTables");
-    let tableContainer = document.getElementById("tableContainer"); // Container untuk tabel tambahan
-    let tableCounter = 0; // Hitung jumlah tabel tambahan
+    document.addEventListener("DOMContentLoaded", function () {
+        let toggleBtn = document.getElementById("toggleTables");
+        let tableContainer = document.getElementById("tableContainer"); // Container untuk tabel tambahan
+        let tableCounter = 0; // Hitung jumlah tabel tambahan
 
-    toggleBtn.addEventListener("click", function () {
-        if (tableCounter === 0) {
-            // Tambah tabel baru
-            let newTable = document.createElement("table");
-            newTable.className = "table table-bordered mt-3"; // Styling tabel
-            newTable.id = "additionalTable" + tableCounter;
-            newTable.innerHTML = `
+        toggleBtn.addEventListener("click", function () {
+            if (tableCounter === 0) {
+                // Tambah tabel baru
+                let newTable = document.createElement("table");
+                newTable.className = "table table-bordered mt-3"; // Styling tabel
+                newTable.id = "additionalTable" + tableCounter;
+                newTable.innerHTML = `
                 <table class="table table-bordered" id="samplingLocationTable">
                         <thead>
                             <tr>
@@ -411,8 +483,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         </tr>
                         @foreach($parameters as $key => $parameter)
                         <tr>
-                            <form class="card" action="{{ route('result.ambient_air', $institute->id) }}" method="POST">
-                                @csrf
                                 <td>{{ $key + 1 }}</td>
                                 <td>
                                     <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
@@ -541,29 +611,46 @@ document.addEventListener("DOMContentLoaded", function () {
                     </table>
             `;
 
-            tableContainer.appendChild(newTable);
-            tableCounter++;
+                tableContainer.appendChild(newTable);
+                tableCounter++;
 
-            toggleBtn.textContent = "Delete Data Analysis";
-        } else {
-            // Hapus semua tabel tambahan
-            tableContainer.innerHTML = "";
-            tableCounter = 0;
-            toggleBtn.textContent = "Create Data Analysis";
-        }
-    });
-
-    // Event delegation untuk hapus tabel satu per satu
-    tableContainer.addEventListener("click", function (e) {
-        if (e.target.classList.contains("deleteTable")) {
-            e.target.closest("table").remove();
-            tableCounter--;
-            if (tableCounter === 0) {
+                toggleBtn.textContent = "Delete Data Analysis";
+            } else {
+                // Hapus semua tabel tambahan
+                tableContainer.innerHTML = "";
+                tableCounter = 0;
                 toggleBtn.textContent = "Create Data Analysis";
             }
-        }
-    });
-});
-</script>
+        });
 
+        // Event delegation untuk hapus tabel satu per satu
+        tableContainer.addEventListener("click", function (e) {
+            if (e.target.classList.contains("deleteTable")) {
+                e.target.closest("table").remove();
+                tableCounter--;
+                if (tableCounter === 0) {
+                    toggleBtn.textContent = "Create Data Analysis";
+                }
+            }
+        });
+    });
+
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let toggleBtn = document.getElementById("toggleTableBtn");
+        let optionalTable = document.getElementById("optionalTable");
+
+        toggleBtn.addEventListener("click", function () {
+            if (optionalTable.style.display === "none") {
+                optionalTable.style.display = "table";
+                toggleBtn.textContent = "Hapus Sampling Location";
+            } else {
+                optionalTable.style.display = "none";
+                toggleBtn.textContent = "Tambahkan Sampling Location";
+            }
+        });
+    });
+
+</script>
 @endsection

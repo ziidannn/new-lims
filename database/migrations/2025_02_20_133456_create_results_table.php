@@ -24,13 +24,14 @@ return new class extends Migration
             $table->string('testing_result')->nullable()->nullable();
             $table->string('unit')->nullable();
             $table->string('method')->nullable();
-            $table->string('time')->nullable();
-            $table->string('regulatory_standard')->nullable();
+            $table->string('location')->nullable();
             $table->string('noise')->nullable();
+            $table->string('time')->nullable();
             $table->string('leq')->nullable();
             $table->string('ls')->nullable();
             $table->string('lm')->nullable();
             $table->string('lsm')->nullable();
+            $table->string('regulatory_standard')->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
         });
