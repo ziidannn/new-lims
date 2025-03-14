@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\AmbientAir;
+use App\Models\Director;
 use App\Models\Parameter;
 use Illuminate\Database\Seeder;
 
@@ -31,7 +32,8 @@ class DatabaseSeeder extends Seeder
             RegulationStandardSeeder::class,
             ParameterSeeder::class,
             CustomerSeeder::class,
-            SamplingTimeRegulationSeeder::class
+            SamplingTimeRegulationSeeder::class,
+            DirectorSeeder::class
         ]);
     }
 }

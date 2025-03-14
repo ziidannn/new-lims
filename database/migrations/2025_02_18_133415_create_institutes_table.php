@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('institutes', function (Blueprint $table) {
             $table->id();
             $table->string('no_coa');
-            // $table->unsignedBigInteger('direktur_id');
-            // $table->foreign('direktur_id')->references('id')->on('direkturs');
+            $table->unsignedBigInteger('director_id')->nullable();
+            $table->foreign('director_id')->references('id')->on('directors')->nullable();
             $table->unsignedBigInteger('customer_id');
             $table->foreign('customer_id')->references('id')->on('customers');
             $table->date('sample_receive_date')->nullable();

@@ -96,6 +96,19 @@
                                 </div>
                             </div>
                             <div class="col-sm-12 fv-plugins-icon-container">
+                                <label class="form-label" for="basicDate">Code Regulation</label>
+                                <div class="input-group input-group-merge has-validation">
+                                    <input type="number" class="form-control @error('regulation_code')  is-invalid @enderror"
+                                        maxlength="120" name="regulation_code" placeholder="Input The New Criteria"
+                                        value="{{ old('regulation_code') }}"></input>
+                                    @error('regulation_code')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-sm-12 fv-plugins-icon-container">
                                 <label class="form-label" for="basicDate">Name Regulation</label>
                                 <div class="input-group input-group-merge has-validation">
                                     <textarea type="text" class="form-control @error('title')  is-invalid @enderror"
@@ -108,6 +121,7 @@
                                     @enderror
                                 </div>
                             </div>
+                            
                             <div class="col-sm-12 mt-4">
                                 <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">Create</button>
                                 <button type="reset" class="btn btn-outline-secondary"
@@ -152,9 +166,14 @@
                         </select>
                     </div>
                     <div class="mb-3">
+                        <label for="editTitle" class="form-label">Code Regulation</label>
+                        <textarea type="text" class="form-control" id="editTitle" name="regulation_code" required maxlength="120"
+                            placeholder="Input The New Code"></textarea>
+                    </div>
+                    <div class="mb-3">
                         <label for="editTitle" class="form-label">Title</label>
                         <textarea type="text" class="form-control" id="editTitle" name="title" required maxlength="120"
-                            placeholder="Input The New Criteria"></textarea>
+                            placeholder="Input The New Title"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

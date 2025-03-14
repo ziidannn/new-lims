@@ -108,6 +108,20 @@
                     </ul>
                 </li>
                 @endcan
+                <li class="menu-item {{ request()->segment(2) == 'manage_director' ? 'open active' : '' }}">
+                    <a href="" class="menu-link menu-toggle">
+                        <div>Manage Director</div>
+                    </a>
+                    <ul class="menu-sub">
+                        @can('setting/manage_account/users.read')
+                        <li class="menu-item {{ request()->segment(1) == 'director' ? 'active' : '' }}">
+                            <a href="{{ route('director.index') }}" class="menu-link">
+                                <div data-i18n="director">Director</div>
+                            </a>
+                        </li>
+                        @endcan
+                    </ul>
+                </li>
             </ul>
         </li>
         @endcan

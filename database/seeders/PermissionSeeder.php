@@ -33,17 +33,22 @@ class PermissionSeeder extends Seeder
             ["guard_name" => "web", "name" => "setting/manage_account/roles.update"],
             ["guard_name" => "web", "name" => "setting/manage_account/roles.delete"],
             ["guard_name" => "web", "name" => "setting/manage_account/permissions.read"],
+            ["guard_name" => "web", "name" => "director.update"], // Tambahkan ini
             //tambahkan permissionnya disini
         ];
         
         //setelah ditambah jalankan perintah : php artisan db:seed --class=PermissionSeeder
         foreach ($data as $x) {
-                if(!Permission::where('name', $x['name'])
-                ->where('guard_name', $x['guard_name'])->first()){
-                    $permission = Permission::create(['name' => $x['name'],'guard_name' => $x['guard_name']]);
-                    $role_admin = Role::where('name',"admin")->first();
-                    $role_admin->givePermissionTo($x['name']);
-                }
+            // Buat permission jika belum ada
+            $permission = Permission::firstOrCreate(
+                ['name' => $x['name'], 'guard_name' => $x['guard_name']]
+            );
+            // Ambil role admin
+            $role_admin = Role::where('name', "admin")->first();
+            // Berikan permission ke role admin jika belum ada
+            if ($role_admin && !$role_admin->hasPermissionTo($x['name'])) {
+                $role_admin->givePermissionTo($x['name']);
+            }
         }
     }
 }

@@ -100,11 +100,13 @@ class CoaController extends Controller
         if ($request->isMethod('POST')) {
             $this->validate($request, [
                 'title' => ['required'],
+                'regulation_code' => ['required'],
                 'subject_id' => ['required'],
             ]);
 
             $data = Regulation::create([
                 'title' => $request->title,
+                'regulation_code' => $request->regulation_code,
                 'subject_id' => $request->subject_id, // Tambahkan regulation_id
             ]);
 
@@ -123,6 +125,7 @@ class CoaController extends Controller
         if ($request->isMethod('POST')) {
             $this->validate($request, [
             'title'    => 'string', 'max:191',
+            'regulation_code' => 'string',
             'subject_id' => 'string'
         ]);
 
