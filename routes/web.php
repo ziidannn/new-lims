@@ -52,13 +52,14 @@ Route::group(['prefix' => 'result'], function () {
     Route::any('/', [ResultController::class, 'index'])->name('result.index')->middleware('auth');
     Route::get('/data', [ResultController::class, 'data'])->name('result.data');
     Route::delete('/delete', [ResultController::class, 'delete'])->name('result.delete');
-    // Route::any('/result/create', [ResultController::class, 'create'])->name('result.create');
     Route::any('/ambient_air/{id}', [ResultController::class, 'addAmbientAir'])->name('result.ambient_air');
+    // Route::any('/ambient_air_new/{id}', [ResultController::class, 'addAmbientAirNew'])->name('result.ambient_air_new');
     Route::any('/noise/{id}', [ResultController::class, 'addNoise'])->name('result.noise');
     Route::any('/waste_water/{id}', [ResultController::class, 'addWasteWater'])->name('result.waste_water');
     Route::any('/workplace/{id}', [ResultController::class, 'addWorkplace'])->name('result.workplace');
     Route::any('/add_result/{id}', [ResultController::class, 'add_result'])->name('result.add_result');
     Route::any('/add_sample/{id}', [ResultController::class, 'add_sample'])->name('result.add_sample');
+    // Route::any('/add_sample_new/{id}', [ResultController::class, 'add_sample_new'])->name('result.add_sample_new');
     Route::any('/list_result/{id}', [ResultController::class, 'list_result'])->name('result.list_result');
     Route::get('/getDataResult/{id}', [ResultController::class, 'getDataResult'])->name('result.getDataResult');
 });

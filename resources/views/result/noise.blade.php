@@ -72,12 +72,17 @@
                     <i class="fw-bold">No Name Available</i>
                 @endif
                 </h4>
+                @if ($regulations->isNotEmpty())
+                    @foreach ($regulations as $regulation)
+                    <i class="fw-bold"
+                        style="font-size: 1.1rem; color: darkred;">{{ $regulation->title ?? 'No Name Available' }}</i>
+                    @endforeach
+                @endif
             </div>
             <div class="card-body">
                 <div class="card-options"><a class="card-options-collapse" href="#" data-bs-toggle="card-collapse"><i
                             class="fe fe-chevron-up"></i></a><a class="card-options-remove" href="#"
                         data-bs-toggle="card-remove"><i class="fe fe-x"></i></a>
-                    <hr>
                 </div>
                 <div class="row">
                     <table class="table table-bordered">
@@ -95,10 +100,13 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><input type="text" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $institute->no_coa ?? '') }}"></td>
-                                <td><input type="text" class="form-control text-center" name="sampling_location"
-                                        value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
+                                <td><input type="text" class="form-control text-center me-1" name="no_sample"
+                                        value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
+                                    <input type="number" class="form-control text-center" name="no_sample" style="width: 60px;"
+                                        value="{{ old('no_sample', $sampling->no_sample ?? '') }}">
+                                </td>
+                                <td><input type="text" class="form-control text-center fst-italic" name="sampling_location"
+                                        value="{{ old('sampling_location') }} See Table" readonly></td>
                                 <td>
                                     <input type="hidden" name="institute_id" value="{{ $institute->id }}">
                                     <input type="hidden" name="institute_subject_id" value="{{ $instituteSubject->id }}">
@@ -109,7 +117,7 @@
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
                                         value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
-                                        value="Grab/24 Hours" readonly></td>
+                                        value="Grab/24 Hours"></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
                                         value="{{ old('date_received', $sampling->date_received ?? '') }}"></td>
                                 <td>
@@ -141,95 +149,165 @@
         <div class="col-xl-12">
             <div class="card-body">
                 <div class="row">
-                    @if ($regulations->isNotEmpty())
-                        @foreach ($regulations as $regulation)
-                        <i class="fw-bold">{{ $regulation->title ?? 'No Name Available' }}</i>
-                        @endforeach
-                    @endif
                     <table class="table table-bordered">
-                        <tr>
-                            <th class="text-center"><b>No</b></th>
-                            <th class="text-center"><b>Sampling Location</b></th>
-                            <th class="text-center"><b>Noise</b></th>
-                            <th class="text-center"><b>Time</b></th>
-                            <th class="text-center"><b>Leq</b></th>
-                            <th class="text-center"><b>Ls</b></th>
-                            <th class="text-center"><b>Lm</b></th>
-                            <th class="text-center"><b>Lsm</b></th>
-                            <th class="text-center"><b>Regulatory Standard</b></th>
-                            <th class="text-center"><b>Unit</b></th>
-                            <th class="text-center"><b>Methods</b></th>
-                        </tr>
-                        @foreach($parameters as $key => $parameter)
-                        <tr>
-                            <td>{{ $key + 1 }}</td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="sampling_location[]"
-                                    value="{{ old('sampling_location') }} Upwind">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" value="L1" readonly>
-                                <input type="text" class="form-control text-center" value="L2" readonly>
-                                <input type="text" class="form-control text-center" value="L3" readonly>
-                                <input type="text" class="form-control text-center" value="L4" readonly>
-                                <input type="text" class="form-control text-center" value="L5" readonly>
-                                <input type="text" class="form-control text-center" value="L6" readonly>
-                                <input type="text" class="form-control text-center" value="L7" readonly>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="noise">
-                                <input type="text" class="form-control text-center" name="noise">
-                                <input type="text" class="form-control text-center" name="noise">
-                                <input type="text" class="form-control text-center" name="noise">
-                                <input type="text" class="form-control text-center" name="noise">
-                                <input type="text" class="form-control text-center" name="noise">
-                                <input type="text" class="form-control text-center" name="noise">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="leq">
-                                <input type="text" class="form-control text-center" name="leq">
-                                <input type="text" class="form-control text-center" name="leq">
-                                <input type="text" class="form-control text-center" name="leq">
-                                <input type="text" class="form-control text-center" name="leq">
-                                <input type="text" class="form-control text-center" name="leq">
-                                <input type="text" class="form-control text-center" name="leq">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="ls">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="lm">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="lsm">
-                            </td>
-                            <td>
-                                @php
-                                    $regulationStandards = $samplingTimeRegulations->where('parameter_id', $parameter->id);
-                                @endphp
-                                @if ($regulationStandards->isNotEmpty())
-                                    @foreach ($regulationStandards as $rs)
-                                    <input type="text" class="form-control text-center" name="regulation_standard_id[]" value="{{ $rs->regulationStandards->title }}" readonly>
-                                    @endforeach
-                                @else
-                                    <input type="text" class="form-control text-center" name="regulation_standard_id[]" value="70" readonly>
+                    @if($parameters->contains(function($parameter) {
+                        return in_array($parameter->regulation_id, [12, 14]) || in_array($parameter->regulation_code, ['031', '033']);
+                    }))
+                        <table class="table table-bordered">
+                            <tr>
+                                <th class="text-center"><b>No</b></th>
+                                <th class="text-center"><b>Sampling Location</b></th>
+                                <th class="text-center"><b>Noise</b></th>
+                                <th class="text-center"><b>Time</b></th>
+                                <th class="text-center"><b>Leq</b></th>
+                                <th class="text-center"><b>Ls</b></th>
+                                <th class="text-center"><b>Lm</b></th>
+                                <th class="text-center"><b>Lsm</b></th>
+                                <th class="text-center"><b>Regulatory Standard</b></th>
+                                <th class="text-center"><b>Unit</b></th>
+                                <th class="text-center"><b>Methods</b></th>
+                            </tr>
+                            @foreach($parameters as $key => $parameter)
+                                @if(in_array($parameter->regulation_id, [12, 14])
+                                || in_array($parameter->regulation_code, ['031', '033']))
+                                    <tr>
+                                        <td>{{ $key + 1 }}</td>
+                                        <td>
+                                            <input type="text" class="form-control text-center" name="location[]"
+                                                value="Upwind" readonly>
+                                        </td>
+                                        <td>
+                                            @for($i = 1; $i <= 7; $i++)
+                                                <input type="text" class="form-control text-center" value="L{{ $i }}" readonly>
+                                            @endfor
+                                        </td>
+                                        <td>
+                                            @for($i = 1; $i <= 7; $i++)
+                                                <input type="text" class="form-control text-center" value="T{{ $i }}" readonly>
+                                            @endfor
+                                        </td>
+                                        <td>
+                                            @for($i = 0; $i < 7; $i++)
+                                                <input type="text" class="form-control text-center" name="leq[]"
+                                                    value="{{ old('leq.' . $i) }}">
+                                            @endfor
+                                        </td>
+                                        <td><input type="text" class="form-control text-center" name="ls" value="{{ old('ls') }}"></td>
+                                        <td><input type="text" class="form-control text-center" name="lm" value="{{ old('lm') }}"></td>
+                                        <td><input type="text" class="form-control text-center" name="lsm" value="{{ old('lsm') }}"></td>
+                                        <td>
+                                            <input type="text" class="form-control text-center" name="regulatory_standard"
+                                                value="{{ old('regulatory_standard') }} 70">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center"
+                                                name="unit[{{ $parameter->id }}]" value="{{ $parameter->unit ?? '' }}" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center"
+                                                name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}" readonly>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ $key + 2 }}</td>
+                                        <td>
+                                            <input type="text" class="form-control text-center" name="location[]"
+                                                value="Downwind" readonly>
+                                        </td>
+                                        <td>
+                                            @for($i = 1; $i <= 7; $i++)
+                                                <input type="text" class="form-control text-center" name="noise" value="L{{ $i }}" readonly>
+                                            @endfor
+                                        </td>
+                                        <td>
+                                            @for($i = 1; $i <= 7; $i++)
+                                                <input type="text" class="form-control text-center" name="time" value="T{{ $i }}" readonly>
+                                            @endfor
+                                        </td>
+                                        <td>
+                                            @for($i = 0; $i < 7; $i++)
+                                                <input type="text" class="form-control text-center" name="leq[]"
+                                                    value="{{ old('leq.' . $i) }}">
+                                            @endfor
+                                        </td>
+                                        <td><input type="text" class="form-control text-center" name="ls" value="{{ old('ls') }}"></td>
+                                        <td><input type="text" class="form-control text-center" name="lm" value="{{ old('lm') }}"></td>
+                                        <td><input type="text" class="form-control text-center" name="lsm" value="{{ old('lsm') }}"></td>
+                                        <td>
+                                            <input type="text" class="form-control text-center" name="regulatory_standard"
+                                                value="{{ old('regulatory_standard') }} 70">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center"
+                                                name="unit[{{ $parameter->id }}]" value="{{ $parameter->unit ?? '' }}" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center"
+                                                name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}" readonly>
+                                        </td>
+                                    </tr>
                                 @endif
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="unit[]" value="{{ $parameter->unit ?? '' }}" readonly>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="method[]" value="{{ $parameter->method ?? '' }}" readonly>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </table>
+                            @endforeach
+                        </table>
+                    @endif
+
+                    <!------------------------------ Table Kedua --------------------------->
+
+                    @if($parameters->contains(function($parameter) {
+                        return in_array($parameter->regulation_id, [13, 15])
+                        || in_array($parameter->regulation_code, ['032', '034']);
+                    }))
+                        <table class="table table-bordered">
+                            <tr>
+                                <th class="text-center"><b>No</b></th>
+                                <th class="text-center"><b>Sampling Location</b></th>
+                                <th class="text-center"><b>Testing Result</b></th>
+                                <th class="text-center"><b>Time</b></th>
+                                <th class="text-center"><b>Regulatory Standard</b></th>
+                                <th class="text-center"><b>Unit</b></th>
+                                <th class="text-center"><b>Methods</b></th>
+                            </tr>
+                            @foreach($parameters as $key => $parameter)
+                                @for($i = 0; $i < 5; $i++)
+                                    <tr>
+                                        <td>{{ ($key * 5) + $i + 1 }}</td>
+                                        <td>
+                                            <input type="text" class="form-control text-center" name="location[]"
+                                            value="{{ old('location.' . (($key * 5) + $i), $result->location[($key * 5) + $i] ?? '') }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center" name="testing_result[]"
+                                            value="{{ old('testing_result.' . (($key * 5) + $i), $result->testing_result[($key * 5) + $i] ?? '') }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center" name="time[]"
+                                            value="{{ old('time.' . (($key * 5) + $i), $result->time[($key * 5) + $i] ?? '') }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center" name="regulatory_standard[]"
+                                            value="{{ old('regulatory_standard.' . (($key * 5) + $i), $result->regulatory_standard[($key * 5) + $i] ?? '') }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center"
+                                            name="unit[{{ $parameter->id }}]"
+                                            value="{{ old('unit.' . $parameter->id, $result->unit[$parameter->id] ?? $parameter->unit ?? '') }}" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center"
+                                            name="method[{{ $parameter->id }}]"
+                                            value="{{ old('method.' . $parameter->id, $result->method[$parameter->id] ?? $parameter->method ?? '') }}" readonly>
+                                        </td>
+                                    </tr>
+                                @endfor
+                            @endforeach
+                        </table>
+                    @endif
                 </div>
                 <div class="card-footer text-end" style="margin-top: -10px;">
                     <button class="btn btn-primary me-1" type="submit">Save</button>
-                    <!-- <a href="{{ url()->previous() }}">
+                    <a href="{{ route('result.list_result', $institute->id) }}">
                         <span class="btn btn-outline-secondary">Back</span>
-                    </a> -->
+                    </a>
                 </div>
             </div>
         </div>

@@ -22,12 +22,13 @@ class Result extends Model
         'unit',
         'method',
         'time',
-        'regulatory_standard',
         'noise',
         'leq',
         'ls',
         'lm',
-        'lsm'
+        'lsm',
+        'regulatory_standard',
+        'location'
     ];
 
     public function parameter()
