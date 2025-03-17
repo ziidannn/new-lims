@@ -66,12 +66,12 @@
             </div>
         
             <br>
-            {{-- <div class="form-group">
+            <div class="form-group">
                 <label for="ttd"> New Signatures:</label>
                 <input type="file" class="form-control" id="ttd"
                     name="ttd" required placeholder="Upload Your New Signature"
                     accept="image/png, image/jpeg">
-            </div> --}}
+            </div>
         
             <br>
             <div class="form-group text-right">

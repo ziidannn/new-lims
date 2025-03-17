@@ -63,25 +63,38 @@
             margin-top: 100px;
             margin-bottom: 110px;
         }
+        @page {
+        margin: 50px;
+        @bottom-center {
+            content: "This Certificate of Analysis consists of " counter(page) " of " counter(pages) " pages";
+            font-size: 12px;
+        }
+    }
     </style>
 </head>
 <body>
-<header >
-    <div style="width: 100%;">
-        <div align="left" style="width: 50%;float: left;">
-            <img src="assets/img/company_profile/logo/logo.png" alt="" width="150px">
-        </div>
-        <div align="right" style="width: 50%; float: right;">
-            <div>
-                <img src="assets/img/kan.png" alt="" width="100px" style="float: right;">
-                <div style="clear: right;"></div>
-                <p style="font-size: 9px; font-weight: bold; text-align:right; margin: -5px;">SK-KLHK No 00161/LPJ/Labling-1/LRK/KLHK</p>
-                <p style="font-size: 8px; text-align: margin: -5px; right;">7.8.1/DIL/VII/2018/FORM REV . 2</p>
-                <p style="font-size: 8px; text-align: margin: -5px; right;">Page {PAGENO} of {nbpg}</p>
+    <header>
+        <div style="width: 100%;">
+            <div align="left" style="width: 50%; float: left;">
+                <img src="{{ public_path('assets/img/company_profile/logo/logo.png') }}" alt="" width="150px">
             </div>
-        </div>
-    </div>  
-</header>
+            <div align="right" style="width: 50%; float: right;">
+                <div>
+                    <img src="{{ public_path('assets/img/kan.png') }}" alt="" width="100px" style="float: right;">
+                    <div style="clear: right;"></div>
+                    <p style="font-size: 9px; font-weight: bold; text-align:right; margin: -5px;">
+                        SK-KLHK No 00161/LPJ/Labling-1/LRK/KLHK
+                    </p>
+                    <p style="font-size: 8px; text-align:right; margin: -5px;">
+                        7.8.1/DIL/VII/2018/FORM REV . 2
+                    </p>
+                    <p style="font-size: 8px; text-align:right; margin: -5px;">
+                        Page {PAGENO} of {nbpg}
+                    </p>
+                </div>
+            </div>
+        </div>  
+    </header>
 <footer>
     <div style="text-align: left; padding-bottom: -5px; margin-bottom: 10;">
         <p style="font-size: 8px; margin: -5; font-weight: bold;">Ruko Prima Orchard No.C 2</p>
@@ -134,8 +147,8 @@
             <td>:</td>
             <td style="margin-top: 10px" colspan="5">
             <ul style="list-style-type: none; padding-left: 0;">
-                @foreach($instituteSubjects as $instituteSubject)
-                <li>- {{ $instituteSubject->subject->name ?? 'N/A' }}</li>
+                @foreach($instituteSubjects->groupBy('subject_id') as $instituteSubject)
+                <li>- {{ $instituteSubject->first()->subject->name ?? 'N/A' }}</li>
                 @endforeach
             </ul>
             </td>
@@ -171,7 +184,7 @@
     <div align="left" style="width: 50%;float: left;"></div>
     <div style="width: 50%; float: right;">
         <div style="text-align: right;">
-            <p style="font-size: 12px;">This Certificate of Analysis consist of {nb} pages</p>
+            <p style="font-size: 12px;">yyzzzz</p>
             <p style="font-size: 12px;">Bekasi, </p>
             <img src="assets/img/company_profile/stamp/cap_dil.png" alt="" width="150px" height="100px">
             <br>
@@ -227,17 +240,49 @@
                 <td style="border: 1px solid; font-weight: bold;">Unit</td>
                 <td style="border: 1px solid; font-weight: bold;">Methods</td>
             </tr>    
-            
-                <tr>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                </tr>
+        
+            @php 
+                $counter = 1; // Nomor tetap seperti sebelumnya
+            @endphp
+        
+            @foreach(collect($samplingTimeRegulations)->pluck('parameter')->unique()->sortBy('id') as $parameter)
+                @php
+                    $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
+                    $rowspan = $samplingTimes->count();
+                    $firstRow = true;
+                @endphp
+        
+                @foreach ($samplingTimes as $samplingTime)
+                    @php
+                        $resultKey = "{$parameter->id}-{$samplingTime->samplingTime->id}";
+                        $resultData = $results->get($resultKey)?->first();
+                        $regulationStandard = $samplingTime->regulationStandards ?? null;
+                    @endphp
+                    <tr>
+                        @if ($firstRow)
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $counter }}</td>
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->name }}</td>
+                        @endif
+                        <td style="border: 1px solid;">{{ $samplingTime->samplingTime->time }}</td>
+                        <td style="border: 1px solid;">{{ $resultData ? $resultData->testing_result : '-' }}</td>
+                        <td style="border: 1px solid;">{{ $regulationStandard ? $regulationStandard->title : '-' }}</td>
+                        @if ($firstRow)
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->unit ?? '-' }}</td>
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->method ?? '-' }}</td>
+                        @endif
+                    </tr>
+                    @php 
+                        $firstRow = false; 
+                    @endphp
+                @endforeach
+        
+                @php 
+                    $counter++; // Tetap seperti sebelumnya
+                @endphp
+            @endforeach
         </table>
+        
+        
     </div>
     {{-- End Parameters --}}
     {{-- Start Condition  --}}
@@ -245,35 +290,35 @@
         <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: left; width: 100%;">
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Ambient Environmental Condition</td>
-                <td style="width: 70%;">: Xxxxxx</td>
+                <td style="width: 70%;"></td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Coordinate</td>
-                <td style="width: 70%;">: Xxxxxx</td>
+                <td style="width: 70%;">: {{ $fieldCondition->coordinate ?? 'N/A' }}</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Temperature</td>
-                <td style="width: 70%;">: Xxxxxx °C</td>
+                <td style="width: 70%;">: {{ $fieldCondition->temperature ?? 'N/A' }} °C</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Pressure</td>
-                <td style="width: 70%;">: Xxxxxx mmHg</td>
+                <td style="width: 70%;">: {{ $fieldCondition->pressure ?? 'N/A' }} mmHg</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Humidity</td>
-                <td style="width: 70%;">: Xxxxxx %RH</td>
+                <td style="width: 70%;">: {{ $fieldCondition->humidity ?? 'N/A' }} %RH</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Wind Speed</td>
-                <td style="width: 70%;">: Xxxxxx m/s</td>
+                <td style="width: 70%;">: {{ $fieldCondition->wind_speed ?? 'N/A' }} m/s</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Wind Direction</td>
-                <td style="width: 70%;">: Xxxxxx</td>
+                <td style="width: 70%;">: {{ $fieldCondition->wind_direction ?? 'N/A' }}</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Weather</td>
-                <td style="width: 70%;">: Xxxxxx</td>
+                <td style="width: 70%;">: {{ $fieldCondition->weather ?? 'N/A' }}</td>
             </tr>
         </table>
     </div>
@@ -293,14 +338,12 @@
                 <td style="width: 0%;"> * </td>
                 <td style="width: 95%;">Accredited Parameters </td>
             </tr>
+            @foreach ($parameters as $parameter)
             <tr style="line-height: 1;">
-                <td style="width: 0%;">**</td>
-                <td style="width: 95%;">
-                    @foreach($data as $regulation)
-                        {{ $regulation->regulation->title  ?? 'N/A' }}<br>
-                    @endforeach
-                </td>
+                <td style="width: 5%;">{{ $loop->iteration }}</td> 
+                <td style="width: 95%;">{{ $parameter->title }}</td>
             </tr>
+            @endforeach
         </table>
     </div>
     {{-- End Notes and Regulation --}}
