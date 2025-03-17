@@ -230,8 +230,7 @@ class ResultController extends Controller
             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
             $parameterNamesList = implode(', ', $parameterNames);
 
-            return redirect()->route('result.ambient_air.add', $institute->id)
-                ->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
@@ -342,8 +341,7 @@ class ResultController extends Controller
             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
             $parameterNamesList = implode(', ', $parameterNames);
 
-            return redirect()->route('result.ambient_air.add_loc', $institute->id)
-                ->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
@@ -491,6 +489,7 @@ class ResultController extends Controller
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
@@ -506,7 +505,7 @@ class ResultController extends Controller
                     // Simpan atau update Result berdasarkan regulation_standard_id
                     $result = Result::updateOrCreate(
                         [
-                            'sampling_id' => $instituteSubject->id,
+                            'sampling_id' => $samplings->id,
                             'parameter_id' => $parameterId,
                             'regulation_standard_id' => $regulationStandardId
                         ],
@@ -545,10 +544,10 @@ class ResultController extends Controller
 
             // Buat notifikasi berdasarkan status penyimpanan data
             if ($resultSaved && $fieldConditionSaved) {
-                return redirect()->route('result.list_result', $institute->id)
+                return redirect()->route('result.list_result', $instituteSubject->id)
                     ->with('msg', 'Data Result dan Field Condition berhasil disimpan.');
             } elseif ($resultSaved) {
-                return redirect()->route('result.list_result', $institute->id)
+                return redirect()->route('result.list_result', $instituteSubject->id)
                     ->with('msg', 'Data Result berhasil disimpan, namun Field Condition tidak ditemukan.');
             } else {
                 return redirect()->back()
