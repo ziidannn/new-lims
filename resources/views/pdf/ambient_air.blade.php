@@ -258,12 +258,12 @@
                         $resultData = $results->get($resultKey)?->first();
                         $regulationStandard = $samplingTime->regulationStandards ?? null;
                     @endphp
-                    <tr>
+                    <tr >
                         @if ($firstRow)
                             <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $counter }}</td>
                             <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->name }}</td>
                         @endif
-                        <td style="border: 1px solid;">{{ $samplingTime->samplingTime->time }}</td>
+                        <td style="border: 1px solid;" >{{ $samplingTime->samplingTime->time }}</td>
                         <td style="border: 1px solid;">{{ $resultData ? $resultData->testing_result : '-' }}</td>
                         <td style="border: 1px solid;">{{ $regulationStandard ? $regulationStandard->title : '-' }}</td>
                         @if ($firstRow)
@@ -338,12 +338,14 @@
                 <td style="width: 0%;"> * </td>
                 <td style="width: 95%;">Accredited Parameters </td>
             </tr>
-            @foreach ($parameters as $parameter)
+            @if ($regulations->isNotEmpty())
+                @foreach ($regulations as $regulation)
             <tr style="line-height: 1;">
                 <td style="width: 5%;">{{ $loop->iteration }}</td> 
-                <td style="width: 95%;">{{ $parameter->title }}</td>
+                <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
             </tr>
             @endforeach
+            @endif
         </table>
     </div>
     {{-- End Notes and Regulation --}}
