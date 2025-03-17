@@ -175,7 +175,6 @@
                             <th class="text-center"><b>Regulatory Standard</b></th>
                             <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
-                            <th class="text-center"><b>Action</b></th>
                         </tr>
                         @foreach($parameters as $key => $parameter)
                         <tr>
@@ -234,13 +233,16 @@
                                         name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}"
                                         readonly>
                                 </td>
-                                <td>
-                                    <button class="btn btn-success btn-sm mt-2" type="submit" name="save">Save</button>
-                                </td>
                             </form>
                         </tr>
                         @endforeach
                     </table>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-primary me-1" type="submit">Save</button>
+                        <a href="{{ route('result.list_result',$institute->id) }}">
+                            <span class="btn btn-outline-secondary">Back</span>
+                        </a>
+                    </div>
                     <table class="table table-bordered">
                         <tr>
                             <td colspan="3">
@@ -316,7 +318,7 @@
                                     </tr>
                                 </table>
                                 <div class="card-footer text-end">
-                                    <button class="btn btn-success me-1" type="submit">Save</button>
+                                    <button class="btn btn-primary me-1" type="submit">Save</button>
                                     <a href="{{ route('result.list_result',$institute->id) }}">
                                         <span class="btn btn-outline-secondary">Back</span>
                                     </a>

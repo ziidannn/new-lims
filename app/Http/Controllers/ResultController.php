@@ -391,79 +391,85 @@ class ResultController extends Controller
     }
 
     public function addNoise(Request $request, $id)
-    {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
+{
+    // Ambil institute_subject dan institute terkait
+    $instituteSubject = InstituteSubject::findOrFail($id);
+    $institute = Institute::findOrFail($instituteSubject->institute_id);
 
-        // Cari institute_subject_id yang memiliki subject_id = 3 (subject "noise")
-        $noiseInstituteSubject = InstituteSubject::where('subject_id', 3)->first();
+    // Ambil Sampling berdasarkan institute_subject_id
+    $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
-        if (!$noiseInstituteSubject) {
-            return redirect()->back()->with('error', 'No institute_subject_id found for noise.');
-        }
+    // Cari institute_subject_id yang memiliki subject_id = 3 (subject "noise")
+    $noiseInstituteSubject = InstituteSubject::where('subject_id', 3)->first();
 
-        // Cari sampling_id yang terkait dengan institute_subject_id dari noise
+    // Pastikan ada data noiseInstituteSubject sebelum mencari sampling
+    if ($noiseInstituteSubject) {
         $samplingNoise = Sampling::where('institute_subject_id', $noiseInstituteSubject->id)
-            ->orderBy('id', 'desc') // Ambil yang paling terakhir
+            ->orderBy('id', 'desc')
             ->first();
+    } else {
+        $samplingNoise = null;
+    }
 
+    // Ambil regulasi terkait institute_subject
+    $regulation = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+        ->with('regulation')
+        ->first();
+
+    if ($request->isMethod('POST')) {
+        $request->validate([
+            'testing_result.*' => 'nullable|string',
+            'unit.*' => 'nullable|string',
+            'method.*' => 'nullable|string',
+            'time.*' => 'nullable|string',
+            'noise' => 'nullable|string',
+            'leq.*' => 'nullable|string',
+            'ls' => 'nullable|string',
+            'lm' => 'nullable|string',
+            'lsm' => 'nullable|string',
+            'regulatory_standard.*' => 'nullable|string',
+            'location.*' => 'nullable|string'
+        ]);
+
+        // Jika tidak ada samplingNoise, return error
         if (!$samplingNoise) {
-            return redirect()->back()->with('error', 'No sampling data found for noise.');
+            return redirect()->back()->with('error', 'No noise sampling ID found.');
         }
 
-        $regulation = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->with('regulation')
-            ->first();
+        $samplingId = $samplingNoise->id; // ID untuk noise
 
-        if ($request->isMethod('POST')) {
-            $request->validate([
-                'testing_result.*' => 'nullable|string',
-                'unit.*' => 'nullable|string',
-                'method.*' => 'nullable|string',
-                'time.*' => 'nullable|string',
-                'noise' => 'nullable|string',
-                'leq.*' => 'nullable|string',
-                'ls' => 'nullable|string',
-                'lm' => 'nullable|string',
-                'lsm' => 'nullable|string',
-                'regulatory_standard.*' => 'nullable|string',
-                'location.*' => 'nullable|string'
-            ]);
-        
-            $samplingId = $samplingNoise->id; // ID untuk noise
-        
-            // Looping setiap input yang diberikan
-            foreach ($request->input('testing_result', []) as $index => $testingResult) {
-                if ($testingResult || $request->input('location')[$index]) { // Hanya simpan jika ada data
-                    Result::create([
-                        'sampling_id' => $samplingId,
-                        'testing_result' => $testingResult,
-                        'unit' => $request->input('unit')[$index] ?? null,
-                        'method' => $request->input('method')[$index] ?? null,
-                        'time' => $request->input('time')[$index] ?? null,
-                        'noise' => $request->input('noise'),
-                        'leq' => $request->input('leq')[$index] ?? null,
-                        'ls' => $request->input('ls'),
-                        'lm' => $request->input('lm'),
-                        'lsm' => $request->input('lsm'),
-                        'regulatory_standard' => $request->input('regulatory_standard')[$index] ?? null,
-                        'location' => $request->input('location')[$index] ?? null,
-                    ]);
-                }
+        // Looping inputan
+        foreach ($request->input('testing_result', []) as $index => $testingResult) {
+            if ($testingResult || $request->input('location')[$index] ?? null) {
+                Result::create([
+                    'sampling_id' => $samplingId,
+                    'testing_result' => $testingResult,
+                    'unit' => $request->input('unit')[$index] ?? null,
+                    'method' => $request->input('method')[$index] ?? null,
+                    'time' => $request->input('time')[$index] ?? null,
+                    'noise' => $request->input('noise') ?? null,
+                    'leq' => $request->input('leq')[$index] ?? null,
+                    'ls' => $request->input('ls') ?? null,
+                    'lm' => $request->input('lm') ?? null,
+                    'lsm' => $request->input('lsm') ?? null,
+                    'regulatory_standard' => $request->input('regulatory_standard')[$index] ?? null,
+                    'location' => $request->input('location')[$index] ?? null,
+                ]);
             }
-        
-            return redirect()->route('result.list_result', $institute->id)
-                ->with('msg', 'Results saved successfully');
         }
-            
+
+        return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Results saved successfully');
+    }
+
     $subject = Subject::find($instituteSubject->subject_id);
 
-    // Ambil data Sampling berdasarkan institute_subject_id
+    // Ambil sampling pertama dari institute_subject_id terkait
     $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
 
-    // Ambil hanya regulation_id pertama yang berelasi dengan institute_subject
+    // Ambil regulation_id pertama yang berelasi dengan institute_subject
     $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-        ->limit(value: 1) // Pastikan hanya mengambil satu regulation_id
+        ->limit(1)
         ->pluck('regulation_id');
 
     $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -477,13 +483,14 @@ class ResultController extends Controller
         ->with(['samplingTime', 'regulationStandards'])
         ->get();
 
-    $results = Result::where('sampling_id', $samplingNoise->id)->get();
+    // Pastikan tidak error jika samplingNoise null
+    $results = $samplingNoise ? Result::where('sampling_id', $samplingNoise->id)->get() : collect();
 
     return view('result.noise', compact(
         'institute', 'parameters', 'regulations',
         'samplingTimeRegulations', 'results', 'subject', 'instituteSubject', 'sampling'
     ));
-    }
+}
 
     public function addWorkplaceAir(Request $request, $id)
     {
