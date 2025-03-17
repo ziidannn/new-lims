@@ -183,9 +183,6 @@
                 </div>
             </div>
             <div class="card-footer text-end" style="margin-top: -30px;">
-                <button type="button" class="btn btn-primary me-1" id="toggleTableBtn">
-                    Create Sampling Location
-                </button>
                 <button class="btn btn-success me-1" type="submit">Save</button>
                 <a href="{{ route('result.list_result',$institute->id) }}">
                     <span class="btn btn-outline-secondary">Back</span>
