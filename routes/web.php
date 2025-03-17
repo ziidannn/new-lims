@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DirectorController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -24,6 +25,8 @@ use App\Http\Controllers\CustomerController;
 Route::get('/', function () {
     return view('welcome');
 })->name('index');
+
+Route::resource('director', DirectorController::class);
 
 require __DIR__.'/auth.php';
 
@@ -111,6 +114,11 @@ Route::middleware('auth')->group(function () {
 //PDF
 Route::get('/resume_coa/{customerId}', [PDFController::class, 'previewPdf'])->name('preview.pdf');
 Route::get('/ambient_air/{customerId}', [PDFController::class, 'ambientAirPdf'])->name('ambient.air.pdf');
+
+
+Route::get('/directors', [DirectorController::class, 'index'])->name('director.index');
+Route::put('/directors/{id}/edit', [DirectorController::class, 'edit'])->name('director.edit');
+
 
 
 Route::get('log-viewers', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['can:log-viewers.read']);
