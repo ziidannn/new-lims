@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@section('title', 'Add Result')
+@section('title', 'Analysis')
 
 @section('css')
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
@@ -267,38 +267,34 @@
                                 <th class="text-center"><b>Unit</b></th>
                                 <th class="text-center"><b>Methods</b></th>
                             </tr>
-                            @foreach($parameters as $key => $parameter)
-                                @for($i = 0; $i < 5; $i++)
-                                    <tr>
-                                        <td>{{ ($key * 5) + $i + 1 }}</td>
-                                        <td>
-                                            <input type="text" class="form-control text-center" name="location[]"
-                                            value="{{ old('location.' . (($key * 5) + $i), $result->location[($key * 5) + $i] ?? '') }}">
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control text-center" name="testing_result[]"
-                                            value="{{ old('testing_result.' . (($key * 5) + $i), $result->testing_result[($key * 5) + $i] ?? '') }}">
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control text-center" name="time[]"
-                                            value="{{ old('time.' . (($key * 5) + $i), $result->time[($key * 5) + $i] ?? '') }}">
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control text-center" name="regulatory_standard[]"
-                                            value="{{ old('regulatory_standard.' . (($key * 5) + $i), $result->regulatory_standard[($key * 5) + $i] ?? '') }}">
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control text-center"
-                                            name="unit[{{ $parameter->id }}]"
-                                            value="{{ old('unit.' . $parameter->id, $result->unit[$parameter->id] ?? $parameter->unit ?? '') }}" readonly>
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control text-center"
-                                            name="method[{{ $parameter->id }}]"
-                                            value="{{ old('method.' . $parameter->id, $result->method[$parameter->id] ?? $parameter->method ?? '') }}" readonly>
-                                        </td>
-                                    </tr>
-                                @endfor
+                            @foreach($results as $key => $result)
+                                <tr>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="location[]"
+                                        value="{{ old('location.' . $key, $result->location ?? '') }}">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="testing_result[]"
+                                        value="{{ old('testing_result.' . $key, $result->testing_result ?? '') }}">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="time[]"
+                                        value="{{ old('time.' . $key, $result->time ?? '') }}">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="regulatory_standard[]"
+                                        value="{{ old('regulatory_standard.' . $key, $result->regulatory_standard ?? '') }}">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="unit[]"
+                                        value="{{ old('unit.' . $key, $result->unit ?? '') }}" readonly>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="method[]"
+                                        value="{{ old('method.' . $key, $result->method ?? '') }}" readonly>
+                                    </td>
+                                </tr>
                             @endforeach
                         </table>
                     @endif

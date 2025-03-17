@@ -28,6 +28,7 @@ class InstituteController extends Controller
                 'no_coa' => ['required'],
                 'customer_id' => ['required'],
                 'subject_id' => ['required', 'array'], // Pastikan subject_id adalah array
+                'regulation_id' => ['required', 'array'], // Pastikan regulation_id juga berupa array
                 'sample_receive_date' => ['required'],
                 'sample_analysis_date' => ['required'],
                 'report_date' => ['required']
@@ -42,36 +43,49 @@ class InstituteController extends Controller
                 'report_date' => $request->report_date,
             ]);
 
+            // Array untuk menyimpan subject_id yang sudah dimasukkan agar tidak duplikat
+            $insertedSubjects = [];
+
             // Simpan subject_id ke tabel institute_subjects dan regulation_id ke institute_regulations
-            if ($request->has('subject_id')) {
-                foreach ($request->subject_id as $subjectId) {
-                    // Simpan subject_id ke tabel institute_subjects
+            foreach ($request->subject_id as $key => $subjectId) {
+                if (!in_array($subjectId, $insertedSubjects)) {
+                    // Jika subject_id belum ada, tambahkan ke array dan buat entri baru
                     $instituteSubject = InstituteSubject::create([
                         'institute_id' => $Institute->id,
                         'subject_id' => $subjectId,
                     ]);
+                    $insertedSubjects[$subjectId] = $instituteSubject->id;
+                } else {
+                    // Jika subject_id sudah ada, gunakan yang sudah dibuat sebelumnya
+                    $instituteSubject = InstituteSubject::find($insertedSubjects[$subjectId]);
+                }
 
-                    // Pastikan regulation_id yang dipilih oleh user tersedia
-                    if ($request->has('regulation_id')) {
-                        foreach ($request->regulation_id as $regulationId) {
-                            // Cek apakah regulation_id ini memang berelasi dengan subject_id yang dipilih
-                            $isValidRegulation = Regulation::where('id', $regulationId)
-                                ->where('subject_id', $subjectId)
-                                ->exists();
+                // Simpan regulation_id yang sesuai dengan subject_id
+                if (!empty($request->regulation_id[$key])) {
+                    $regulationId = $request->regulation_id[$key];
 
-                            if ($isValidRegulation) {
-                                // Simpan regulation_id ke tabel institute_regulations
-                                InstituteRegulation::create([
-                                    'institute_subject_id' => $instituteSubject->id,
-                                    'regulation_id' => $regulationId,
-                                ]);
-                            }
-                        }
+                    // Cek apakah regulation_id valid untuk subject_id ini
+                    $isValidRegulation = Regulation::where('id', $regulationId)
+                        ->where('subject_id', $subjectId)
+                        ->exists();
+
+                    if ($isValidRegulation) {
+                        $instituteRegulation = InstituteRegulation::create([
+                            'institute_subject_id' => $instituteSubject->id,
+                            'regulation_id' => $regulationId,
+                        ]);
+
+                        // Buat entri Sampling hanya jika regulation_id valid
+                        // Sampling::create([
+                        //     'institute_id' => $Institute->id,
+                        //     'institute_subject_id' => $instituteSubject->id,
+                        //     'institute_regulation_id' => $instituteRegulation->id,
+                        // ]);
                     }
                 }
             }
 
-            return redirect()->route('institute.index')->with('msg', 'Data berhasil ditambahkan');
+            return redirect()->route('institute.index')->with('msg', 'Data ' . $request->no_coa . ' added successfully');
         }
 
         $data = Institute::all();
@@ -146,7 +160,7 @@ class InstituteController extends Controller
                 }
             }
 
-            return redirect()->route('institute.index')->with('msg', 'Data berhasil diubah');
+            return redirect()->route('institute.index')->with('msg', 'Data '. $request->no_coa .' updated successfully');
         }
 
         // Ambil regulasi berdasarkan subject yang sudah ada di institute

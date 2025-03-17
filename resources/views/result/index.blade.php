@@ -121,7 +121,7 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        var html = "<code><span title='" + row.no_coa + "' style='font-size: 18px; color:rgb(30, 55, 23);'>"
+                        var html = "<code><span title='" + row.no_coa + "' style='font-size: 18px; color:rgb(146, 45, 45);'>"
                                     + row.no_coa + "</span></code>";
                         return html;
                     },
@@ -132,16 +132,14 @@
                         if (row.subjects && row.subjects.length > 0) {
                             // Gunakan Set untuk menyimpan subject_id yang unik
                             var uniqueSubjects = new Set();
+                            var html = '';
 
-                            // Bangun HTML hanya untuk data yang unik
-                            var html = '<ul style="padding-left: 15px;">';
                             row.subjects.forEach(function(subject) {
                                 if (!uniqueSubjects.has(subject.id)) {
                                     uniqueSubjects.add(subject.id);
-                                    html += `<li><span class="badge bg-dark">${subject.name}</span></li>`;
+                                    html += `<span class="badge bg-dark me-1">${subject.name}</span>`;
                                 }
                             });
-                            html += '</ul>';
 
                             return html;
                         } else {

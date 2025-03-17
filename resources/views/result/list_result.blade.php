@@ -154,13 +154,22 @@
                                 html = `<a class="badge bg-warning badge-icon" title="Add Ambient Air" href="/result/ambient_air/${instituteSubjectId}">
                                         <i class="bx bx-pencil icon-white"></i></a>`;
                             } else if (row.institute_subject.subject.id == 2) {
-                                html = `<a class="badge bg-warning badge-icon" title="Add Waste Water" href="/result/waste_water/${instituteSubjectId}">
+                                html = `<a class="badge bg-warning badge-icon" title="Add Workplace Air" href="/result/workplace_air/${instituteSubjectId}">
                                         <i class="bx bx-pencil icon-white"></i></a>`;
                             } else if (row.institute_subject.subject.id == 3) {
                                 html = `<a class="badge bg-warning badge-icon" title="Add Noise" href="/result/noise/${instituteSubjectId}">
                                         <i class="bx bx-pencil icon-white"></i></a>`;
                             } else if (row.institute_subject.subject.id == 4) {
-                                html = `<a class="badge bg-warning badge-icon" title="Add Workplace" href="/result/workplace/${instituteSubjectId}">
+                                html = `<a class="badge bg-warning badge-icon" title="Add Odor" href="/result/odor/${instituteSubjectId}">
+                                        <i class="bx bx-pencil icon-white"></i></a>`;
+                            } else if (row.institute_subject.subject.id == 5) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Illumination*" href="/result/illumination/${instituteSubjectId}">
+                                        <i class="bx bx-pencil icon-white"></i></a>`;
+                            } else if (row.institute_subject.subject.id == 6) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Heat Stress" href="/result/heat_stress/${instituteSubjectId}">
+                                        <i class="bx bx-pencil icon-white"></i></a>`;
+                            } else if (row.institute_subject.subject.id == 7) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Stationary Stack Source Emission" href="/result/stationary_stack/${instituteSubjectId}">
                                         <i class="bx bx-pencil icon-white"></i></a>`;
                             }
                         } else {

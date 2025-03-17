@@ -131,7 +131,7 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        var html = "<code><span title='" + row.no_coa + "' style='font-size: 16px; color: #dc3545;'>"
+                        var html = "<code><span title='" + row.no_coa + "' style='font-size: 18px; color:rgb(199, 76, 76);'>"
                                     + row.no_coa + "</span></code>";
                         return html;
                     },
@@ -153,42 +153,25 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        var html = "<code><span title='" + row.customer.phone + "' style='font-size: 16px;'>"
+                        var html = "<code><span title='" + row.customer.phone + "' style='font-size: 18px; color:rgb(30, 55, 23);'>"
                                     + row.customer.phone + "</span></code>";
                         return html;
                     },
                     orderable: false
                 },
-                // {
-                //     render: function (data, type, row, meta) {
-                //         if (row.sample_descriptions && row.sample_descriptions.length > 0) {
-                //             var html = row.sample_descriptions.map(function(desc, index) {
-                //                 return `<span class="badge bg-dark"
-                //                             style="border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
-                //                             ${desc.name}
-                //                         </span>`;
-                //             }).join('');
-                //             return html;
-                //         } else {
-                //             return '-';
-                //         }
-                //     }
-                // },
                 {
                     render: function (data, type, row, meta) {
                         if (row.subjects && row.subjects.length > 0) {
                             // Gunakan Set untuk menyimpan subject_id yang unik
                             var uniqueSubjects = new Set();
+                            var html = '';
 
-                            // Bangun HTML hanya untuk data yang unik
-                            var html = '<ul style="padding-left: 15px;">';
                             row.subjects.forEach(function(subject) {
                                 if (!uniqueSubjects.has(subject.id)) {
                                     uniqueSubjects.add(subject.id);
-                                    html += `<li><span class="badge bg-dark">${subject.name}</span></li>`;
+                                    html += `<span class="badge bg-dark me-1">${subject.name}</span>`;
                                 }
                             });
-                            html += '</ul>';
 
                             return html;
                         } else {

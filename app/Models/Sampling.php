@@ -13,9 +13,9 @@ class Sampling extends Model
     public $incrementing = true;
     protected $fillable = [
         'institute_id',
+        'institute_subject_id',
         'no_sample',
         'sampling_location',
-        'institute_subject_id',
         'sampling_date',
         'sampling_time',
         'sampling_method',
