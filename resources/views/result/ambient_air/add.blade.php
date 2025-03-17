@@ -124,19 +124,19 @@
                                         value="{{ $instituteSubject->subject->name }}" readonly>
                                 </td>
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
-                                        value="{{ old('sampling_date', $sampling->sampling_date ?? '') }}"></td>
+                                        value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
                                         value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab/24 Hours" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
-                                        value="{{ old('date_received', $sampling->date_received ?? '') }}"></td>
+                                        value="{{ old('date_received', $institute->sample_analysis_date ?? '') }}"></td>
                                 <td>
                                     <input type="date" class="form-control text-center" name="itd_start"
-                                        value="{{ old('itd_start', $sampling->itd_start ?? '') }}">
+                                        value="{{ old('itd_start', $institute->sample_analysis_date ?? '') }}">
                                     <span class="mx-2">to</span>
                                     <input type="date" class="form-control text-center" name="itd_end"
-                                        value="{{ old('itd_end', $sampling->itd_end ?? '') }}">
+                                        value="{{ old('itd_end', $institute->report_date ?? '') }}">
                                 </td>
                             </tr>
                         </tbody>
@@ -175,6 +175,7 @@
                             <th class="text-center"><b>Regulatory Standard</b></th>
                             <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
+                            <th class="text-center"><b>Action</b></th>
                         </tr>
                         @foreach($parameters as $key => $parameter)
                         <tr>
@@ -233,16 +234,13 @@
                                         name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}"
                                         readonly>
                                 </td>
+                                <td>
+                                    <button class="btn btn-success btn-sm mt-2" type="submit" name="save">Save</button>
+                                </td>
                             </form>
                         </tr>
                         @endforeach
                     </table>
-                    <div class="card-footer text-end">
-                        <button class="btn btn-primary me-1" type="submit">Save</button>
-                        <a href="{{ route('result.list_result',$institute->id) }}">
-                            <span class="btn btn-outline-secondary">Back</span>
-                        </a>
-                    </div>
                     <table class="table table-bordered">
                         <tr>
                             <td colspan="3">
@@ -318,7 +316,7 @@
                                     </tr>
                                 </table>
                                 <div class="card-footer text-end">
-                                    <button class="btn btn-primary me-1" type="submit">Save</button>
+                                    <button class="btn btn-success me-1" type="submit">Save</button>
                                     <a href="{{ route('result.list_result',$institute->id) }}">
                                         <span class="btn btn-outline-secondary">Back</span>
                                     </a>
