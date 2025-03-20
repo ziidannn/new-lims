@@ -43,17 +43,6 @@
 @section('breadcrumb-title')
 @endsection
 @section('content')
-<div class="col-md-12">
-    <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-        <li cass="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add',$institute->id) }}">
-                <i class="bx bx-current-location me-1"></i>
-                Sampling Location</a></li></a></li>
-        <li class="nav-item"><a class="nav-link active"
-                href="{{ route('result.ambient_air.add_loc', $institute->id) }}"><i
-                    class="bx bx-location-plus me-1"></i>
-                Add Sampling Location</a></li>
-    </ul>
-</div>
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
     @if(session('msg'))
     <div class="alert alert-success alert-dismissible" role="alert">
@@ -72,7 +61,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('result.add_sample_new', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.add_sample', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
@@ -96,14 +85,14 @@
                         data-bs-toggle="card-remove"><i class="fe fe-x"></i></a>
                 </div>
                 <div class="row">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered" id="samplingLocationTable">
                         <thead>
                             <tr>
                                 <th class="text-center"><b>Sample No.</b></th>
                                 <th class="text-center"><b>Sampling Location</b></th>
                                 <th class="text-center"><b>Sample Description</b></th>
-                                <th class="text-center"><b>Date</b></th>
-                                <th class="text-center"><b>Time</b></th>
+                                <th class="text-center"><b>Sampling Date</b></th>
+                                <th class="text-center"><b>Sampling Time</b></th>
                                 <th class="text-center"><b>Sampling Method</b></th>
                                 <th class="text-center"><b>Date Received</b></th>
                                 <th class="text-center"><b>Interval Testing Date</b></th>
@@ -126,19 +115,19 @@
                                         value="{{ $instituteSubject->subject->name }}" readonly>
                                 </td>
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
-                                        value="{{ old('sampling_date', $sampling->sampling_date ?? '') }}"></td>
+                                        value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
                                         value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
-                                        value="Grab/24 Hours" readonly></td>
+                                        value="Grab" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
-                                        value="{{ old('date_received', $sampling->date_received ?? '') }}"></td>
+                                        value="{{ old('date_received', $institute->sample_analysis_date ?? '') }}"></td>
                                 <td>
                                     <input type="date" class="form-control text-center" name="itd_start"
-                                        value="{{ old('itd_start', $sampling->itd_start ?? '') }}">
+                                        value="{{ old('itd_start', $institute->sample_analysis_date ?? '') }}">
                                     <span class="mx-2">to</span>
                                     <input type="date" class="form-control text-center" name="itd_end"
-                                        value="{{ old('itd_end', $sampling->itd_end ?? '') }}">
+                                        value="{{ old('itd_end', $institute->report_date ?? '') }}">
                                 </td>
                             </tr>
                         </tbody>
@@ -158,91 +147,71 @@
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
     @if(session('msg'))
-    <div class="alert alert-success alert-dismissible" role="alert">
-        {{ session('msg') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+        <div class="alert alert-success alert-dismissible" role="alert">
+            {{ session('msg') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     @endif
-    <form class="card" action="{{ route('result.ambient_air.add_loc', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.workplace_air', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
                 <div class="row">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered" id="parameterTable">
                         <tr>
                             <th class="text-center"><b>No</b></th>
                             <th class="text-center"><b>Parameters</b></th>
-                            <th class="text-center"><b>Sampling Time</b></th>
                             <th class="text-center"><b>Testing Result</b></th>
                             <th class="text-center"><b>Regulatory Standard</b></th>
                             <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
-                            <th class="text-center"><b>Action</b></th>
                         </tr>
-                        @foreach($parameters as $key => $parameter)
+                        @foreach ($parameters as $key => $parameter)
                         <tr>
-                            <form class="card" action="{{ route('result.ambient_air.add_loc', $institute->id) }}"
-                                method="POST">
-                                @csrf
-                                <td>{{ $key + 1 }}</td>
-                                <td>
-                                    <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
-                                    <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
-                                        readonly>
-                                </td>
-                                <td>
-                                    @php
-                                    $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
-                                    @endphp
-                                    @foreach ($samplingTimes as $samplingTime)
-                                    <input type="hidden" name="sampling_time_id[{{ $parameter->id }}][]"
-                                        value="{{ $samplingTime->samplingTime->id }}">
-                                    <input type="text" class="form-control text-center"
-                                        value="{{ $samplingTime->samplingTime->time }}" readonly>
-                                    @endforeach
-                                </td>
-                                <td>
-                                    @foreach ($samplingTimes as $samplingTime)
-                                    @php
-                                    $key =
-                                    "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
-                                    $resultData = $results[$key] ?? null;
-                                    @endphp
-
-                                    <input type="text" class="form-control text-center testing-result"
-                                        name="testing_result[{{ $parameter->id }}][]"
-                                        value="{{ $resultData ? $resultData->first()->testing_result : old('testing_result') }}"
-                                        required>
-                                    @endforeach
-                                </td>
-                                <td>
-                                    @foreach ($samplingTimes as $samplingTime)
-                                    @php
-                                    $regulationStandard = $samplingTime->regulationStandards ?? null;
-                                    @endphp
-                                    @if ($regulationStandard)
-                                    <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}][]"
-                                        value="{{ $regulationStandard->id }}">
-                                    <input type="text" class="form-control text-center"
-                                        value="{{ $regulationStandard->title }}" readonly>
-                                    @endif
-                                    @endforeach
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control text-center"
-                                        name="unit[{{ $parameter->id }}]" value="{{ $parameter->unit ?? '' }}" readonly>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control text-center"
-                                        name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}"
-                                        readonly>
-                                </td>
-                                <td>
-                                    <button class="btn btn-success btn-sm mt-2" type="submit" name="save">Save</button>
-                                </td>
-                            </form>
+                            <td>{{ $key + 1 }}</td>
+                            <td>
+                                <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
+                                <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
+                                    readonly>
+                            </td>
+                            <td>
+                                @php
+                                $regulationStandard = $samplingTimeRegulations->where('parameter_id',
+                                $parameter->id)->first()->regulationStandards ?? null;
+                                $resultKey = $parameter->id . '-' . ($regulationStandard->id ?? 'null');
+                                $testingResult = $results[$resultKey]->testing_result ?? '';
+                                @endphp
+                                <input type="text" class="form-control text-center testing-result"
+                                    name="testing_result[{{ $parameter->id }}]"
+                                    value="{{ old('testing_result.' . $parameter->id, $testingResult) }}" required>
+                            </td>
+                            <td>
+                                @if ($regulationStandard)
+                                <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}]"
+                                    value="{{ $regulationStandard->id }}">
+                                <input type="text" class="form-control text-center"
+                                    value="{{ $regulationStandard->title }}" readonly>
+                                @endif
+                            </td>
+                            <td>
+                                <input type="text" class="form-control text-center" name="unit[{{ $parameter->id }}]"
+                                    value="{{ $parameter->unit ?? '' }}" readonly>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control text-center" name="method[{{ $parameter->id }}]"
+                                    value="{{ $parameter->method ?? '' }}" readonly>
+                            </td>
                         </tr>
                         @endforeach
+                    </table>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-primary me-1" type="submit">Save</button>
+                        <a href="{{ route('result.list_result',$institute->id) }}">
+                            <span class="btn btn-outline-secondary">Back</span>
+                        </a>
+                    </div>
+                    </td>
+                    </tr>
                     </table>
                 </div>
             </div>

@@ -16,12 +16,12 @@ return new class extends Migration
             $table->unsignedBigInteger('sampling_id')->nullable();
             $table->foreign('sampling_id')->references('id')->on('samplings');
             $table->unsignedBigInteger('parameter_id')->nullable();
-            $table->foreign('parameter_id')->references('id')->on('parameters');
+            $table->foreign('parameter_id')->references('id')->on('parameters')->onDelete('cascade');
             $table->unsignedBigInteger('sampling_time_id')->nullable();
             $table->foreign('sampling_time_id')->references('id')->on('sampling_times');
             $table->unsignedBigInteger('regulation_standard_id')->nullable();
             $table->foreign('regulation_standard_id')->references('id')->on('regulation_standards');
-            $table->string('testing_result')->nullable()->nullable();
+            $table->string('testing_result')->nullable();
             $table->string('unit')->nullable();
             $table->string('method')->nullable();
             $table->string('location')->nullable();

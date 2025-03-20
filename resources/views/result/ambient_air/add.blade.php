@@ -37,6 +37,35 @@
         color: red;
     }
 
+    .custom-blue {
+        background-color: rgb(43, 92, 177);
+        /* Biru soft */
+        border-color: rgb(201, 214, 236);
+        /* Border sedikit lebih gelap */
+        color: white;
+    }
+
+    .custom-blue:hover {
+        background-color: #365A9E;
+        /* Warna lebih gelap saat hover */
+    }
+
+    .button-group {
+        display: flex;
+        flex-direction: column;
+        /* Susun tombol secara vertikal */
+        gap: 2px;
+        /* Jarak antar tombol */
+        width: fit-content;
+        /* Ukuran tombol menyesuaikan teks terpanjang */
+    }
+
+    .custom-button {
+        min-width: 50px;
+        /* Lebar minimum yang sama untuk semua tombol */
+        text-align: center;
+    }
+
 </style>
 @endsection
 
@@ -46,7 +75,7 @@
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
         <li class="nav-item"><a class="nav-link active" href="{{ route('result.ambient_air.add',$institute->id) }}">
-            <i class="bx bx-current-location me-1"></i>
+                <i class="bx bx-current-location me-1"></i>
                 Sampling Location</a></li></a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_loc', $institute->id) }}"><i
                     class="bx bx-location-plus me-1"></i>
@@ -77,9 +106,9 @@
             <div class="card-header">
                 <h4 class="card-title mb-0">@yield('title')
                     @if ($subject)
-                    <i class="fw-bold">{{ $subject->name }}</i>
+                        <i class="fw-bold">{{ $subject->name }}</i>
                     @else
-                    <i class="fw-bold">No Name Available</i>
+                        <i class="fw-bold">No Name Available</i>
                     @endif
                 </h4>
                 @if ($regulations->isNotEmpty())
@@ -112,7 +141,8 @@
                             <tr>
                                 <td><input type="text" class="form-control text-center" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
-                                    <input type="number" class="form-control text-center" name="no_sample" value="{{ old('no_sample', $sampling->no_sample ?? '') }}">
+                                    <input type="number" class="form-control text-center" name="no_sample"
+                                        value="{{ old('no_sample', $sampling->no_sample ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
                                         value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
@@ -205,7 +235,6 @@
                                     "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
                                     $resultData = $results[$key] ?? null;
                                     @endphp
-
                                     <input type="text" class="form-control text-center testing-result"
                                         name="testing_result[{{ $parameter->id }}][]"
                                         value="{{ $resultData ? $resultData->first()->testing_result : old('testing_result') }}"
@@ -235,98 +264,36 @@
                                         readonly>
                                 </td>
                                 <td>
-                                    <button class="btn btn-success btn-sm mt-2" type="submit" name="save">Save</button>
+                                    <div class="button-group">
+                                        <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                            name="save">Save</button>
+                                            <button type="button"
+                                                class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
+                                                data-parameter-id="{{ $parameter->id }}">
+                                                Hide
+                                            </button>
+                                    </div>
                                 </td>
                             </form>
                         </tr>
                         @endforeach
                     </table>
-                    <table class="table table-bordered">
-                        <tr>
-                            <td colspan="3">
-                                <label class="mb-1" style="font-size: 18px; font-weight: bold; display: block;">Ambient
-                                    Environmental Condition</label>
-
-                                <!-- Tabel tanpa garis -->
-                                <table style="border-collapse: collapse; width: 100%;">
-                                    <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="coordinate">Coordinate:</label></td>
-                                        <td style="border: none;">
-                                            <input type="text" class="form-control" maxlength="120" name="coordinate"
-                                                placeholder="Input Coordinate"
-                                                value="{{ old('coordinate', $fieldCondition->coordinate ?? '') }}">
-                                            <input type="hidden" name="result_id"
-                                                value="{{ $fieldCondition->result_id ?? '' }}">
-                                        </td>
-                                    </tr>
-                                    <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="temperature">Temperature:</label></td>
-                                        <td style="border: none;">
-                                            <input type="text" class="form-control" maxlength="120" name="temperature"
-                                                placeholder="Input Temperature"
-                                                value="{{ old('temperature', $fieldCondition->temperature ?? '') }}">
-                                        </td>
-                                    </tr>
-                                    <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="pressure">Pressure:</label></td>
-                                        <td style="border: none;">
-                                            <input type="text" class="form-control" maxlength="120" name="pressure"
-                                                placeholder="Input Pressure"
-                                                value="{{ old('pressure', $fieldCondition->pressure ?? '') }}">
-                                        </td>
-                                    </tr>
-                                    <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="humidity">Humidity:</label></td>
-                                        <td style="border: none;">
-                                            <input type="text" class="form-control" maxlength="120" name="humidity"
-                                                placeholder="Input Humidity"
-                                                value="{{ old('humidity', $fieldCondition->humidity ?? '') }}">
-                                        </td>
-                                    </tr>
-                                    <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="wind_speed">Wind Speed:</label></td>
-                                        <td style="border: none;">
-                                            <input type="text" class="form-control" maxlength="120" name="wind_speed"
-                                                placeholder="Input Wind Speed"
-                                                value="{{ old('wind_speed', $fieldCondition->wind_speed ?? '') }}">
-                                        </td>
-                                    </tr>
-                                    <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="wind_direction">Wind Direction:</label></td>
-                                        <td style="border: none;">
-                                            <input type="text" class="form-control" maxlength="120"
-                                                name="wind_direction" placeholder="Input Wind Direction"
-                                                value="{{ old('wind_direction', $fieldCondition->wind_direction ?? '') }}">
-                                        </td>
-                                    </tr>
-                                    <tr style="border: none;">
-                                        <td style="width: 10%; padding: 5px; border: none;"><label class="form-label"
-                                                for="weather">Weather:</label></td>
-                                        <td style="border: none;">
-                                            <input type="text" class="form-control" maxlength="120" name="weather"
-                                                placeholder="Input Weather"
-                                                value="{{ old('weather', $fieldCondition->weather ?? '') }}">
-                                        </td>
-                                    </tr>
-                                </table>
-                                <div class="card-footer text-end">
-                                    <button class="btn btn-success me-1" type="submit">Save</button>
-                                    <a href="{{ route('result.list_result',$institute->id) }}">
-                                        <span class="btn btn-outline-secondary">Back</span>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
+                    <div class="card-footer d-flex justify-content-between align-items-end">
+                        <div class="d-flex">
+                            <button id="btn-undo" class="btn btn-warning me-1" style="display: none;">Undo</button>
+                        </div>
+                        <div class="d-flex">
+                            <form id="audit-form" action="{{ route('result.ambient_air.add', $institute->id) }}" method="POST">
+                            @csrf
+                                <button class="btn btn-primary me-2" type="button" onclick="confirmSubmit()">Save All</button>
+                                <a href="{{ route('result.list_result', $institute->id) }}" class="btn btn-outline-secondary">Back</a>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </form>
 </div>
 </div>
 </div>
@@ -334,6 +301,7 @@
 
 @section('script')
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+<script src="{{ asset('assets/js/sweetalert.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -346,8 +314,6 @@
         });
     });
 
-</script>
-<script>
     $(document).ready(function () {
         $('#date_range').daterangepicker({
             timePicker: true,
@@ -357,5 +323,105 @@
         });
     });
 
+    function confirmSubmit() {
+    swal({
+        title: "Are you sure?",
+        text: "Please make sure all data is correct and complete before submitting.",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willSubmit) => {
+        if (willSubmit) {
+            swal("Submitting...", {
+                icon: "info",
+                buttons: false,
+                timer: 300, // Delay 0.3 detik sebelum redirect
+            }).then(() => {
+                window.location.href = "{{ route('result.list_result', $institute->id) }}?success=1";
+            });
+        }
+    });
+}
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let regulationId = document.body.getAttribute("data-regulation-id"); // Ambil regulation_id dari atribut di body
+        let storedHiddenParameters = JSON.parse(localStorage.getItem("hidden_parameters")) || {};
+        let hiddenParameters = storedHiddenParameters[regulationId] || []; // Ambil parameter tersembunyi hanya untuk regulation saat ini
+        let undoButton = document.getElementById("btn-undo");
+
+        // Tampilkan tombol Undo jika ada parameter yang disembunyikan
+        undoButton.style.display = hiddenParameters.length > 0 ? "inline-block" : "none";
+
+        // Sembunyikan parameter yang ada di localStorage untuk regulation saat ini
+        hiddenParameters.forEach(parameterId => {
+            document.querySelectorAll(`[data-parameter-id="${parameterId}"]`).forEach(element => {
+                element.closest("tr").style.display = "none";
+            });
+        });
+
+        // Event listener untuk tombol hide
+        document.querySelectorAll(".hide-parameter").forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                let parameterId = this.getAttribute("data-parameter-id");
+
+                // Simpan posisi scroll sebelum meng-hide
+                let scrollPosition = window.scrollY;
+                localStorage.setItem("scroll_position", scrollPosition);
+
+                // Pastikan hidden_parameters hanya untuk regulation saat ini
+                if (!hiddenParameters.includes(parameterId)) {
+                    hiddenParameters.push(parameterId);
+                    storedHiddenParameters[regulationId] = hiddenParameters;
+                    localStorage.setItem("hidden_parameters", JSON.stringify(storedHiddenParameters));
+                }
+
+                // Sembunyikan baris tanpa refresh
+                this.closest("tr").style.display = "none";
+
+                // Tampilkan tombol Undo
+                undoButton.style.display = "inline-block";
+
+                // Kembalikan posisi scroll agar tidak naik ke atas
+                window.scrollTo(0, scrollPosition);
+            });
+        });
+
+        // Event listener untuk tombol undo
+        undoButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (hiddenParameters.length > 0) {
+                let lastHiddenParameter = hiddenParameters.pop(); // Ambil parameter terakhir yang di-hide
+                storedHiddenParameters[regulationId] = hiddenParameters;
+                localStorage.setItem("hidden_parameters", JSON.stringify(storedHiddenParameters));
+
+                // Munculkan kembali baris yang terakhir di-hide
+                document.querySelectorAll(`[data-parameter-id="${lastHiddenParameter}"]`).forEach(element => {
+                    element.closest("tr").style.display = "";
+                });
+
+                // Sembunyikan tombol Undo jika tidak ada parameter yang di-hide
+                if (hiddenParameters.length === 0) {
+                    undoButton.style.display = "none";
+                }
+
+                // Ambil posisi scroll terakhir dan atur kembali
+                let scrollPosition = localStorage.getItem("scroll_position");
+                if (scrollPosition) {
+                    window.scrollTo(0, scrollPosition);
+                }
+            }
+        });
+
+        // Reset hidden parameters jika regulation_id berubah
+        document.body.setAttribute("data-regulation-id", regulationId);
+    });
 </script>
 @endsection

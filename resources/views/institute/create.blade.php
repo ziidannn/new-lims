@@ -154,10 +154,12 @@
                             <div id="subject_id_container">
                                 <div class="row mb-2">
                                     <div class="col-md-5">
-                                        <select name="subject_id[]" class="form-select input-sm select2-modal" required>
+                                        <select id="subject_select" name="subject_id[]"
+                                            class="form-select input-sm select2-modal" required>
                                             <option value="">Select Sample Description</option>
                                             @foreach ($description as $desc)
-                                            <option value="{{ $desc->id }}">({{ $desc->subject_code }}) - {{ $desc->name }}</option>
+                                            <option value="{{ $desc->id }}">({{ $desc->subject_code }}) -
+                                                {{ $desc->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -167,7 +169,8 @@
                                             required>
                                             <option value="">Select Regulation</option>
                                             @foreach ($regulation as $rg)
-                                            <option value="{{ $rg->id }}">({{ $rg->regulation_code }}) - {{ $rg->title }}</option>
+                                            <option value="{{ $rg->id }}">({{ $rg->regulation_code }}) -
+                                                {{ $rg->title }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -177,9 +180,69 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <button type="button" class="btn btn-primary mt-2" id="add_more">+ Add More</button>
+                            <button type="button" class="btn btn-primary mt-2 mb-3" id="add_more">+ Add More</button>
                         </div>
+                        <hr style="color: #333;">
+                        <div id="condition_section">
+                            <h4 class="mb-3">Ambient Environmental Condition</h4>
+
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 field-condition" id="coordinate">
+                                    <label class="form-label">Coordinate:</label>
+                                    <input type="text" class="form-control" name="coordinate"
+                                        placeholder="Input Coordinate" value="{{ old('coordinate') }}">
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 field-condition" id="temperature">
+                                    <label class="form-label">Temperature:</label>
+                                    <input type="text" class="form-control" name="temperature"
+                                        placeholder="Input Temperature" value="{{ old('temperature') }}">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 field-condition" id="pressure">
+                                    <label class="form-label">Pressure:</label>
+                                    <input type="text" class="form-control" name="pressure" placeholder="Input Pressure"
+                                        value="{{ old('pressure') }}">
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 field-condition" id="humidity">
+                                    <label class="form-label">Humidity:</label>
+                                    <input type="text" class="form-control" name="humidity" placeholder="Input Humidity"
+                                        value="{{ old('humidity') }}">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 field-condition" id="wind_speed">
+                                    <label class="form-label">Wind Speed:</label>
+                                    <input type="text" class="form-control" name="wind_speed"
+                                        placeholder="Input Wind Speed" value="{{ old('wind_speed') }}">
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 field-condition" id="wind_direction">
+                                    <label class="form-label">Wind Direction:</label>
+                                    <input type="text" class="form-control" name="wind_direction"
+                                        placeholder="Input Wind Direction" value="{{ old('wind_direction') }}">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 field-condition" id="weather">
+                                    <label class="form-label">Weather:</label>
+                                    <input type="text" class="form-control" name="weather" placeholder="Input Weather"
+                                        value="{{ old('weather') }}">
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 field-condition" id="velocity">
+                                    <label class="form-label">Velocity:</label>
+                                    <input type="text" class="form-control" name="velocity" placeholder="Input Velocity"
+                                        value="{{ old('velocity') }}">
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
                 <div class="card-footer text-end">
@@ -223,7 +286,8 @@
                     let regulationOptions = '<option value="">Select Regulation</option>';
                     $.each(results, function (key, value) {
                         regulationOptions += '<option value="' + value.id + '"><strong>' +
-                        value.regulation_code + '</strong> - ' + value.title + '</option>';
+                            value.regulation_code + '</strong> - ' + value.title +
+                            '</option>';
                     });
 
                     regulationSelect.html(regulationOptions);
@@ -329,5 +393,30 @@
         }
     });
 
+</script>
+<script>
+    $(document).ready(function () {
+    $('#condition_section').hide();
+
+    $('#subject_select').on('change', function () {
+        let selectedValue = $(this).val();
+        $('#condition_section').hide();
+        $('.field-condition').hide();
+
+        if (selectedValue == 1 || selectedValue == 4) { // Ambient Air & Odor (Semua input)
+            $('#condition_section').show();
+            $('.field-condition').show();
+            $('#velocity').hide(); // Sembunyikan velocity
+        }
+        if (selectedValue == 7) { // Stationary Stack Source Emission (Coordinate & Velocity)
+            $('#condition_section').show();
+            $('#coordinate, #velocity').show();
+        }
+        if (selectedValue == 2) { // Workplace Air (Temperature & Humidity)
+            $('#condition_section').show();
+            $('#temperature, #humidity').show();
+        }
+    });
+});
 </script>
 @endsection

@@ -48,7 +48,7 @@
         <li class="menu-item {{ request()->segment(1) == 'result' ? 'active' : '' }}">
             <a href="{{ route('result.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-analyse"></i>
-                <div data-i18n="result">Final Analys</div>
+                <div data-i18n="result">Final Analysis</div>
             </a>
         </li>
         @endcan
