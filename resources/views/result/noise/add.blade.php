@@ -149,7 +149,7 @@
     </div>
 @endif
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('result.noise', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
@@ -172,7 +172,7 @@
                                 @if(in_array($parameter->regulation_id, [12, 14])
                                 || in_array($parameter->regulation_code, ['031', '033']))
                                     <tr>
-                                    <form class="card" action="{{ route('result.noise', $institute->id) }}" method="POST">
+                                    <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
                                     @csrf
                                         <td>{{ $key + 1 }}</td>
                                         <td>
@@ -219,7 +219,7 @@
                                     </form>
                                     </tr>
                                     <tr>
-                                    <form class="card" action="{{ route('result.noise', $institute->id) }}" method="POST">
+                                    <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
                                     @csrf
                                         <td>{{ $key + 2 }}</td>
                                         <td>

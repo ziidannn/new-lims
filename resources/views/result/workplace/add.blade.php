@@ -152,7 +152,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
-    <form class="card" action="{{ route('result.workplace_air', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.workplace.add', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
