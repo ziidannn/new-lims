@@ -26,6 +26,22 @@
                     <form action="{{ route('parameter.add_parameter') }}" method="POST">
                         @csrf
                         <div class="row">
+                                    <div class="col-lg-6">
+                                        <label for="editSamplesubjects" class="form-label">Subject<i class="text-danger">*</i></label>
+                                        <select class="form-select" id="editSamplesubjects" name="subject_id" required>
+                                            <option value="">-- Select Sample subjects --</option>
+                                            @foreach($subjects as $p)
+                                            <option value="{{ $p->id }}">{{ $p->subject_code }} - {{ $p->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @error('subject_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+
+                            
                             <div class="col-lg-12 col-md-12">
                                 <div class="form-group">
                                     <label for="name" class="col-form-label">Name <i class="text-danger">*</i></label>
@@ -51,7 +67,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-6">
+                            {{-- <div class="col-lg-6">
                                 <div class="form-group">
                                     <label for="regulation_id" class="col-form-label">Regulation <i
                                             class="text-danger">*</i></label>
@@ -65,7 +81,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="col-lg-12">
                                 <label class="col-form-label">Sampling Time & Regulation Standard <i
                                         class="text-danger">*</i></label>
@@ -164,6 +180,5 @@
                 e.target.closest('.row').remove();
             }
         });
-
     </script>
     @endsection

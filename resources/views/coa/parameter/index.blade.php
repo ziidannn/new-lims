@@ -87,17 +87,17 @@
                                 <label class="form-label" for="basicDate">Regulation</label>
                                 <div class="input-group input-group-merge has-validation">
                                     <select
-                                        class="form-select @error('regulation_id') is-invalid @enderror input-sm select2-modal"
-                                        name="regulation_id" id="regulation_id">
-                                        <option value="">-- Select Regulation --</option>
-                                        @foreach($regulation as $p)
-                                        <option value="{{ $p->id }}"
-                                            {{ old('regulation_id') == $p->id ? 'selected' : '' }}>
-                                            {{ $p->id }} - {{ $p->title }}
+                                        class="form-select @error('subject_id') is-invalid @enderror input-sm select2-modal"
+                                        name="subject_id" id="subject_id">
+                                        <option value="">-- Select Subject --</option>
+                                        @foreach($subjects as $sub)
+                                        <option value="{{ $sub->id }}"
+                                            {{ old('subject_id') == $sub->id ? 'selected' : '' }}>
+                                            {{ $sub->id }} - {{ $sub->title }}
                                         </option>
                                         @endforeach
                                     </select>
-                                    @error('regulation_id')
+                                    @error('subject_id')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
@@ -177,7 +177,7 @@
                     <thead>
                         <tr>
                             <th scope="col" width="10px"><b>No</b></th>
-                            <th scope="col" width="20px"><b>Code Regulation</b></th>
+                            <th scope="col" width="20px"><b>Subject</b></th>
                             <th scope="col" width="20px"><b>Parameter</b></th>
                             <th scope="col" width="20px"><b>Sampling Time</b></th>
                             <th scope="col" width="20px"><b>Regulatory Standard</b></th>
@@ -262,11 +262,24 @@
                 },
                 {
                     render: function (data, type, row, meta) {
-                        return `<span style="color: red; font-weight: bold;">${row.regulation.regulation_code}</span>`;
+                        // Check if row.category exists and has an id
+                        if (row.subjects && row.subjects.id) {
+                            var html =
+                                `<a class="text-primary" title="${row.subjects.name}" href=""><b>${row.subjects.name}</b></a>`;
+                            return html;
+                        } else {
+                            return ''; // Return empty string or handle the case where regulation.title is missing
+                        }
                     },
-                    orderable: false,
                     className: "text-center"
                 },
+                // {
+                //     render: function (data, type, row, meta) {
+                //         return `<span style="color: red; font-weight: bold;">${row.subjects.name}</span>`;
+                //     },
+                //     orderable: false,
+                //     className: "text-center"
+                // },
                 {
                     render: function (data, type, row, meta) {
                         return row.name;
@@ -359,6 +372,39 @@
             table.draw();
         });
     });
+    function DeleteId(id, data) {
+        swal({
+                title: "Apa kamu yakin?",
+                text: "Setelah dihapus, data (" + data + ") tidak dapat dipulihkan!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: "{{ route('coa.parameter.delete_parameter') }}",
+                        type: "DELETE",
+                        data: {
+                            "id": id,
+                            "_token": $("meta[name='csrf-token']").attr("content"),
+                        },
+                        success: function (data) {
+                            if (data['success']) {
+                                swal(data['message'], {
+                                    icon: "success",
+                                });
+                                $('#datatable').DataTable().ajax.reload();
+                            } else {
+                                swal(data['message'], {
+                                    icon: "error",
+                                });
+                            }
+                        }
+                    })
+                }
+            })
+    }
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
