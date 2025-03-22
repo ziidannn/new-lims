@@ -34,7 +34,7 @@ class Sampling extends Model
     }
     public function instituteSubject()
     {
-        return $this->belongsTo(InstituteSubject::class, 'institute_subject_id', 'id');
+        return $this->belongsTo(InstituteSubject::class, 'institute_subject_id');
     }
 }
 

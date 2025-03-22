@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\FieldCondition;
 use App\Models\Institute;
 use App\Models\InstituteRegulation;
 use App\Models\InstituteSubject;
@@ -27,14 +28,13 @@ class InstituteController extends Controller
             $this->validate($request, [
                 'no_coa' => ['required'],
                 'customer_id' => ['required'],
-                'subject_id' => ['required', 'array'], // Pastikan subject_id adalah array
-                'regulation_id' => ['required', 'array'], // Pastikan regulation_id juga berupa array
+                'subject_id' => ['required', 'array'],
+                'regulation_id' => ['required', 'array'],
                 'sample_receive_date' => ['required'],
                 'sample_analysis_date' => ['required'],
                 'report_date' => ['required']
             ]);
 
-            // Buat entri baru di tabel `institutes`
             $Institute = Institute::create([
                 'no_coa' => $request->no_coa,
                 'customer_id' => $request->customer_id,
@@ -43,28 +43,21 @@ class InstituteController extends Controller
                 'report_date' => $request->report_date,
             ]);
 
-            // Array untuk menyimpan subject_id yang sudah dimasukkan agar tidak duplikat
             $insertedSubjects = [];
 
-            // Simpan subject_id ke tabel institute_subjects dan regulation_id ke institute_regulations
             foreach ($request->subject_id as $key => $subjectId) {
                 if (!in_array($subjectId, $insertedSubjects)) {
-                    // Jika subject_id belum ada, tambahkan ke array dan buat entri baru
                     $instituteSubject = InstituteSubject::create([
                         'institute_id' => $Institute->id,
                         'subject_id' => $subjectId,
                     ]);
                     $insertedSubjects[$subjectId] = $instituteSubject->id;
                 } else {
-                    // Jika subject_id sudah ada, gunakan yang sudah dibuat sebelumnya
                     $instituteSubject = InstituteSubject::find($insertedSubjects[$subjectId]);
                 }
 
-                // Simpan regulation_id yang sesuai dengan subject_id
                 if (!empty($request->regulation_id[$key])) {
                     $regulationId = $request->regulation_id[$key];
-
-                    // Cek apakah regulation_id valid untuk subject_id ini
                     $isValidRegulation = Regulation::where('id', $regulationId)
                         ->where('subject_id', $subjectId)
                         ->exists();
@@ -74,14 +67,39 @@ class InstituteController extends Controller
                             'institute_subject_id' => $instituteSubject->id,
                             'regulation_id' => $regulationId,
                         ]);
-
-                        // Buat entri Sampling hanya jika regulation_id valid
-                        // Sampling::create([
-                        //     'institute_id' => $Institute->id,
-                        //     'institute_subject_id' => $instituteSubject->id,
-                        //     'institute_regulation_id' => $instituteRegulation->id,
-                        // ]);
                     }
+                }
+
+                // **Handle Field Conditions based on subject_id**
+                if ($subjectId == 1 || $subjectId == 7 || $subjectId == 4 || $subjectId == 2) {
+                    $fieldConditionData = [
+                        'institute_id' => $Institute->id,
+                        'institute_subject_id' => $instituteSubject->id,
+                    ];
+
+                    if ($subjectId == 1 || $subjectId == 4) { // Ambient Air & Odor (Semua input)
+                        $fieldConditionData += [
+                            'coordinate' => $request->coordinate,
+                            'temperature' => $request->temperature,
+                            'pressure' => $request->pressure,
+                            'humidity' => $request->humidity,
+                            'wind_speed' => $request->wind_speed,
+                            'wind_direction' => $request->wind_direction,
+                            'weather' => $request->weather,
+                        ];
+                    } elseif ($subjectId == 7) { // Stationary Stack Source Emission (Coordinate & Velocity)
+                        $fieldConditionData += [
+                            'coordinate' => $request->coordinate,
+                            'velocity' => $request->velocity,
+                        ];
+                    } elseif ($subjectId == 2) { // Workplace Air (Temperature & Humidity)
+                        $fieldConditionData += [
+                            'temperature' => $request->temperature,
+                            'humidity' => $request->humidity,
+                        ];
+                    }
+
+                    FieldCondition::create($fieldConditionData);
                 }
             }
 

@@ -78,8 +78,14 @@
             }
         });
     });
-
 </script>
+@endif
+@if(request()->has('success'))
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            swal("Success!", "Data successfully submitted.", "success");
+        });
+    </script>
 @endif
 <script>
     "use strict";

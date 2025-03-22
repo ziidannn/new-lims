@@ -12,7 +12,8 @@ class FieldCondition extends Model
     public $timestamps = true;
     public $incrementing = true;
     protected $fillable = [
-        'result_id',
+        'institute_id',
+        'institute_subject_id',
         'coordinate',
         'temperature',
         'pressure',
@@ -21,8 +22,4 @@ class FieldCondition extends Model
         'wind_direction',
         'weather',
     ];
-    public function result()
-    {
-        return $this->belongsTo(Result::class, 'result_id');
-    }
 }

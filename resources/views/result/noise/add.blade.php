@@ -134,25 +134,26 @@
             </div>
             <div class="card-footer text-end" style="margin-top: -30px;">
                 <button class="btn btn-primary me-1" type="submit">Save</button>
-                <!-- <a href="{{ url()->previous() }}">
+                <a href="{{ url()->previous() }}">
                     <span class="btn btn-outline-secondary">Back</span>
-                </a> -->
+                </a>
             </div>
     </form>
 </div>
 
 <br>
-
+@if(session('msg'))
+    <div class="alert alert-success alert-dismissible" role="alert">
+        {{ session('msg') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('result.noise', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
                 <div class="row">
-                    <table class="table table-bordered">
-                    @if($parameters->contains(function($parameter) {
-                        return in_array($parameter->regulation_id, [12, 14]) || in_array($parameter->regulation_code, ['031', '033']);
-                    }))
                         <table class="table table-bordered">
                             <tr>
                                 <th class="text-center"><b>No</b></th>
@@ -171,6 +172,8 @@
                                 @if(in_array($parameter->regulation_id, [12, 14])
                                 || in_array($parameter->regulation_code, ['031', '033']))
                                     <tr>
+                                    <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
+                                    @csrf
                                         <td>{{ $key + 1 }}</td>
                                         <td>
                                             <input type="text" class="form-control text-center" name="location[]"
@@ -178,12 +181,12 @@
                                         </td>
                                         <td>
                                             @for($i = 1; $i <= 7; $i++)
-                                                <input type="text" class="form-control text-center" value="L{{ $i }}" readonly>
+                                                <input type="text" class="form-control text-center" name="noise" value="L{{ $i }}" readonly>
                                             @endfor
                                         </td>
                                         <td>
                                             @for($i = 1; $i <= 7; $i++)
-                                                <input type="text" class="form-control text-center" value="T{{ $i }}" readonly>
+                                                <input type="text" class="form-control text-center" name="time" value="T{{ $i }}" readonly>
                                             @endfor
                                         </td>
                                         <td>
@@ -207,8 +210,17 @@
                                             <input type="text" class="form-control text-center"
                                                 name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}" readonly>
                                         </td>
+                                        <td>
+                                            <div class="button-group">
+                                                <button class="btn btn-primary btn-sm mt-1 custom-button custom-blue" type="submit"
+                                                    name="save">Save</button>
+                                            </div>
+                                        </td>
+                                    </form>
                                     </tr>
                                     <tr>
+                                    <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
+                                    @csrf
                                         <td>{{ $key + 2 }}</td>
                                         <td>
                                             <input type="text" class="form-control text-center" name="location[]"
@@ -245,11 +257,17 @@
                                             <input type="text" class="form-control text-center"
                                                 name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}" readonly>
                                         </td>
+                                        <td>
+                                            <div class="button-group">
+                                                <button class="btn btn-primary btn-sm mt-1 custom-button custom-blue" type="submit"
+                                                    name="save">Save</button>
+                                            </div>
+                                        </td>
+                                    </form>
                                     </tr>
                                 @endif
                             @endforeach
                         </table>
-                    @endif
 
                     <!------------------------------ Table Kedua --------------------------->
 
@@ -267,7 +285,7 @@
                                 <th class="text-center"><b>Unit</b></th>
                                 <th class="text-center"><b>Methods</b></th>
                             </tr>
-                            @foreach($results as $key => $result)
+                            @foreach($parameters as $key => $parameter)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td>
@@ -288,11 +306,11 @@
                                     </td>
                                     <td>
                                         <input type="text" class="form-control text-center" name="unit[]"
-                                        value="{{ old('unit.' . $key, $result->unit ?? '') }}" readonly>
+                                        value="{{ old('unit.' . $key, $parameter->unit ?? '') }}" readonly>
                                     </td>
                                     <td>
                                         <input type="text" class="form-control text-center" name="method[]"
-                                        value="{{ old('method.' . $key, $result->method ?? '') }}" readonly>
+                                        value="{{ old('method.' . $key, $parameter->method ?? '') }}" readonly>
                                     </td>
                                 </tr>
                             @endforeach
