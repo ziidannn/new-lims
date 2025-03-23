@@ -51,7 +51,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-6">
+                            {{-- <div class="col-lg-6">
                                 <div class="form-group">
                                     <label for="regulation_id" class="col-form-label">Regulation <i
                                             class="text-danger">*</i></label>
@@ -65,7 +65,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <div class="col-lg-12">
                                 <label class="col-form-label">Sampling Time & Regulation Standard <i

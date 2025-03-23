@@ -15,11 +15,11 @@ class Parameter extends Model
         'name',
         'unit',
         'method',
-        'regulation_id'
+        'subject_id'
     ];
-    public function regulation()
+    public function subjects()
     {
-        return $this->belongsTo(Regulation::class, 'regulation_id', 'id');
+        return $this->belongsTo(Subject::class, 'subject_id', 'id');
     }
     public function samplingTimeRegulations()
     {

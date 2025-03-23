@@ -150,8 +150,8 @@
                             </div>
                         </div> -->
                         <div class="col-lg-12">
-                            <label class="col-form-label">Sample Description & Regulation</label>
                             <div id="subject_id_container">
+                                <label class="col-form-label">Subject Description And Regulatiom<i class="text-danger">*</i></label>
                                 <div class="row mb-2">
                                     <div class="col-md-5">
                                         <select id="subject_select" name="subject_id[]"
@@ -163,7 +163,6 @@
                                             @endforeach
                                         </select>
                                     </div>
-
                                     <div class="col-md-5">
                                         <select name="regulation_id[]" class="form-select input-sm select2-modal"
                                             required>
