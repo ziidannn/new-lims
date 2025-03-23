@@ -2,18 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FieldCondition;
 use App\Models\Institute;
 use App\Models\InstituteRegulation;
 use App\Models\InstituteSubject;
 use App\Models\Parameter;
 use App\Models\Regulation;
-use App\Models\RegulationStandard;
 use App\Models\Result;
 use Illuminate\Http\Request;
 use App\Models\Sampling;
 use App\Models\Subject;
-use App\Models\SamplingTime;
 use App\Models\SamplingTimeRegulation;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -155,206 +152,89 @@ class ResultController extends Controller
         ));
     }
 
-    public function addAmbientAir(Request $request, $id)
-    {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        if ($request->isMethod('POST')) {
-            $parameters = $request->input('parameter_id', []);
-            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->latest('id')
-                ->first(); // Ensure this doesn't return null
-
-            foreach ($parameters as $parameterId) {
-                if (!isset($request->sampling_time_id[$parameterId])) {
-                    continue;
-                }
-
-                foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                    $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                    if ($regulationStandardId === null || $testingResult === null) {
-                        continue;
-                    }
-
-                    Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'sampling_time_id' => $samplingTimeId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $testingResult,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                        ]
-                    );
-                }
-            }
-
-            $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-            $parameterNamesList = implode(', ', $parameterNames);
-
-             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $results = Result::
-            whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-            ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-            ->get()
-            ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
-
-        return view('result.ambient_air.add', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling',
-        ));
-    }
-
-    public function addAmbientAirNew(Request $request, $id)
-    {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-
-        // ✅ Periksa apakah ada data Sampling dengan institute_subject_id terkait
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->latest()->first();
-
-        if ($request->isMethod('POST')) {
-            $parameters = $request->input('parameter_id', []);
-
-            foreach ($parameters as $parameterId) {
-                if (!isset($request->sampling_time_id[$parameterId])) {
-                    continue;
-                }
-
-                foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                    $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                    if ($regulationStandardId === null || $testingResult === null) {
-                        continue;
-                    }
-
-                    // ✅ Simpan atau update Result
-                    $result = Result::updateOrCreate(
-                        [
-                            'sampling_id' => $sampling->id,
-                            'parameter_id' => $parameterId,
-                            'sampling_time_id' => $samplingTimeId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $testingResult,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                        ]
-                    );
-                }
-            }
-
-            $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-            $parameterNamesList = implode(', ', $parameterNames);
-
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $id)->latest()->first(); // Ambil data terbaru
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $results = Result::whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-        ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-        ->orderBy('id', 'desc') // Ambil data terbaru berdasarkan ID
-        ->get()
-        ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
-
-        return view('result.ambient_air.add_loc', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
-        ));
-    }
-
     public function addNoise(Request $request, $id)
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-        $noiseInstituteSubject = InstituteSubject::where('subject_id', 3)->first();
+        $samplingNoise = InstituteSubject::where('subject_id', 3)->first();
 
-        if ($noiseInstituteSubject) {
-            $samplingNoise = Sampling::where('institute_subject_id', $noiseInstituteSubject->id)
-                ->orderBy('id', 'desc')
-                ->first();
-        } else {
+        if (!$samplingNoise) {
             return redirect()->back()->with('error', 'No noise sampling ID found.');
         }
+
+        $samplingNoise = Sampling::where('institute_subject_id', $samplingNoise->id)
+            ->orderBy('id', 'desc')
+            ->first();
 
         if ($request->isMethod('POST')) {
             $request->validate([
                 'testing_result.*.*' => 'nullable|string',
-                'unit.*.*' => 'nullable|string',
-                'method.*.*' => 'nullable|string',
-                'noise' => 'nullable|string',
+                'unit.*' => 'nullable|string',
+                'method.*' => 'nullable|string',
+                'noise.*.*' => 'nullable|string',
                 'time.*.*' => 'nullable|string',
                 'leq.*.*' => 'nullable|string',
                 'ls' => 'nullable|string',
                 'lm' => 'nullable|string',
                 'lsm' => 'nullable|string',
-                'regulatory_standard.*.*' => 'nullable|string',
+                'regulatory_standard.*' => 'nullable|string',
                 'location.*' => 'nullable|string'
             ]);
 
-            $samplingId = $samplingNoise->id;
-            $locations = ['Upwind', 'Downwind'];
-            $l_values = range(1, 7);
-            $t_values = range(1, 7);
+            $messages = [];
 
-            foreach ($locations as $locIndex => $location) {
-                foreach ($l_values as $lIndex => $l) {
-                    foreach ($t_values as $tIndex => $t) {
-                        $uniqueId = ($lIndex * 7) + $tIndex + 1;
+            foreach ($request->location as $locIndex => $location) {
+                foreach ($request->noise[$locIndex] as $i => $noiseValue) {
+                    $parameterId = $request->parameter_id[$locIndex] ?? null;
+                    $timeValue = $request->time[$locIndex][$i] ?? null;
+
+                    // Pastikan query juga mempertimbangkan noise dan time
+                    $existingResult = Result::where([
+                        'sampling_id' => $samplingNoise->id,
+                        'parameter_id' => $parameterId,
+                        'location' => $location,
+                        'noise' => $noiseValue,
+                        'time' => $timeValue
+                    ])->first();
+
+                    if ($existingResult) {
+                        // Update data jika sudah ada
+                        $existingResult->update([
+                            'testing_result' => $request->testing_result[$locIndex][$i] ?? null,
+                            'unit' => $request->unit[$parameterId] ?? null,
+                            'method' => $request->method[$parameterId] ?? null,
+                            'leq' => $request->leq[$locIndex][$i] ?? null,
+                            'ls' => $request->ls ?? null,
+                            'lm' => $request->lm ?? null,
+                            'lsm' => $request->lsm ?? null,
+                            'regulatory_standard' => $request->regulatory_standard[$locIndex] ?? null,
+                        ]);
+                    } else {
+                        // Buat data baru jika belum ada
                         Result::create([
-                            'sampling_id' => $samplingId,
-                            'testing_result' => $request->input("testing_result.$locIndex.$lIndex.$tIndex") ?? null,
-                            'unit' => $request->input("unit.$locIndex.$lIndex.$tIndex") ?? null,
-                            'method' => $request->input("method.$locIndex.$lIndex.$tIndex") ?? null,
-                            'time' => $request->input("time.$locIndex.$lIndex.$tIndex") ?? null,
-                            'noise' => $request->input('noise') ?? null,
-                            'leq' => $request->input("leq.$locIndex.$lIndex.$tIndex") ?? null,
-                            'ls' => $request->input('ls') ?? null,
-                            'lm' => $request->input('lm') ?? null,
-                            'lsm' => $request->input('lsm') ?? null,
-                            'regulatory_standard' => $request->input("regulatory_standard.$locIndex.$lIndex.$tIndex") ?? null,
+                            'sampling_id' => $samplingNoise->id,
+                            'parameter_id' => $parameterId,
+                            'testing_result' => $request->testing_result[$locIndex][$i] ?? null,
+                            'unit' => $request->unit[$parameterId] ?? null,
+                            'method' => $request->method[$parameterId] ?? null,
+                            'time' => $timeValue,
+                            'noise' => $noiseValue,
+                            'leq' => $request->leq[$locIndex][$i] ?? null,
+                            'ls' => $request->ls ?? null,
+                            'lm' => $request->lm ?? null,
+                            'lsm' => $request->lsm ?? null,
+                            'regulatory_standard' => $request->regulatory_standard[$locIndex] ?? null,
                             'location' => $location,
                         ]);
                     }
+
+                    // Simpan hanya satu pesan per lokasi
+                    $messages["$location"] = "Data untuk lokasi $location telah diperbarui/dibuat.";
                 }
             }
 
-            return redirect()->back()->with('msg', "Results saved successfully");
+            // Gabungkan pesan-pesan menjadi satu
+            return redirect()->back()->with('msg', implode(' ', array_values($messages)));
         }
 
         $subject = Subject::find($instituteSubject->subject_id);
@@ -366,9 +246,119 @@ class ResultController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = $samplingNoise ? Result::where('sampling_id', $samplingNoise->id)->get() : collect();
+        $results = $samplingNoise
+            ? Result::where('sampling_id', $samplingNoise->id)
+                ->whereIn('parameter_id', $parametersIds)
+                ->get()
+            : collect();
 
-        return view('result.noise.add', compact(
+        if ($parameters->contains(fn($parameter) => in_array($parameter->regulation_id, [13, 15])
+            || in_array($parameter->regulation_code, ['032', '034']))) {
+            $view = 'result.noise.add_new';
+        } elseif ($parameters->contains(fn($parameter) => in_array($parameter->regulation_id, [12, 14])
+            || in_array($parameter->regulation_code, ['031', '033']))) {
+            $view = 'result.noise.add';
+        }
+
+        return view($view, compact(
+            'institute', 'parameters', 'regulations',
+            'samplingTimeRegulations', 'results', 'subject', 'instituteSubject', 'sampling'
+        ));
+    }
+
+    public function addNoiseNew(Request $request, $id)
+    {
+        $instituteSubject = InstituteSubject::findOrFail($id);
+        $institute = Institute::findOrFail($instituteSubject->institute_id);
+        $samplings = InstituteSubject::where('subject_id', 3)->latest()->first();
+        $samplingNoise = Sampling::where('institute_subject_id', $samplings->id)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($request->isMethod('POST')) {
+            $request->validate([
+                'testing_result.*.*' => 'nullable|string',
+                'unit.*' => 'nullable|string',
+                'method.*' => 'nullable|string',
+                'noise.*.*' => 'nullable|string',
+                'time.*.*' => 'nullable|string',
+                'leq.*.*' => 'nullable|string',
+                'ls' => 'nullable|string',
+                'lm' => 'nullable|string',
+                'lsm' => 'nullable|string',
+                'regulatory_standard.*' => 'nullable|string',
+                'location.*' => 'nullable|string'
+            ]);
+
+            $messages = [];
+
+            foreach ($request->input('testing_result', []) as $index => $testingResult) {
+                $location = $request->input('location')[$index] ?? null;
+                $parameterId = $request->parameter_id[$index] ?? null;
+                if ($location) {
+                    $existingResult = Result::where('sampling_id', $samplingNoise->id)
+                        ->where('location', $location)
+                        ->first();
+
+                    if ($existingResult) {
+                        $existingResult->update([
+                            'testing_result' => $testingResult,
+                            'unit' => $request->input[$parameterId] ?? null,
+                            'method' => $request->input[$parameterId] ?? null,
+                            'time' => $request->input('time')[$index] ?? null,
+                            'noise' => $request->input('noise') ?? null,
+                            'leq' => $request->input('leq')[$index] ?? null,
+                            'ls' => $request->input('ls') ?? null,
+                            'lm' => $request->input('lm') ?? null,
+                            'lsm' => $request->input('lsm') ?? null,
+                            'regulatory_standard' => $request->input('regulatory_standard')[$index] ?? null,
+                        ]);
+                        $messages[] = "Data for location $location updated successfully.";
+                    } else {
+                        Result::create([
+                            'sampling_id' => $samplingNoise->id,
+                            'parameter_id' => $parameterId,
+                            'testing_result' => $testingResult,
+                            'unit' => $request->input[$parameterId] ?? null,
+                            'method' => $request->input[$parameterId] ?? null,
+                            'time' => $request->input('time')[$index] ?? null,
+                            'noise' => $request->input('noise') ?? null,
+                            'leq' => $request->input('leq')[$index] ?? null,
+                            'ls' => $request->input('ls') ?? null,
+                            'lm' => $request->input('lm') ?? null,
+                            'lsm' => $request->input('lsm') ?? null,
+                            'regulatory_standard' => $request->input('regulatory_standard')[$index] ?? null,
+                            'location' => $location,
+                        ]);
+                        $messages[] = "Data for location $location created successfully.";
+                    }
+                }
+            }
+
+            return redirect()->back()->with('msg', implode(' ', $messages));
+        }
+
+        $subject = Subject::find($instituteSubject->subject_id);
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
+        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)->pluck('regulation_id');
+        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $parametersIds = $parameters->pluck('id');
+
+        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+            ->with(['samplingTime', 'regulationStandards'])
+            ->get();
+        $results = Result::where('sampling_id', $sampling->id)->get();
+
+        if ($parameters->contains(fn($parameter) => in_array($parameter->regulation_id, [13, 15])
+            || in_array($parameter->regulation_code, ['032', '034']))) {
+            $view = 'result.noise.add_new';
+        } elseif ($parameters->contains(fn($parameter) => in_array($parameter->regulation_id, [12, 14])
+            || in_array($parameter->regulation_code, ['031', '033']))) {
+            $view = 'result.noise.add';
+        }
+
+        return view($view, compact(
             'institute', 'parameters', 'regulations',
             'samplingTimeRegulations', 'results', 'subject', 'instituteSubject', 'sampling'
         ));
