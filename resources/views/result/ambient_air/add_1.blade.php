@@ -37,6 +37,35 @@
         color: red;
     }
 
+    .custom-blue {
+        background-color: rgb(43, 92, 177);
+        /* Biru soft */
+        border-color: rgb(201, 214, 236);
+        /* Border sedikit lebih gelap */
+        color: white;
+    }
+
+    .custom-blue:hover {
+        background-color: #365A9E;
+        /* Warna lebih gelap saat hover */
+    }
+
+    .button-group {
+        display: flex;
+        flex-direction: column;
+        /* Susun tombol secara vertikal */
+        gap: 2px;
+        /* Jarak antar tombol */
+        width: fit-content;
+        /* Ukuran tombol menyesuaikan teks terpanjang */
+    }
+
+    .custom-button {
+        min-width: 50px;
+        /* Lebar minimum yang sama untuk semua tombol */
+        text-align: center;
+    }
+
 </style>
 @endsection
 
@@ -45,13 +74,36 @@
 @section('content')
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-        <li cass="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add',$institute->id) }}">
+        <li class="nav-item"><a class="nav-link active" href="{{ route('result.ambient_air.add_1', $institute->id) }}">
                 <i class="bx bx-current-location me-1"></i>
-                Sampling Location</a></li></a></li>
-        <li class="nav-item"><a class="nav-link active"
-                href="{{ route('result.ambient_air.add_loc', $institute->id) }}"><i
-                    class="bx bx-location-plus me-1"></i>
-                Add Sampling Location</a></li>
+                <b><i style="font-size: 1.1rem;">Location - 1</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_2', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 2</i></b></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_3',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 3</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_4', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 4</i></b></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_5',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 5</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_6', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 6</i></b></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_7',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 7</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_8', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 8</i></b></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_9',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 9</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_10', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 10</i></b></a></li>
     </ul>
 </div>
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
@@ -72,15 +124,15 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('result.add_sample_new', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.add_sample', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
                 <h4 class="card-title mb-0">@yield('title')
                     @if ($subject)
-                    <i class="fw-bold">{{ $subject->name }}</i>
+                        <i class="fw-bold">{{ $subject->name }}</i>
                     @else
-                    <i class="fw-bold">No Name Available</i>
+                        <i class="fw-bold">No Name Available</i>
                     @endif
                 </h4>
                 @if ($regulations->isNotEmpty())
@@ -111,10 +163,11 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><input type="text" class="form-control text-center" name="no_sample"
+                                <td>
+                                    <input type="text" class="form-control text-center" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $sampling->no_sample ?? '') }}">
+                                        value="{{ old('no_sample', $sampling->no_sample ?? $sampleNo) }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
                                         value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
@@ -126,19 +179,19 @@
                                         value="{{ $instituteSubject->subject->name }}" readonly>
                                 </td>
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
-                                        value="{{ old('sampling_date', $sampling->sampling_date ?? '') }}"></td>
+                                        value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
                                         value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab/24 Hours" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
-                                        value="{{ old('date_received', $sampling->date_received ?? '') }}"></td>
+                                        value="{{ old('date_received', $institute->sample_analysis_date ?? '') }}"></td>
                                 <td>
                                     <input type="date" class="form-control text-center" name="itd_start"
-                                        value="{{ old('itd_start', $sampling->itd_start ?? '') }}">
+                                        value="{{ old('itd_start', $institute->sample_analysis_date ?? '') }}">
                                     <span class="mx-2">to</span>
                                     <input type="date" class="form-control text-center" name="itd_end"
-                                        value="{{ old('itd_end', $sampling->itd_end ?? '') }}">
+                                        value="{{ old('itd_end', $institute->report_date ?? '') }}">
                                 </td>
                             </tr>
                         </tbody>
@@ -163,7 +216,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('result.ambient_air.add_loc', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.ambient_air.add_1', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
@@ -181,8 +234,7 @@
                         </tr>
                         @foreach($parameters as $key => $parameter)
                         <tr>
-                            <form class="card" action="{{ route('result.ambient_air.add_loc', $institute->id) }}"
-                                method="POST">
+                            <form class="card" action="{{ route('result.ambient_air.add_1', $institute->id) }}" method="POST">
                                 @csrf
                                 <td>{{ $key + 1 }}</td>
                                 <td>
@@ -203,16 +255,15 @@
                                 </td>
                                 <td>
                                     @foreach ($samplingTimes as $samplingTime)
-                                    @php
-                                    $key =
-                                    "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
-                                    $resultData = $results[$key] ?? null;
-                                    @endphp
+                                        @php
+                                            $key = "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
+                                            $resultData = $results[$key] ?? null; // Ambil hanya data dari sampling_id yang aktif
+                                        @endphp
 
-                                    <input type="text" class="form-control text-center testing-result"
-                                        name="testing_result[{{ $parameter->id }}][]"
-                                        value="{{ $resultData ? $resultData->first()->testing_result : old('testing_result') }}"
-                                        required>
+                                        <input type="text" class="form-control text-center testing-result"
+                                            name="testing_result[{{ $parameter->id }}][]"
+                                            value="{{ $sampling ? ($resultData ? $resultData->first()->testing_result : '') : '' }}"
+                                            required>
                                     @endforeach
                                 </td>
                                 <td>
@@ -238,12 +289,29 @@
                                         readonly>
                                 </td>
                                 <td>
-                                    <button class="btn btn-success btn-sm mt-2" type="submit" name="save">Save</button>
+                                    <div class="button-group">
+                                        <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                            name="save">Save</button>
+                                            <button type="button"
+                                                class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
+                                                data-parameter-id="{{ $parameter->id }}">
+                                                Hide
+                                            </button>
+                                    </div>
                                 </td>
                             </form>
                         </tr>
                         @endforeach
                     </table>
+                    <div class="card-footer d-flex justify-content-between align-items-end">
+                        <div class="d-flex">
+                            <button id="btn-undo" class="btn btn-warning me-1" style="display: none;">Undo</button>
+                        </div>
+                        <div class="d-flex">
+                            <button class="btn btn-primary me-2" type="button" onclick="confirmSubmit()">Save All</button>
+                            <a href="{{ route('result.list_result', $institute->id) }}" class="btn btn-outline-secondary">Back</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -255,6 +323,7 @@
 
 @section('script')
 <script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+<script src="{{ asset('assets/js/sweetalert.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -267,8 +336,6 @@
         });
     });
 
-</script>
-<script>
     $(document).ready(function () {
         $('#date_range').daterangepicker({
             timePicker: true,
@@ -278,5 +345,105 @@
         });
     });
 
+    function confirmSubmit() {
+    swal({
+        title: "Are you sure?",
+        text: "Please make sure all data is correct and complete before submitting.",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willSubmit) => {
+        if (willSubmit) {
+            swal("Submitting...", {
+                icon: "info",
+                buttons: false,
+                timer: 300, // Delay 0.3 detik sebelum redirect
+            }).then(() => {
+                window.location.href = "{{ route('result.list_result', $institute->id) }}?success=1";
+            });
+        }
+    });
+}
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let regulationId = document.body.getAttribute("data-regulation-id"); // Ambil regulation_id dari atribut di body
+        let storedHiddenParameters = JSON.parse(localStorage.getItem("hidden_parameters")) || {};
+        let hiddenParameters = storedHiddenParameters[regulationId] || []; // Ambil parameter tersembunyi hanya untuk regulation saat ini
+        let undoButton = document.getElementById("btn-undo");
+
+        // Tampilkan tombol Undo jika ada parameter yang disembunyikan
+        undoButton.style.display = hiddenParameters.length > 0 ? "inline-block" : "none";
+
+        // Sembunyikan parameter yang ada di localStorage untuk regulation saat ini
+        hiddenParameters.forEach(parameterId => {
+            document.querySelectorAll(`[data-parameter-id="${parameterId}"]`).forEach(element => {
+                element.closest("tr").style.display = "none";
+            });
+        });
+
+        // Event listener untuk tombol hide
+        document.querySelectorAll(".hide-parameter").forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                let parameterId = this.getAttribute("data-parameter-id");
+
+                // Simpan posisi scroll sebelum meng-hide
+                let scrollPosition = window.scrollY;
+                localStorage.setItem("scroll_position", scrollPosition);
+
+                // Pastikan hidden_parameters hanya untuk regulation saat ini
+                if (!hiddenParameters.includes(parameterId)) {
+                    hiddenParameters.push(parameterId);
+                    storedHiddenParameters[regulationId] = hiddenParameters;
+                    localStorage.setItem("hidden_parameters", JSON.stringify(storedHiddenParameters));
+                }
+
+                // Sembunyikan baris tanpa refresh
+                this.closest("tr").style.display = "none";
+
+                // Tampilkan tombol Undo
+                undoButton.style.display = "inline-block";
+
+                // Kembalikan posisi scroll agar tidak naik ke atas
+                window.scrollTo(0, scrollPosition);
+            });
+        });
+
+        // Event listener untuk tombol undo
+        undoButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (hiddenParameters.length > 0) {
+                let lastHiddenParameter = hiddenParameters.pop(); // Ambil parameter terakhir yang di-hide
+                storedHiddenParameters[regulationId] = hiddenParameters;
+                localStorage.setItem("hidden_parameters", JSON.stringify(storedHiddenParameters));
+
+                // Munculkan kembali baris yang terakhir di-hide
+                document.querySelectorAll(`[data-parameter-id="${lastHiddenParameter}"]`).forEach(element => {
+                    element.closest("tr").style.display = "";
+                });
+
+                // Sembunyikan tombol Undo jika tidak ada parameter yang di-hide
+                if (hiddenParameters.length === 0) {
+                    undoButton.style.display = "none";
+                }
+
+                // Ambil posisi scroll terakhir dan atur kembali
+                let scrollPosition = localStorage.getItem("scroll_position");
+                if (scrollPosition) {
+                    window.scrollTo(0, scrollPosition);
+                }
+            }
+        });
+
+        // Reset hidden parameters jika regulation_id berubah
+        document.body.setAttribute("data-regulation-id", regulationId);
+    });
 </script>
 @endsection

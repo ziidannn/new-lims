@@ -74,12 +74,36 @@
 @section('content')
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-        <li class="nav-item"><a class="nav-link active" href="{{ route('result.ambient_air.add',$institute->id) }}">
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_1',$institute->id) }}">
                 <i class="bx bx-current-location me-1"></i>
-                Sampling Location</a></li></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_loc', $institute->id) }}"><i
-                    class="bx bx-location-plus me-1"></i>
-                Add Sampling Location</a></li>
+                <b><i style="font-size: 1.1rem;">Location - 1</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_2', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 2</i></b></a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ route('result.ambient_air.add_3',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 3</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_4', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 4</i></b></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_5',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 5</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_6', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 6</i></b></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_7',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 7</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_8', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 8</i></b></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_9',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 9</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_10', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.1rem;">Location - 10</i></b></a></li>
     </ul>
 </div>
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
@@ -100,7 +124,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('result.add_sample', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.add_sample_3', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
@@ -139,10 +163,11 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><input type="text" class="form-control text-center" name="no_sample"
+                                <td>
+                                    <input type="text" class="form-control text-center" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $sampling->no_sample ?? '') }}">
+                                        value="{{ old('no_sample', $sampling->no_sample ?? $sampleNo) }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
                                         value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
@@ -191,7 +216,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('result.ambient_air.add', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.ambient_air.add_3', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
@@ -209,7 +234,7 @@
                         </tr>
                         @foreach($parameters as $key => $parameter)
                         <tr>
-                            <form class="card" action="{{ route('result.ambient_air.add', $institute->id) }}" method="POST">
+                            <form class="card" action="{{ route('result.ambient_air.add_3', $institute->id) }}" method="POST">
                                 @csrf
                                 <td>{{ $key + 1 }}</td>
                                 <td>
@@ -230,15 +255,15 @@
                                 </td>
                                 <td>
                                     @foreach ($samplingTimes as $samplingTime)
-                                    @php
-                                    $key =
-                                    "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
-                                    $resultData = $results[$key] ?? null;
-                                    @endphp
-                                    <input type="text" class="form-control text-center testing-result"
-                                        name="testing_result[{{ $parameter->id }}][]"
-                                        value="{{ $resultData ? $resultData->first()->testing_result : old('testing_result') }}"
-                                        required>
+                                        @php
+                                            $key = "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
+                                            $resultData = $results[$key] ?? null; // Ambil hanya data dari sampling_id yang aktif
+                                        @endphp
+
+                                        <input type="text" class="form-control text-center testing-result"
+                                            name="testing_result[{{ $parameter->id }}][]"
+                                            value="{{ $sampling ? ($resultData ? $resultData->first()->testing_result : '') : '' }}"
+                                            required>
                                     @endforeach
                                 </td>
                                 <td>
@@ -283,11 +308,8 @@
                             <button id="btn-undo" class="btn btn-warning me-1" style="display: none;">Undo</button>
                         </div>
                         <div class="d-flex">
-                            <form id="audit-form" action="{{ route('result.ambient_air.add', $institute->id) }}" method="POST">
-                            @csrf
-                                <button class="btn btn-primary me-2" type="button" onclick="confirmSubmit()">Save All</button>
-                                <a href="{{ route('result.list_result', $institute->id) }}" class="btn btn-outline-secondary">Back</a>
-                            </form>
+                            <button class="btn btn-primary me-2" type="button" onclick="confirmSubmit()">Save All</button>
+                            <a href="{{ route('result.list_result', $institute->id) }}" class="btn btn-outline-secondary">Back</a>
                         </div>
                     </div>
                 </div>
