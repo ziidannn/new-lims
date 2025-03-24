@@ -15,13 +15,146 @@ class SamplingTimeRegulationSeeder extends Seeder
     {
         //
         $data = [
-// parameter 1-9 Subject code 01
-            [ // 1
+// --------------------------------------------S U J E C T  C O D E  0 1--------------------------------------------
+            // parameter 1
+            [ 
                 "id" => "1",
                 "parameter_id" => "1",
                 "sampling_time_id" => "1",
                 "regulation_standard_id" => "11",
             ],
+            [ 
+                "id" => "2",
+                "parameter_id" => "1",
+                "sampling_time_id" => "4",
+                "regulation_standard_id" => "9",
+            ],
+            [ 
+                "id" => "3",
+                "parameter_id" => "1",
+                "sampling_time_id" => "5",
+                "regulation_standard_id" => "5",
+            ],
+            // parameter 2
+            [ 
+                "id" => "4",
+                "parameter_id" => "2",
+                "sampling_time_id" => "1",
+                "regulation_standard_id" => "16",
+            ],
+            [ 
+                "id" => "5",
+                "parameter_id" => "2",
+                "sampling_time_id" => "3",
+                "regulation_standard_id" => "15",
+            ],
+            // parameter 3
+            [ 
+                "id" => "6",
+                "parameter_id" => "3",
+                "sampling_time_id" => "1",
+                "regulation_standard_id" => "13",
+            ],
+            [ 
+                "id" => "7",
+                "parameter_id" => "3",
+                "sampling_time_id" => "4",
+                "regulation_standard_id" => "8",
+            ],
+            [ 
+                "id" => "8",
+                "parameter_id" => "3",
+                "sampling_time_id" => "5",
+                "regulation_standard_id" => "6",
+            ],
+            // parameter 4
+            [ 
+                "id" => "9",
+                "parameter_id" => "4",
+                "sampling_time_id" => "1",
+                "regulation_standard_id" => "11",
+            ],
+            [ 
+                "id" => "10",
+                "parameter_id" => "4",
+                "sampling_time_id" => "4",
+                "regulation_standard_id" => "10",
+            ],
+            [ 
+                "id" => "11",
+                "parameter_id" => "4",
+                "sampling_time_id" => "5",
+                "regulation_standard_id" => "3",
+            ],
+            // parameter 5
+            [ 
+                "id" => "12",
+                "parameter_id" => "5",
+                "sampling_time_id" => "2",
+                "regulation_standard_id" => "12",
+            ],
+            // parameter 6
+            [ 
+                "id" => "13",
+                "parameter_id" => "6",
+                "sampling_time_id" => "1",
+                "regulation_standard_id" => "17",
+            ],
+            [ 
+                "id" => "14",
+                "parameter_id" => "6",
+                "sampling_time_id" => "4",
+                "regulation_standard_id" => "14",
+            ],
+            // parameter 7
+            [ 
+                "id" => "15",
+                "parameter_id" => "7",
+                "sampling_time_id" => "4",
+                "regulation_standard_id" => "9",
+            ],
+            [ 
+                "id" => "16",
+                "parameter_id" => "7",
+                "sampling_time_id" => "5",
+                "regulation_standard_id" => "4",
+            ],
+            // parameter 8
+            [ 
+                "id" => "17",
+                "parameter_id" => "8",
+                "sampling_time_id" => "4",
+                "regulation_standard_id" => "7",
+            ],
+            [ 
+                "id" => "18",
+                "parameter_id" => "8",
+                "sampling_time_id" => "5",
+                "regulation_standard_id" => "2",
+            ],
+            // parameter 9
+            [ 
+                "id" => "19",
+                "parameter_id" => "9",
+                "sampling_time_id" => "4",
+                "regulation_standard_id" => "1",
+            ],
+            // parameter 10
+            [ 
+                "id" => "19",
+                "parameter_id" => "10",
+                "sampling_time_id" => "1",
+                "regulation_standard_id" => "18",
+            ],
+            // parameter 11
+            [ 
+                "id" => "19",
+                "parameter_id" => "11",
+                "sampling_time_id" => "1",
+                "regulation_standard_id" => "19",
+            ],
+
+
 // parameter 1-9 regulation code 011
 //             [ // 1
 //                 "id" => "1",
