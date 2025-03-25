@@ -167,7 +167,7 @@
                                     <input type="text" class="form-control text-center" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $sampling->no_sample ?? $sampleNo) }}">
+                                        value="{{ old('no_sample', $sampling->no_sample ?? '01') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
                                         value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>

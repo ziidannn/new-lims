@@ -95,7 +95,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('result.add_sample_new', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.add_sample_4', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
@@ -134,14 +134,17 @@
                         </thead>
                         <tbody>
                             <tr>
+                                @php
+                                    $samplingData = $sampling->where('no_sample', '04')->where('institute_id', $institute->id)->first();
+                                @endphp
                                 <td>
                                     <input type="text" class="form-control text-center" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $sampling->no_sample ?? $sampleNo) }}">
+                                        value="{{ old('no_sample', '04') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
-                                        value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
+                                        value="{{ old('sampling_location', $samplingData->sampling_location ?? '') }}"></td>
                                 <td>
                                     <input type="hidden" name="institute_id" value="{{ $institute->id }}">
                                     <input type="hidden" name="institute_subject_id"
@@ -150,19 +153,19 @@
                                         value="{{ $instituteSubject->subject->name }}" readonly>
                                 </td>
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
-                                        value="{{ old('sampling_date', $sampling->sampling_date ?? '') }}"></td>
+                                        value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
+                                        value="{{ old('sampling_time', $samplingData->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab/24 Hours" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
-                                        value="{{ old('date_received', $sampling->date_received ?? '') }}"></td>
+                                        value="{{ old('date_received', $institute->sample_analysis_date ?? '') }}"></td>
                                 <td>
                                     <input type="date" class="form-control text-center" name="itd_start"
-                                        value="{{ old('itd_start', $sampling->itd_start ?? '') }}">
+                                        value="{{ old('itd_start', $institute->sample_analysis_date ?? '') }}">
                                     <span class="mx-2">to</span>
                                     <input type="date" class="form-control text-center" name="itd_end"
-                                        value="{{ old('itd_end', $sampling->itd_end ?? '') }}">
+                                        value="{{ old('itd_end', $institute->report_date ?? '') }}">
                                 </td>
                             </tr>
                         </tbody>

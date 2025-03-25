@@ -134,14 +134,18 @@
                         </thead>
                         <tbody>
                             <tr>
+                                @php
+                                    $samplingData = $sampling->where('no_sample', '02')->where('institute_id', $institute->id)->first();
+                                @endphp
                                 <td>
                                     <input type="text" class="form-control text-center" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $sampling->no_sample ?? $sampleNo) }}">
+                                        value="{{ old('no_sample', '02') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
-                                        value="{{ old('sampling_location', $sampling ? $sampling->sampling_location : '') }}"></td>
+                                        value="{{ old('sampling_location', $samplingData?->sampling_location ?? '') }}">
+                                </td>
                                 <td>
                                     <input type="hidden" name="institute_id" value="{{ $institute->id }}">
                                     <input type="hidden" name="institute_subject_id"
@@ -152,7 +156,7 @@
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
+                                        value="{{ old('sampling_time', $samplingData?->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab/24 Hours" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
