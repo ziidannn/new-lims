@@ -139,77 +139,6 @@ class AmbientAirController extends Controller
         return $this->add_sample($request, $id, '010');
     }
 
-    public function addAmbientAir(Request $request, $id)
-    {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        if ($request->isMethod('POST')) {
-            $parameters = $request->input('parameter_id', []);
-            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->latest('id')
-                ->first();
-
-            foreach ($parameters as $parameterId) {
-                if (!isset($request->sampling_time_id[$parameterId])) {
-                    continue;
-                }
-
-                foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                    $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                    if ($regulationStandardId === null || $testingResult === null) {
-                        continue;
-                    }
-
-                    Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'sampling_time_id' => $samplingTimeId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $testingResult,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                        ]
-                    );
-                }
-            }
-
-            $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-            $parameterNamesList = implode(', ', $parameterNames);
-
-             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $results = Result::
-            whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-            ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-            ->get()
-            ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
-
-        return view('result.ambient_air.add_1', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling',
-        ));
-    }
-
     public function addAmbientAir_1(Request $request, $id)
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
@@ -219,7 +148,8 @@ class AmbientAirController extends Controller
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
             $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->latest('id')
+                ->where('no_sample', '01')
+                ->latest()
                 ->first();
 
             foreach ($parameters as $parameterId) {
@@ -258,7 +188,6 @@ class AmbientAirController extends Controller
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -267,17 +196,24 @@ class AmbientAirController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::
-            whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-            ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-            ->get()
-            ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->where('no_sample', '01')
+            ->latest()
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+                ->get()
+                ->groupBy(function ($item) {
+                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+                });
+        }
 
         return view('result.ambient_air.add_1', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling',
+            'regulations', 'subject', 'instituteSubject', 'sampling'
         ));
     }
 
@@ -285,12 +221,14 @@ class AmbientAirController extends Controller
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-
-        // ✅ Periksa apakah ada data Sampling dengan institute_subject_id terkait
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->latest()->first();
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
+            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+                ->where('no_sample', '02')
+                ->latest()
+                ->first();
 
             foreach ($parameters as $parameterId) {
                 if (!isset($request->sampling_time_id[$parameterId])) {
@@ -305,10 +243,9 @@ class AmbientAirController extends Controller
                         continue;
                     }
 
-                    // ✅ Simpan atau update Result
-                    $result = Result::updateOrCreate(
+                    Result::updateOrCreate(
                         [
-                            'sampling_id' => $sampling->id,
+                            'sampling_id' => $samplings->id,
                             'parameter_id' => $parameterId,
                             'sampling_time_id' => $samplingTimeId,
                             'regulation_standard_id' => $regulationStandardId
@@ -325,11 +262,10 @@ class AmbientAirController extends Controller
             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
             $parameterNamesList = implode(', ', $parameterNames);
 
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $id)->latest()->first(); // Ambil data terbaru
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -338,13 +274,20 @@ class AmbientAirController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-        ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-        ->orderBy('id', 'desc') // Ambil data terbaru berdasarkan ID
-        ->get()
-        ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->where('no_sample', '02')
+            ->latest()
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+                ->get()
+                ->groupBy(function ($item) {
+                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+                });
+        }
 
         return view('result.ambient_air.add_2', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
@@ -356,12 +299,14 @@ class AmbientAirController extends Controller
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-
-        // ✅ Periksa apakah ada data Sampling dengan institute_subject_id terkait
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->latest()->first();
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
+            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+                ->where('no_sample', '03')
+                ->latest()
+                ->first();
 
             foreach ($parameters as $parameterId) {
                 if (!isset($request->sampling_time_id[$parameterId])) {
@@ -376,10 +321,9 @@ class AmbientAirController extends Controller
                         continue;
                     }
 
-                    // ✅ Simpan atau update Result
-                    $result = Result::updateOrCreate(
+                    Result::updateOrCreate(
                         [
-                            'sampling_id' => $sampling->id,
+                            'sampling_id' => $samplings->id,
                             'parameter_id' => $parameterId,
                             'sampling_time_id' => $samplingTimeId,
                             'regulation_standard_id' => $regulationStandardId
@@ -396,11 +340,10 @@ class AmbientAirController extends Controller
             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
             $parameterNamesList = implode(', ', $parameterNames);
 
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $id)->latest()->first(); // Ambil data terbaru
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -409,13 +352,20 @@ class AmbientAirController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-        ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-        ->orderBy('id', 'desc') // Ambil data terbaru berdasarkan ID
-        ->get()
-        ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->where('no_sample', '02')
+            ->latest()
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+                ->get()
+                ->groupBy(function ($item) {
+                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+                });
+        }
 
         return view('result.ambient_air.add_3', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
@@ -427,12 +377,14 @@ class AmbientAirController extends Controller
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-
-        // ✅ Periksa apakah ada data Sampling dengan institute_subject_id terkait
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->latest()->first();
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
+            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+                ->where('no_sample', '04')
+                ->latest()
+                ->first();
 
             foreach ($parameters as $parameterId) {
                 if (!isset($request->sampling_time_id[$parameterId])) {
@@ -447,10 +399,9 @@ class AmbientAirController extends Controller
                         continue;
                     }
 
-                    // ✅ Simpan atau update Result
-                    $result = Result::updateOrCreate(
+                    Result::updateOrCreate(
                         [
-                            'sampling_id' => $sampling->id,
+                            'sampling_id' => $samplings->id,
                             'parameter_id' => $parameterId,
                             'sampling_time_id' => $samplingTimeId,
                             'regulation_standard_id' => $regulationStandardId
@@ -467,11 +418,10 @@ class AmbientAirController extends Controller
             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
             $parameterNamesList = implode(', ', $parameterNames);
 
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $id)->latest()->first(); // Ambil data terbaru
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -480,13 +430,20 @@ class AmbientAirController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-        ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-        ->orderBy('id', 'desc') // Ambil data terbaru berdasarkan ID
-        ->get()
-        ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->where('no_sample', '02')
+            ->latest()
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+                ->get()
+                ->groupBy(function ($item) {
+                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+                });
+        }
 
         return view('result.ambient_air.add_4', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
@@ -498,12 +455,14 @@ class AmbientAirController extends Controller
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-
-        // ✅ Periksa apakah ada data Sampling dengan institute_subject_id terkait
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->latest()->first();
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
+            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+                ->where('no_sample', '05')
+                ->latest()
+                ->first();
 
             foreach ($parameters as $parameterId) {
                 if (!isset($request->sampling_time_id[$parameterId])) {
@@ -518,10 +477,9 @@ class AmbientAirController extends Controller
                         continue;
                     }
 
-                    // ✅ Simpan atau update Result
-                    $result = Result::updateOrCreate(
+                    Result::updateOrCreate(
                         [
-                            'sampling_id' => $sampling->id,
+                            'sampling_id' => $samplings->id,
                             'parameter_id' => $parameterId,
                             'sampling_time_id' => $samplingTimeId,
                             'regulation_standard_id' => $regulationStandardId
@@ -538,11 +496,10 @@ class AmbientAirController extends Controller
             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
             $parameterNamesList = implode(', ', $parameterNames);
 
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $id)->latest()->first(); // Ambil data terbaru
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -551,13 +508,20 @@ class AmbientAirController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-        ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-        ->orderBy('id', 'desc') // Ambil data terbaru berdasarkan ID
-        ->get()
-        ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->where('no_sample', '02')
+            ->latest()
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+                ->get()
+                ->groupBy(function ($item) {
+                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+                });
+        }
 
         return view('result.ambient_air.add_5', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
@@ -569,12 +533,14 @@ class AmbientAirController extends Controller
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-
-        // ✅ Periksa apakah ada data Sampling dengan institute_subject_id terkait
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->latest()->first();
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
+            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+                ->where('no_sample', '06')
+                ->latest()
+                ->first();
 
             foreach ($parameters as $parameterId) {
                 if (!isset($request->sampling_time_id[$parameterId])) {
@@ -589,10 +555,9 @@ class AmbientAirController extends Controller
                         continue;
                     }
 
-                    // ✅ Simpan atau update Result
-                    $result = Result::updateOrCreate(
+                    Result::updateOrCreate(
                         [
-                            'sampling_id' => $sampling->id,
+                            'sampling_id' => $samplings->id,
                             'parameter_id' => $parameterId,
                             'sampling_time_id' => $samplingTimeId,
                             'regulation_standard_id' => $regulationStandardId
@@ -609,11 +574,10 @@ class AmbientAirController extends Controller
             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
             $parameterNamesList = implode(', ', $parameterNames);
 
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $id)->latest()->first(); // Ambil data terbaru
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -622,13 +586,20 @@ class AmbientAirController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-        ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-        ->orderBy('id', 'desc') // Ambil data terbaru berdasarkan ID
-        ->get()
-        ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->where('no_sample', '02')
+            ->latest()
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+                ->get()
+                ->groupBy(function ($item) {
+                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+                });
+        }
 
         return view('result.ambient_air.add_6', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
@@ -640,12 +611,14 @@ class AmbientAirController extends Controller
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-
-        // ✅ Periksa apakah ada data Sampling dengan institute_subject_id terkait
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->latest()->first();
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
+            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+                ->where('no_sample', '07')
+                ->latest()
+                ->first();
 
             foreach ($parameters as $parameterId) {
                 if (!isset($request->sampling_time_id[$parameterId])) {
@@ -660,10 +633,9 @@ class AmbientAirController extends Controller
                         continue;
                     }
 
-                    // ✅ Simpan atau update Result
-                    $result = Result::updateOrCreate(
+                    Result::updateOrCreate(
                         [
-                            'sampling_id' => $sampling->id,
+                            'sampling_id' => $samplings->id,
                             'parameter_id' => $parameterId,
                             'sampling_time_id' => $samplingTimeId,
                             'regulation_standard_id' => $regulationStandardId
@@ -680,11 +652,10 @@ class AmbientAirController extends Controller
             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
             $parameterNamesList = implode(', ', $parameterNames);
 
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $id)->latest()->first(); // Ambil data terbaru
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -693,13 +664,20 @@ class AmbientAirController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-        ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-        ->orderBy('id', 'desc') // Ambil data terbaru berdasarkan ID
-        ->get()
-        ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->where('no_sample', '02')
+            ->latest()
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+                ->get()
+                ->groupBy(function ($item) {
+                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+                });
+        }
 
         return view('result.ambient_air.add_7', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
@@ -711,12 +689,14 @@ class AmbientAirController extends Controller
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-
-        // ✅ Periksa apakah ada data Sampling dengan institute_subject_id terkait
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->latest()->first();
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
+            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+                ->where('no_sample', '08')
+                ->latest()
+                ->first();
 
             foreach ($parameters as $parameterId) {
                 if (!isset($request->sampling_time_id[$parameterId])) {
@@ -731,10 +711,9 @@ class AmbientAirController extends Controller
                         continue;
                     }
 
-                    // ✅ Simpan atau update Result
-                    $result = Result::updateOrCreate(
+                    Result::updateOrCreate(
                         [
-                            'sampling_id' => $sampling->id,
+                            'sampling_id' => $samplings->id,
                             'parameter_id' => $parameterId,
                             'sampling_time_id' => $samplingTimeId,
                             'regulation_standard_id' => $regulationStandardId
@@ -751,11 +730,10 @@ class AmbientAirController extends Controller
             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
             $parameterNamesList = implode(', ', $parameterNames);
 
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $id)->latest()->first(); // Ambil data terbaru
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -764,13 +742,20 @@ class AmbientAirController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-        ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-        ->orderBy('id', 'desc') // Ambil data terbaru berdasarkan ID
-        ->get()
-        ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->where('no_sample', '02')
+            ->latest()
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+                ->get()
+                ->groupBy(function ($item) {
+                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+                });
+        }
 
         return view('result.ambient_air.add_8', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
@@ -782,12 +767,14 @@ class AmbientAirController extends Controller
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-
-        // ✅ Periksa apakah ada data Sampling dengan institute_subject_id terkait
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->latest()->first();
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
+            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+                ->where('no_sample', '09')
+                ->latest()
+                ->first();
 
             foreach ($parameters as $parameterId) {
                 if (!isset($request->sampling_time_id[$parameterId])) {
@@ -802,10 +789,9 @@ class AmbientAirController extends Controller
                         continue;
                     }
 
-                    // ✅ Simpan atau update Result
-                    $result = Result::updateOrCreate(
+                    Result::updateOrCreate(
                         [
-                            'sampling_id' => $sampling->id,
+                            'sampling_id' => $samplings->id,
                             'parameter_id' => $parameterId,
                             'sampling_time_id' => $samplingTimeId,
                             'regulation_standard_id' => $regulationStandardId
@@ -822,11 +808,10 @@ class AmbientAirController extends Controller
             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
             $parameterNamesList = implode(', ', $parameterNames);
 
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $id)->latest()->first(); // Ambil data terbaru
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -835,13 +820,20 @@ class AmbientAirController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-        ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-        ->orderBy('id', 'desc') // Ambil data terbaru berdasarkan ID
-        ->get()
-        ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->where('no_sample', '02')
+            ->latest()
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+                ->get()
+                ->groupBy(function ($item) {
+                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+                });
+        }
 
         return view('result.ambient_air.add_9', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
@@ -853,12 +845,14 @@ class AmbientAirController extends Controller
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-
-        // ✅ Periksa apakah ada data Sampling dengan institute_subject_id terkait
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->latest()->first();
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
 
         if ($request->isMethod('POST')) {
             $parameters = $request->input('parameter_id', []);
+            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+                ->where('no_sample', '010')
+                ->latest()
+                ->first();
 
             foreach ($parameters as $parameterId) {
                 if (!isset($request->sampling_time_id[$parameterId])) {
@@ -873,10 +867,9 @@ class AmbientAirController extends Controller
                         continue;
                     }
 
-                    // ✅ Simpan atau update Result
-                    $result = Result::updateOrCreate(
+                    Result::updateOrCreate(
                         [
-                            'sampling_id' => $sampling->id,
+                            'sampling_id' => $samplings->id,
                             'parameter_id' => $parameterId,
                             'sampling_time_id' => $samplingTimeId,
                             'regulation_standard_id' => $regulationStandardId
@@ -893,11 +886,10 @@ class AmbientAirController extends Controller
             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
             $parameterNamesList = implode(', ', $parameterNames);
 
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $sampling = Sampling::where('institute_subject_id', $id)->latest()->first(); // Ambil data terbaru
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -906,13 +898,20 @@ class AmbientAirController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id'))
-        ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id'))
-        ->orderBy('id', 'desc') // Ambil data terbaru berdasarkan ID
-        ->get()
-        ->groupBy(function ($item) {
-            return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-        });
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->where('no_sample', '02')
+            ->latest()
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+                ->get()
+                ->groupBy(function ($item) {
+                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+                });
+        }
 
         return view('result.ambient_air.add_10', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',

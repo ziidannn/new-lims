@@ -135,7 +135,7 @@
                         <tbody>
                             <tr>
                                 @php
-                                    $samplingData = $sampling->where('no_sample', '05')->where('institute_id', $institute->id)->first();
+                                    $samplingData = $sampling ? $sampling->where('no_sample', '05')->where('institute_id', $institute->id)->first() : null;
                                 @endphp
                                 <td>
                                     <input type="text" class="form-control text-center" name="no_sample"
@@ -231,14 +231,14 @@
                                 <td>
                                     @foreach ($samplingTimes as $samplingTime)
                                         @php
-                                            $key = "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
-                                            $resultData = $results[$key] ?? null; // Ambil hanya data dari sampling_id yang aktif
+                                            $samplingTimeId = optional($samplingTime->samplingTime)->id;
+                                            $regulationStandardId = optional($samplingTime->regulationStandards)->id;
+                                            $key = "{$parameter->id}-{$samplingTimeId}-{$regulationStandardId}";
+                                            $resultData = $results[$key] ?? collect();
                                         @endphp
-
                                         <input type="text" class="form-control text-center testing-result"
                                             name="testing_result[{{ $parameter->id }}][]"
-                                            value="{{ $sampling ? ($resultData ? $resultData->first()->testing_result : '') : '' }}"
-                                            required>
+                                            value="{{ $resultData->isNotEmpty() ? $resultData->first()->testing_result : '' }}" required>
                                     @endforeach
                                 </td>
                                 <td>

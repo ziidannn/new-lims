@@ -44,7 +44,7 @@
 @endsection
 @section('content')
 <div class="col-md-12">
-<ul class="nav nav-pills flex-column flex-sm-row mb-4">
+    <ul class="nav nav-pills flex-column flex-sm-row mb-4">
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_1',$institute->id) }}">
                 <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.1rem;">Location - 1</i></b></a></li></a></li>
@@ -60,7 +60,8 @@
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_5',$institute->id) }}">
                 <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.1rem;">Location - 5</i></b></a></li></a></li>
-        <li class="nav-item"><a class="nav-link active" href="{{ route('result.ambient_air.add_6', $institute->id) }}"><i
+        <li class="nav-item"><a class="nav-link active"
+                href="{{ route('result.ambient_air.add_6', $institute->id) }}"><i
                     class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.1rem;">Location - 6</i></b></a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_7',$institute->id) }}">
@@ -133,9 +134,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                          <tr>
+                            <tr>
                                 @php
-                                    $samplingData = $sampling->where('no_sample', '06')->where('institute_id', $institute->id)->first();
+                                    $samplingData = $sampling ? $sampling->where('no_sample', '06')->where('institute_id',
+                                    $institute->id)->first() : null;
                                 @endphp
                                 <td>
                                     <input type="text" class="form-control text-center" name="no_sample"
@@ -144,7 +146,8 @@
                                         value="{{ old('no_sample', '06') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
-                                        value="{{ old('sampling_location', $samplingData->sampling_location ?? '') }}"></td>
+                                        value="{{ old('sampling_location', $samplingData->sampling_location ?? '') }}">
+                                </td>
                                 <td>
                                     <input type="hidden" name="institute_id" value="{{ $institute->id }}">
                                     <input type="hidden" name="institute_subject_id"
@@ -231,14 +234,14 @@
                                 <td>
                                     @foreach ($samplingTimes as $samplingTime)
                                         @php
-                                            $key = "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
-                                            $resultData = $results[$key] ?? null; // Ambil hanya data dari sampling_id yang aktif
+                                            $samplingTimeId = optional($samplingTime->samplingTime)->id;
+                                            $regulationStandardId = optional($samplingTime->regulationStandards)->id;
+                                            $key = "{$parameter->id}-{$samplingTimeId}-{$regulationStandardId}";
+                                            $resultData = $results[$key] ?? collect();
                                         @endphp
-
                                         <input type="text" class="form-control text-center testing-result"
                                             name="testing_result[{{ $parameter->id }}][]"
-                                            value="{{ $sampling ? ($resultData ? $resultData->first()->testing_result : '') : '' }}"
-                                            required>
+                                            value="{{ $resultData->isNotEmpty() ? $resultData->first()->testing_result : '' }}" required>
                                     @endforeach
                                 </td>
                                 <td>
@@ -267,11 +270,11 @@
                                     <div class="button-group">
                                         <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
                                             name="save">Save</button>
-                                            <button type="button"
-                                                class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
-                                                data-parameter-id="{{ $parameter->id }}">
-                                                Hide
-                                            </button>
+                                        <button type="button"
+                                            class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
+                                            data-parameter-id="{{ $parameter->id }}">
+                                            Hide
+                                        </button>
                                     </div>
                                 </td>
                             </form>
@@ -283,8 +286,10 @@
                             <button id="btn-undo" class="btn btn-warning me-1" style="display: none;">Undo</button>
                         </div>
                         <div class="d-flex">
-                            <button class="btn btn-primary me-2" type="button" onclick="confirmSubmit()">Save All</button>
-                            <a href="{{ route('result.list_result', $institute->id) }}" class="btn btn-outline-secondary">Back</a>
+                            <button class="btn btn-primary me-2" type="button" onclick="confirmSubmit()">Save
+                                All</button>
+                            <a href="{{ route('result.list_result', $institute->id) }}"
+                                class="btn btn-outline-secondary">Back</a>
                         </div>
                     </div>
                 </div>
@@ -320,32 +325,36 @@
     });
 
     function confirmSubmit() {
-    swal({
-        title: "Are you sure?",
-        text: "Please make sure all data is correct and complete before submitting.",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-    })
-    .then((willSubmit) => {
-        if (willSubmit) {
-            swal("Submitting...", {
-                icon: "info",
-                buttons: false,
-                timer: 300, // Delay 0.3 detik sebelum redirect
-            }).then(() => {
-                window.location.href = "{{ route('result.list_result', $institute->id) }}?success=1";
+        swal({
+                title: "Are you sure?",
+                text: "Please make sure all data is correct and complete before submitting.",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willSubmit) => {
+                if (willSubmit) {
+                    swal("Submitting...", {
+                        icon: "info",
+                        buttons: false,
+                        timer: 300, // Delay 0.3 detik sebelum redirect
+                    }).then(() => {
+                        window.location.href =
+                        "{{ route('result.list_result', $institute->id) }}?success=1";
+                    });
+                }
             });
-        }
-    });
-}
+    }
+
 </script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        let regulationId = document.body.getAttribute("data-regulation-id"); // Ambil regulation_id dari atribut di body
+        let regulationId = document.body.getAttribute(
+        "data-regulation-id"); // Ambil regulation_id dari atribut di body
         let storedHiddenParameters = JSON.parse(localStorage.getItem("hidden_parameters")) || {};
-        let hiddenParameters = storedHiddenParameters[regulationId] || []; // Ambil parameter tersembunyi hanya untuk regulation saat ini
+        let hiddenParameters = storedHiddenParameters[regulationId] ||
+    []; // Ambil parameter tersembunyi hanya untuk regulation saat ini
         let undoButton = document.getElementById("btn-undo");
 
         // Tampilkan tombol Undo jika ada parameter yang disembunyikan
@@ -374,7 +383,8 @@
                 if (!hiddenParameters.includes(parameterId)) {
                     hiddenParameters.push(parameterId);
                     storedHiddenParameters[regulationId] = hiddenParameters;
-                    localStorage.setItem("hidden_parameters", JSON.stringify(storedHiddenParameters));
+                    localStorage.setItem("hidden_parameters", JSON.stringify(
+                        storedHiddenParameters));
                 }
 
                 // Sembunyikan baris tanpa refresh
@@ -394,14 +404,16 @@
             event.stopPropagation();
 
             if (hiddenParameters.length > 0) {
-                let lastHiddenParameter = hiddenParameters.pop(); // Ambil parameter terakhir yang di-hide
+                let lastHiddenParameter = hiddenParameters
+            .pop(); // Ambil parameter terakhir yang di-hide
                 storedHiddenParameters[regulationId] = hiddenParameters;
                 localStorage.setItem("hidden_parameters", JSON.stringify(storedHiddenParameters));
 
                 // Munculkan kembali baris yang terakhir di-hide
-                document.querySelectorAll(`[data-parameter-id="${lastHiddenParameter}"]`).forEach(element => {
-                    element.closest("tr").style.display = "";
-                });
+                document.querySelectorAll(`[data-parameter-id="${lastHiddenParameter}"]`).forEach(
+                    element => {
+                        element.closest("tr").style.display = "";
+                    });
 
                 // Sembunyikan tombol Undo jika tidak ada parameter yang di-hide
                 if (hiddenParameters.length === 0) {
@@ -419,5 +431,6 @@
         // Reset hidden parameters jika regulation_id berubah
         document.body.setAttribute("data-regulation-id", regulationId);
     });
+
 </script>
 @endsection
