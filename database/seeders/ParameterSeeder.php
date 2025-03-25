@@ -15,14 +15,94 @@ class ParameterSeeder extends Seeder
     {
         //
         $data = [
-
-            // Parameter for Subject code 01
+// --------------------------------------------S U J E C T  C O D E  0 1--------------------------------------------
+            // Parameter 1
             [
                 "id" => "1",
                 "subject_id" => "1",
                 "name" => "Sulfur Dioxide (SO₂)*",
                 "unit" => "µg/Nm3",
                 "method" => "SNI 7119-7:2017"
+            ],
+            // Parameter 2
+            [
+                "id" => "2",
+                "subject_id" => "1",
+                "name" => "Carbon Monoxide (CO)*",
+                "unit" => "µg/Nm3",
+                "method" => "IK 7.4.19 (Direct Reading)"
+            ],
+            // Parameter 3
+            [
+                "id" => "3",
+                "subject_id" => "1",
+                "name" => "Nitrogen Dioxide (NO2)*",
+                "unit" => "µg/Nm3",
+                "method" => "SNI 19-7119.2-2005"
+            ],
+            // Parameter 4
+            [
+                "id" => "4",
+                "subject_id" => "1",
+                "name" => "Oxidant (Ox)* ",
+                "unit" => "µg/Nm3",
+                "method" => "SNI 7119-8:2017"
+            ],
+            // Parameter 5
+            [
+                "id" => "5",
+                "subject_id" => "1",
+                "name" => "Hydrocarbon Non Methane (NMHC)",
+                "unit" => "µg/Nm3",
+                "method" => "Gas Chromatography"
+            ],
+            // Parameter 6
+            [
+                "id" => "6",
+                "subject_id" => "1",
+                "name" => "Total Suspended Particulates (TSP)*",
+                "unit" => "µg/Nm3",
+                "method" => "SNI 7119.3:2017"
+            ],
+            // Parameter 7
+            [
+                "id" => "7",
+                "subject_id" => "1",
+                "name" => "PM10 (Particulate Matters) ",
+                "unit" => "µg/Nm3",
+                "method" => "Direct Reading"
+            ],
+            // Parameter 8
+            [
+                "id" => "8",
+                "subject_id" => "1",
+                "name" => "PM2.5 (Particulate Matters) ",
+                "unit" => "µg/Nm3",
+                "method" => "Direct Reading"
+            ],
+            // Parameter 9
+            [
+                "id" => "9",
+                "subject_id" => "1",
+                "name" => "Lead (Pb)",
+                "unit" => "µg/Nm3",
+                "method" => "ICP-OES"
+            ],
+            // Parameter 10
+            [
+                "id" => "10",
+                "subject_id" => "1",
+                "name" => "Ammonia (NH3)*",
+                "unit" => "µg/Nm3",
+                "method" => "SNI 19-7119.1-2005"
+            ],
+            // Parameter 11
+            [
+                "id" => "11",
+                "subject_id" => "1",
+                "name" => "Hydrogen Sulfide (H2S)",
+                "unit" => "µg/Nm3",
+                "method" => "IK-7.4.22 (Spectrophotometry)"
             ],
 
 //             // Parameter for Regulation code 011

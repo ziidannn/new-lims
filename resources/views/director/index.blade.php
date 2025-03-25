@@ -49,7 +49,7 @@
             </ul>
         </div> --}}
         @can('director.update')
-        <form action="" method="PUT" enctype="multipart/form-data">
+        <form action="{{ route('director.edit', $director->id ?? '') }}" method="POST" enctype="multipart/form-data">
             @csrf 
             <div class="form-group text-center">
                 <label for="current_password">Current Director:</label>

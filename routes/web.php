@@ -140,9 +140,9 @@ Route::middleware('auth')->group(function () {
 Route::get('/resume_coa/{customerId}', [PDFController::class, 'previewPdf'])->name('preview.pdf');
 Route::get('/ambient_air/{customerId}', [PDFController::class, 'ambientAirPdf'])->name('ambient.air.pdf');
 
-
+// Director
 Route::get('/directors', [DirectorController::class, 'index'])->name('director.index');
-Route::put('/directors/{id}/edit', [DirectorController::class, 'edit'])->name('director.edit');
+Route::post('/directors/{id}/edit', [DirectorController::class, 'edit'])->name('director.edit');
 
 
 
