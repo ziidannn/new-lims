@@ -164,7 +164,7 @@
                         <tbody>
                             <tr>
                                 @php
-                                    $samplingData = $sampling ? $sampling->where('no_sample', '02')->where('institute_id', $institute->id)->first() : null;
+                                    $samplingData = $sampling ? $sampling->where('no_sample', '01')->where('institute_id', $institute->id)->first() : null;
                                 @endphp
                                 <td>
                                     <input type="text" class="form-control text-center" name="no_sample"

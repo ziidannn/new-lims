@@ -117,7 +117,7 @@
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $samplings->sampling_time ?? '') }}"></td>
+                                        value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
@@ -140,82 +140,6 @@
                     <span class="btn btn-outline-secondary">Back</span>
                 </a>
             </div>
-    </form>
-</div>
-
-<br>
-
-<div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    @if(session('msg'))
-        <div class="alert alert-success alert-dismissible" role="alert">
-            {{ session('msg') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-    <form class="card" action="{{ route('result.workplace.add', $institute->id) }}" method="POST">
-        @csrf
-        <div class="col-xl-12">
-            <div class="card-body">
-                <div class="row">
-                    <table class="table table-bordered" id="parameterTable">
-                        <tr>
-                            <th class="text-center"><b>No</b></th>
-                            <th class="text-center"><b>Parameters</b></th>
-                            <th class="text-center"><b>Testing Result</b></th>
-                            <th class="text-center"><b>Regulatory Standard</b></th>
-                            <th class="text-center"><b>Unit</b></th>
-                            <th class="text-center"><b>Methods</b></th>
-                        </tr>
-                        @foreach ($parameters as $key => $parameter)
-                        <tr>
-                            <td>{{ $key + 1 }}</td>
-                            <td>
-                                <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
-                                <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
-                                    readonly>
-                            </td>
-                            <td>
-                                @php
-                                $regulationStandard = $samplingTimeRegulations->where('parameter_id',
-                                $parameter->id)->first()->regulationStandards ?? null;
-                                $resultKey = $parameter->id . '-' . ($regulationStandard->id ?? 'null');
-                                $testingResult = $results[$resultKey]->testing_result ?? '';
-                                @endphp
-                                <input type="text" class="form-control text-center testing-result"
-                                    name="testing_result[{{ $parameter->id }}]"
-                                    value="{{ old('testing_result.' . $parameter->id, $testingResult) }}" required>
-                            </td>
-                            <td>
-                                @if ($regulationStandard)
-                                <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}]"
-                                    value="{{ $regulationStandard->id }}">
-                                <input type="text" class="form-control text-center"
-                                    value="{{ $regulationStandard->title }}" readonly>
-                                @endif
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="unit[{{ $parameter->id }}]"
-                                    value="{{ $parameter->unit ?? '' }}" readonly>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="method[{{ $parameter->id }}]"
-                                    value="{{ $parameter->method ?? '' }}" readonly>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </table>
-                    <div class="card-footer text-end">
-                        <button class="btn btn-primary me-1" type="submit">Save</button>
-                        <a href="{{ route('result.list_result',$institute->id) }}">
-                            <span class="btn btn-outline-secondary">Back</span>
-                        </a>
-                    </div>
-                    </td>
-                    </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
     </form>
 </div>
 </div>
@@ -242,7 +166,7 @@
         $('#date_range').daterangepicker({
             timePicker: true,
             locale: {
-                format: 'DD-MM-YYYY'
+                format: 'YYYY-MM-DD HH:mm'
             }
         });
     });

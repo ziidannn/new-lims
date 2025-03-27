@@ -152,6 +152,75 @@ class ResultController extends Controller
         ));
     }
 
+    public function addWorkplaceAir(Request $request, $id)
+    {
+        $instituteSubject = InstituteSubject::findOrFail($id);
+        $institute = Institute::findOrFail($instituteSubject->institute_id);
+        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
+
+        if ($request->isMethod('POST')) {
+            $parameters = $request->input('parameter_id', []);
+
+            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+                ->latest('id')
+                ->first();
+
+            foreach ($parameters as $parameterId) {
+                // Ambil regulation_standard_id berdasarkan parameter_id
+                $regulationStandardId = SamplingTimeRegulation::where('parameter_id', $parameterId)
+                    ->value('regulation_standard_id');
+
+                if ($regulationStandardId) {
+                    $result = Result::updateOrCreate(
+                        [
+                            'sampling_id' => $samplings->id,
+                            'parameter_id' => $parameterId,
+                            'regulation_standard_id' => $regulationStandardId
+                        ],
+                        [
+                            'testing_result' => $request->input("testing_result.$parameterId"),
+                            'unit' => $request->input("unit.$parameterId"),
+                            'method' => $request->input("method.$parameterId"),
+                        ]
+                    );
+                }
+            }
+
+            return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Results saved successfully');
+        }
+
+        // Ambil data untuk view
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+            ->pluck('regulation_id');
+        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+        $parametersIds = $parameters->pluck('id');
+
+        // Ambil standar regulasi terkait dengan parameter
+        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+            ->with(['samplingTime', 'regulationStandards'])
+            ->get();
+
+        // Ambil semua hasil berdasarkan sampling_id dan parameter_id
+        $results = Result::whereIn('parameter_id', $parametersIds)
+            ->get()
+            ->keyBy(function ($item) {
+                return $item->parameter_id . '-' . $item->regulation_standard_id;
+            });
+
+        $resultIds = $results->pluck('id'); // Ambil semua result_id
+
+        return view('result.workplace.add', compact(
+            'institute', 'parameters', 'samplingTimeRegulations', 'results',
+            'regulations', 'subject', 'instituteSubject', 'sampling'
+        ));
+    }
+
     public function addNoise(Request $request, $id)
     {
         $instituteSubject = InstituteSubject::findOrFail($id);
@@ -237,11 +306,14 @@ class ResultController extends Controller
             return redirect()->back()->with('msg', implode(' ', array_values($messages)));
         }
 
-        $subject = Subject::find($instituteSubject->subject_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)->pluck('regulation_id');
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+            ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
@@ -261,7 +333,7 @@ class ResultController extends Controller
         }
 
         return view($view, compact(
-            'institute', 'parameters', 'regulations',
+            'institute', 'parameters', 'regulations', 'subjects',
             'samplingTimeRegulations', 'results', 'subject', 'instituteSubject', 'sampling'
         ));
     }
@@ -338,17 +410,20 @@ class ResultController extends Controller
             return redirect()->back()->with('msg', implode(' ', $messages));
         }
 
-        $subject = Subject::find($instituteSubject->subject_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)->pluck('regulation_id');
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+            ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
 
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::where('sampling_id', $sampling->id)->get();
+        $results = Result::where('sampling_id', $samplings->id)->get();
 
         if ($parameters->contains(fn($parameter) => in_array($parameter->regulation_id, [13, 15])
             || in_array($parameter->regulation_code, ['032', '034']))) {
@@ -359,75 +434,8 @@ class ResultController extends Controller
         }
 
         return view($view, compact(
-            'institute', 'parameters', 'regulations',
+            'institute', 'parameters', 'regulations', 'subjects',
             'samplingTimeRegulations', 'results', 'subject', 'instituteSubject', 'sampling'
-        ));
-    }
-
-    public function addWorkplaceAir(Request $request, $id)
-    {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        if ($request->isMethod('POST')) {
-            $parameters = $request->input('parameter_id', []);
-
-            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->latest('id')
-                ->first();
-
-            foreach ($parameters as $parameterId) {
-                // Ambil regulation_standard_id berdasarkan parameter_id
-                $regulationStandardId = SamplingTimeRegulation::where('parameter_id', $parameterId)
-                    ->value('regulation_standard_id');
-
-                if ($regulationStandardId) {
-                    $result = Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $request->input("testing_result.$parameterId"),
-                            'unit' => $request->input("unit.$parameterId"),
-                            'method' => $request->input("method.$parameterId"),
-                        ]
-                    );
-                }
-            }
-
-            return redirect()->route('result.list_result', $institute->id)
-            ->with('msg', 'Results saved successfully');
-        }
-
-        // Ambil data untuk view
-        $subject = Subject::find($instituteSubject->subject_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-
-        // Ambil standar regulasi terkait dengan parameter
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-
-        // Ambil semua hasil berdasarkan sampling_id dan parameter_id
-        $results = Result::whereIn('parameter_id', $parametersIds)
-            ->get()
-            ->keyBy(function ($item) {
-                return $item->parameter_id . '-' . $item->regulation_standard_id;
-            });
-
-        $resultIds = $results->pluck('id'); // Ambil semua result_id
-
-        return view('result.workplace.add', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
         ));
     }
 
@@ -469,12 +477,14 @@ class ResultController extends Controller
         }
 
         // Ambil data untuk view
-        $subject = Subject::find($instituteSubject->subject_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
 
         // Ambil standar regulasi terkait dengan parameter
@@ -534,12 +544,14 @@ class ResultController extends Controller
         }
 
         // Ambil data untuk view
-        $subject = Subject::find($instituteSubject->subject_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
 
         // Ambil standar regulasi terkait dengan parameter
@@ -599,14 +611,15 @@ class ResultController extends Controller
         }
 
         // Ambil data untuk view
-        $subject = Subject::find($instituteSubject->subject_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
-
         // Ambil standar regulasi terkait dengan parameter
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
@@ -664,12 +677,14 @@ class ResultController extends Controller
         }
 
         // Ambil data untuk view
-        $subject = Subject::find($instituteSubject->subject_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->first();
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
 
         // Ambil standar regulasi terkait dengan parameter

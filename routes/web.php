@@ -63,7 +63,6 @@ Route::group(['prefix' => 'result'], function () {
     Route::any('/illumination/{id}', [ResultController::class, 'addIllumination'])->name('result.illumination.add');
     Route::any('/heat_stress/{id}', [ResultController::class, 'addHeatStress'])->name('result.heat_stress.add');
     Route::any('/stationary_stack/{id}', [ResultController::class, 'addStationaryStack'])->name('result.stationary_stack.add');
-    Route::any('/add_result/{id}', [ResultController::class, 'add_result'])->name('result.add_result');
     Route::any('/add_sample/{id}', [ResultController::class, 'add_sample'])->name('result.add_sample');
     Route::any('/add_sample_new/{id}', [ResultController::class, 'add_sample_new'])->name('result.add_sample_new');
     Route::any('/list_result/{id}', [ResultController::class, 'list_result'])->name('result.list_result');
@@ -95,20 +94,20 @@ Route::group(['prefix' => 'result'], function () {
 
 Route::group(['prefix' => 'manage_coa'], function () {
     Route::group(['prefix' => 'coa'], function () {
-        
+
         //subject
         Route::get('/subject', [CoaController::class, 'subject'])->name('coa.subject.index')->middleware('auth');
         Route::get('/data_subject', [CoaController::class, 'data_subject'])->name('coa.subject.data_subject');
         Route::post('/subject', [CoaController::class, 'create_subject'])->name('coa.subject.store');
         Route::any('/subject/{id}/update', [CoaController::class, 'edit_subject'])->name('coa.subject.update');
         Route::delete('/subject/delete_subject', [CoaController::class, 'delete_subject'])->name('coa.subject.delete_subject');
-        
+
         //regulation
         Route::any('/regulation', [CoaController::class, 'index'])->name('coa.regulation.index')->middleware('auth');
         Route::get('/data_regulation', [CoaController::class, 'data_regulation'])->name('coa.regulation.data_regulation');
         Route::any('/regulation/update/{id}', [CoaController::class, 'edit_regulation'])->name('coa.regulation.update');
         Route::delete('/regulation/delete_regulation', [CoaController::class, 'delete_regulation'])->name('coa.regulation.delete_regulation');
-        
+
         //parameter
         Route::any('/parameter', [CoaController::class, 'parameter'])->name('coa.parameter.index')->middleware('auth');
         Route::any('/parameter/add_parameter', [CoaController::class, 'add_parameter'])->name('parameter.add_parameter');

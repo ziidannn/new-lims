@@ -265,7 +265,6 @@
             allowClear: true
         });
     });
-
 </script>
 <script>
     $(document).on('change', 'select[name="subject_id[]"]', function () {

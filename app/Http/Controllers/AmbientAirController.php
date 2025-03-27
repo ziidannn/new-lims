@@ -191,7 +191,10 @@ class AmbientAirController extends Controller
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
@@ -213,7 +216,7 @@ class AmbientAirController extends Controller
 
         return view('result.ambient_air.add_1', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
+            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
@@ -269,7 +272,10 @@ class AmbientAirController extends Controller
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
@@ -291,7 +297,7 @@ class AmbientAirController extends Controller
 
         return view('result.ambient_air.add_2', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
+            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
@@ -347,13 +353,16 @@ class AmbientAirController extends Controller
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '02')
+            ->where('no_sample', '03')
             ->latest()
             ->first();
         $results = collect();
@@ -369,7 +378,7 @@ class AmbientAirController extends Controller
 
         return view('result.ambient_air.add_3', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
+            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
@@ -425,13 +434,16 @@ class AmbientAirController extends Controller
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '02')
+            ->where('no_sample', '04')
             ->latest()
             ->first();
         $results = collect();
@@ -447,7 +459,7 @@ class AmbientAirController extends Controller
 
         return view('result.ambient_air.add_4', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
+            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
@@ -503,13 +515,16 @@ class AmbientAirController extends Controller
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '02')
+            ->where('no_sample', '05')
             ->latest()
             ->first();
         $results = collect();
@@ -525,7 +540,7 @@ class AmbientAirController extends Controller
 
         return view('result.ambient_air.add_5', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
+            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
@@ -581,13 +596,16 @@ class AmbientAirController extends Controller
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '02')
+            ->where('no_sample', '06')
             ->latest()
             ->first();
         $results = collect();
@@ -603,7 +621,7 @@ class AmbientAirController extends Controller
 
         return view('result.ambient_air.add_6', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
+            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
@@ -659,13 +677,16 @@ class AmbientAirController extends Controller
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '02')
+            ->where('no_sample', '07')
             ->latest()
             ->first();
         $results = collect();
@@ -681,7 +702,7 @@ class AmbientAirController extends Controller
 
         return view('result.ambient_air.add_7', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
+            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
@@ -737,13 +758,16 @@ class AmbientAirController extends Controller
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '02')
+            ->where('no_sample', '08')
             ->latest()
             ->first();
         $results = collect();
@@ -759,7 +783,7 @@ class AmbientAirController extends Controller
 
         return view('result.ambient_air.add_8', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
+            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
@@ -815,13 +839,16 @@ class AmbientAirController extends Controller
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '02')
+            ->where('no_sample', '09')
             ->latest()
             ->first();
         $results = collect();
@@ -837,7 +864,7 @@ class AmbientAirController extends Controller
 
         return view('result.ambient_air.add_9', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
+            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
@@ -893,13 +920,16 @@ class AmbientAirController extends Controller
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+            ->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '02')
+            ->where('no_sample', '010')
             ->latest()
             ->first();
         $results = collect();
@@ -915,7 +945,7 @@ class AmbientAirController extends Controller
 
         return view('result.ambient_air.add_10', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
+            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 }

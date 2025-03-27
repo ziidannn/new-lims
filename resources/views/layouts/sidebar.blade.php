@@ -100,7 +100,7 @@
                     <ul class="menu-sub">
                         @can('setting/manage_account/users.read')
                         <li class="menu-item {{ request()->segment(1) == 'coa' ? 'active' : '' }}">
-                            <a href="{{ route('coa.regulation.index') }}" class="menu-link">
+                            <a href="{{ route('coa.subject.index') }}" class="menu-link">
                                 <div data-i18n="coa">COA</div>
                             </a>
                         </li>
