@@ -2,35 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon; // Import Carbon
-use Illuminate\Support\Facades\File; // Import File
-use App\Models\Director;
-
 use Illuminate\Http\Request;
+use App\Models\Director;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class DirectorController extends Controller
 {
-
     public function index()
     {
-        $data = Director::all();
-        return view('director.index', compact('data'));
+        $director = Director::first();
+        return view('director.index', compact('director'));
     }
 
-    public function edit(Request $request, $id)
+    public function store(Request $request)
     {
-        $director = Director::findOrFail($id);
-
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'ttd' => ['nullable', 'mimes:png', 'max:12048'], // hanya PNG, max 12MB
+            'name' => 'required|string|max:255',
+            'ttd' => 'nullable|mimes:png,jpg,jpeg|max:12048', // Boleh kosong untuk update tanpa ganti gambar
         ]);
 
-        $fileName = $director->ttd; // Default ke ttd lama jika tidak ada update
+        // Cari director pertama (Jika sudah ada, update data ini)
+        $director = Director::first();
 
+        // Simpan tanda tangan jika ada file diunggah
+        $fileName = $director->ttd ?? null; // Pakai tanda tangan lama jika tidak diubah
         if ($request->hasFile('ttd')) {
             $ext = $request->ttd->getClientOriginalExtension();
-            $name = 'ttd_' . $id . '.' . $ext; // Format nama file: ttd_ID.png
+            $name = 'ttd_' . time() . '.' . $ext; // Nama unik
             $folderName = "storage/FILE/director_ttd/" . Carbon::now()->format('Y/m');
             $path = public_path($folderName);
 
@@ -38,18 +38,23 @@ class DirectorController extends Controller
                 File::makeDirectory($path, 0755, true);
             }
 
-            $upload = $request->ttd->move($path, $name);
-            if ($upload) {
-                $fileName = $folderName . "/" . $name;
-            }
+            $request->ttd->move($path, $name);
+            $fileName = $folderName . "/" . $name;
         }
 
-        $director->update([
-            'name' => $request->name,
-            'ttd' => $fileName,
-        ]);
+        // Jika director sudah ada, update. Jika belum, buat baru.
+        if ($director) {
+            $director->update([
+                'name' => $request->name,
+                'ttd' => $fileName,
+            ]);
+        } else {
+            $director = Director::create([
+                'name' => $request->name,
+                'ttd' => $fileName,
+            ]);
+        }
 
-        return redirect()->route('director.edit', $id)->with('msg', 'Data Director telah diperbarui!');
+        return redirect()->route('director.index')->with('msg', 'Director berhasil disimpan!');
     }
 }
-

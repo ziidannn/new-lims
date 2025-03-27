@@ -324,17 +324,23 @@ class ResultController extends Controller
                 ->get()
             : collect();
 
-        if ($parameters->contains(fn($parameter) => in_array($parameter->regulation_id, [13, 15])
-            || in_array($parameter->regulation_code, ['032', '034']))) {
+            if ($regulations->contains(fn($regulation) =>
+            in_array($regulation->id, [13, 15]) ||
+            ($regulation->subject && ($regulation->subject->id == 3 || $regulation->subject->code == '03'))
+        )) {
             $view = 'result.noise.add_new';
-        } elseif ($parameters->contains(fn($parameter) => in_array($parameter->regulation_id, [12, 14])
-            || in_array($parameter->regulation_code, ['031', '033']))) {
+        } elseif ($regulations->contains(fn($regulation) =>
+            in_array($regulation->id, [12, 14]) ||
+            ($regulation->subject && ($regulation->subject->id == 3 || $regulation->subject->code == '03'))
+        )) {
             $view = 'result.noise.add';
+        } else {
+            abort(404, 'Halaman tidak ditemukan');
         }
 
         return view($view, compact(
             'institute', 'parameters', 'regulations', 'subjects',
-            'samplingTimeRegulations', 'results', 'subject', 'instituteSubject', 'sampling'
+            'samplingTimeRegulations', 'results', 'subject', 'instituteSubject'
         ));
     }
 
@@ -425,17 +431,23 @@ class ResultController extends Controller
             ->get();
         $results = Result::where('sampling_id', $samplings->id)->get();
 
-        if ($parameters->contains(fn($parameter) => in_array($parameter->regulation_id, [13, 15])
-            || in_array($parameter->regulation_code, ['032', '034']))) {
+        if ($regulations->contains(fn($regulation) =>
+            in_array($regulation->id, [13, 15]) ||
+            ($regulation->subject && ($regulation->subject->id == 3 || $regulation->subject->code == '03'))
+        )) {
             $view = 'result.noise.add_new';
-        } elseif ($parameters->contains(fn($parameter) => in_array($parameter->regulation_id, [12, 14])
-            || in_array($parameter->regulation_code, ['031', '033']))) {
+        } elseif ($regulations->contains(fn($regulation) =>
+            in_array($regulation->id, [12, 14]) ||
+            ($regulation->subject && ($regulation->subject->id == 3 || $regulation->subject->code == '03'))
+        )) {
             $view = 'result.noise.add';
+        } else {
+            abort(404, 'Halaman tidak ditemukan');
         }
 
         return view($view, compact(
             'institute', 'parameters', 'regulations', 'subjects',
-            'samplingTimeRegulations', 'results', 'subject', 'instituteSubject', 'sampling'
+            'samplingTimeRegulations', 'results', 'subject', 'instituteSubject'
         ));
     }
 
@@ -503,7 +515,7 @@ class ResultController extends Controller
 
         return view('result.odor.add', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling'
+            'regulations', 'subject', 'instituteSubject'
         ));
     }
 
@@ -570,7 +582,7 @@ class ResultController extends Controller
 
         return view('result.illumination.add', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'fieldConditions'
+            'regulations', 'subject', 'instituteSubject'
         ));
     }
 
@@ -703,7 +715,7 @@ class ResultController extends Controller
 
         return view('result.stationary_stack.add', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'fieldConditions'
+            'regulations', 'subject', 'instituteSubject'
         ));
     }
 

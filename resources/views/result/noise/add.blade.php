@@ -116,19 +116,19 @@
                                         value="{{ $instituteSubject->subject->name }}" readonly>
                                 </td>
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
-                                        value="{{ old('sampling_date', $sampling->sampling_date ?? '') }}"></td>
+                                    value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
+                                        value="{{ old('sampling_time', $samplings->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
-                                        value="Grab/24 Hours"></td>
+                                        value="Grab" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
-                                        value="{{ old('date_received', $sampling->date_received ?? '') }}"></td>
+                                        value="{{ old('date_received', $institute->sample_analysis_date ?? '') }}"></td>
                                 <td>
                                     <input type="date" class="form-control text-center" name="itd_start"
-                                        value="{{ old('itd_start', $sampling->itd_start ?? '') }}">
+                                        value="{{ old('itd_start', $institute->sample_analysis_date ?? '') }}">
                                     <span class="mx-2">to</span>
                                     <input type="date" class="form-control text-center" name="itd_end"
-                                        value="{{ old('itd_end', $sampling->itd_end ?? '') }}">
+                                        value="{{ old('itd_end', $institute->report_date ?? '') }}">
                                 </td>
                             </tr>
                         </tbody>
@@ -172,76 +172,84 @@
                             <th class="text-center"><b>Methods</b></th>
                             <th class="text-center"><b>Action</b></th>
                         </tr>
-                        @foreach($parameters as $key => $parameter)
-                        @if(in_array($parameter->regulation_id, [12, 14])
-                        || in_array($parameter->regulation_code,
-                        ['031', '033']))
-                        @foreach(['Upwind', 'Downwind'] as $index => $location)
-                        <tr>
-                            <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
-                                @csrf
-                                <td>{{ $key * 2 + $index + 1 }}</td>
-                                <td>
-                                    <input type="text" class="form-control text-center" name="location[{{ $key }}]"
-                                        value="{{ $location }}" readonly>
-                                </td>
-                                <td>
-                                    @for($i = 1; $i <= 7; $i++) <input type="text" class="form-control text-center"
-                                        name="noise[{{ $key }}][{{ $i }}]" value="L{{ $i }}" readonly>
-                                        @endfor
-                                </td>
-                                <td>
-                                    @for($i = 1; $i <= 7; $i++) <input type="text" class="form-control text-center"
-                                        name="time[{{ $key }}][{{ $i }}]" value="T{{ $i }}" readonly>
-                                        @endfor
-                                </td>
-                                <td>
-                                    @for($i = 1; $i <= 7; $i++)
-                                        @php
-                                            $noiseLabel = "L$i";
-                                            $timeLabel = "T$i";
+                        @foreach($regulations as $key => $regulation)
+                            @if(in_array($regulation->id, [12, 14]) ||
+                                ($regulation->subject && ($regulation->subject->id == 3 || $regulation->subject->code == '03')))
 
-                                            $result = $results->where('parameter_id', $parameter->id)
-                                                            ->where('location', $location)
-                                                            ->where('noise', $noiseLabel)
-                                                            ->where('time', $timeLabel)
-                                                            ->first();
-                                            $leqValue = $result ? $result->leq : '';
-                                        @endphp
-                                        <input type="text" class="form-control text-center"
-                                            name="leq[{{ $key }}][{{ $i }}]"
-                                            value="{{ old("leq.$key.$i", $leqValue) }}">
-                                    @endfor
-                                </td>
-                                <td><input type="text" class="form-control text-center" name="ls"
-                                    value="{{ old('ls', optional($results->where('parameter_id', $parameter->id)->where('location', $location)->first())->ls) }}"></td>
-                                <td><input type="text" class="form-control text-center" name="lm"
-                                    value="{{ old('lm', optional($results->where('parameter_id', $parameter->id)->where('location', $location)->first())->lm) }}"></td>
-                                <td><input type="text" class="form-control text-center" name="lsm"
-                                    value="{{ old('lsm', optional($results->where('parameter_id', $parameter->id)->where('location', $location)->first())->lsm) }}"></td>
-                                <td>
-                                    <input type="text" class="form-control text-center"
-                                        name="regulatory_standard[{{ $key }}]"
-                                        value="{{ old("regulatory_standard.$key", optional($results->where('parameter_id', $parameter->id)->where('location', $location)->first())->regulatory_standard) }}">
-                                </td>
-                                <td>
-                                    <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
-                                    <input type="text" class="form-control text-center"
-                                        name="unit[{{ $parameter->id }}]" value="{{ $parameter->unit ?? '' }}" readonly>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control text-center"
-                                        name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}"
-                                        readonly>
-                                </td>
-                                <td>
-                                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
-                                    name="save">Save</button>
-                                </td>
-                            </form>
-                        </tr>
-                        @endforeach
-                        @endif
+                                @foreach(['Upwind', 'Downwind'] as $index => $location)
+                                <tr>
+                                    <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
+                                        @csrf
+                                        <td>{{ $key * 2 + $index + 1 }}</td>
+                                        <td>
+                                            <input type="text" class="form-control text-center"
+                                                name="location[{{ $key }}]" value="{{ $location }}" readonly>
+                                        </td>
+                                        <td>
+                                            @for($i = 1; $i <= 7; $i++)
+                                                <input type="text" class="form-control text-center"
+                                                    name="noise[{{ $key }}][{{ $i }}]" value="L{{ $i }}" readonly>
+                                            @endfor
+                                        </td>
+                                        <td>
+                                            @for($i = 1; $i <= 7; $i++)
+                                                <input type="text" class="form-control text-center"
+                                                    name="time[{{ $key }}][{{ $i }}]" value="T{{ $i }}" readonly>
+                                            @endfor
+                                        </td>
+                                        <td>
+                                            @for($i = 1; $i <= 7; $i++)
+                                                @php
+                                                    $noiseLabel = "L$i";
+                                                    $timeLabel = "T$i";
+
+                                                    $result = $results->where('regulation_id', $regulation->id)
+                                                                    ->where('location', $location)
+                                                                    ->where('noise', $noiseLabel)
+                                                                    ->where('time', $timeLabel)
+                                                                    ->first();
+                                                    $leqValue = $result ? $result->leq : '';
+                                                @endphp
+                                                <input type="text" class="form-control text-center"
+                                                    name="leq[{{ $key }}][{{ $i }}]" value="{{ old("leq.$key.$i", $leqValue) }}">
+                                            @endfor
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center" name="ls"
+                                                value="{{ old('ls', optional($results->where('regulation_id', $regulation->id)->where('location', $location)->first())->ls) }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center" name="lm"
+                                                value="{{ old('lm', optional($results->where('regulation_id', $regulation->id)->where('location', $location)->first())->lm) }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center" name="lsm"
+                                                value="{{ old('lsm', optional($results->where('regulation_id', $regulation->id)->where('location', $location)->first())->lsm) }}">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center"
+                                                name="regulatory_standard[{{ $key }}]"
+                                                value="{{ old("regulatory_standard.$key", optional($results->where('regulation_id', $regulation->id)->where('location', $location)->first())->regulatory_standard) }}">
+                                        </td>
+                                        <td>
+                                            <input type="hidden" name="regulation_id[]" value="{{ $regulation->id }}">
+                                            <input type="text" class="form-control text-center"
+                                                name="unit[{{ $regulation->id }}]" value="{{ $regulation->unit ?? '' }}" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control text-center"
+                                                name="method[{{ $regulation->id }}]" value="{{ $regulation->method ?? '' }}" readonly>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">
+                                                Save
+                                            </button>
+                                        </td>
+                                    </form>
+                                </tr>
+                                @endforeach
+
+                            @endif
                         @endforeach
                     </table>
                 </div>
