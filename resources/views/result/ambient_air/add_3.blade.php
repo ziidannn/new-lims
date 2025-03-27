@@ -163,14 +163,17 @@
                         </thead>
                         <tbody>
                             <tr>
+                                @php
+                                    $samplingData = $sampling ? $sampling->where('no_sample', '03')->where('institute_id', $institute->id)->first() : null;
+                                @endphp
                                 <td>
                                     <input type="text" class="form-control text-center" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $sampling->no_sample ?? $sampleNo) }}">
+                                        value="{{ old('no_sample', '03') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
-                                        value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
+                                        value="{{ old('sampling_location', $samplingData->sampling_location ?? '') }}"></td>
                                 <td>
                                     <input type="hidden" name="institute_id" value="{{ $institute->id }}">
                                     <input type="hidden" name="institute_subject_id"
@@ -181,7 +184,7 @@
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
+                                        value="{{ old('sampling_time', $samplingData->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab/24 Hours" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
@@ -256,14 +259,14 @@
                                 <td>
                                     @foreach ($samplingTimes as $samplingTime)
                                         @php
-                                            $key = "{$parameter->id}-{$samplingTime->samplingTime->id}-{$samplingTime->regulationStandards->id}";
-                                            $resultData = $results[$key] ?? null; // Ambil hanya data dari sampling_id yang aktif
+                                            $samplingTimeId = optional($samplingTime->samplingTime)->id;
+                                            $regulationStandardId = optional($samplingTime->regulationStandards)->id;
+                                            $key = "{$parameter->id}-{$samplingTimeId}-{$regulationStandardId}";
+                                            $resultData = $results[$key] ?? collect();
                                         @endphp
-
                                         <input type="text" class="form-control text-center testing-result"
                                             name="testing_result[{{ $parameter->id }}][]"
-                                            value="{{ $sampling ? ($resultData ? $resultData->first()->testing_result : '') : '' }}"
-                                            required>
+                                            value="{{ $resultData->isNotEmpty() ? $resultData->first()->testing_result : '' }}" required>
                                     @endforeach
                                 </td>
                                 <td>
