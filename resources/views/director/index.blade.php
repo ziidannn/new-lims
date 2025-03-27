@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-md-12">
             @if(session('msg'))
-            <div class="alert alert-primary alert-dismissible" role="alert">
+            <div class="alert alert-success alert-dismissible" role="alert">
                 {{ session('msg') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
