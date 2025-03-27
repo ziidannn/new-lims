@@ -104,7 +104,15 @@ class ParameterSeeder extends Seeder
                 "unit" => "µg/Nm3",
                 "method" => "IK-7.4.22 (Spectrophotometry)"
             ],
-
+// --------------------------------------------S U J E C T  C O D E  0 2--------------------------------------------
+            // Parameter 11
+            // [
+            //     "id" => "12",
+            //     "subject_id" => "2",
+            //     "name" => "Sulphur Dioxide (SO2)*",
+            //     "unit" => "mg/m3(PSD/KTD)",
+            //     "method" => "IK-7.4.3 (Spectrophotometry)"
+            // ],
 //             // Parameter for Regulation code 011
 //             [
 //                 "id" => "1",

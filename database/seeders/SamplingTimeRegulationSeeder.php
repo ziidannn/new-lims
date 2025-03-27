@@ -153,8 +153,14 @@ class SamplingTimeRegulationSeeder extends Seeder
                 "sampling_time_id" => "1",
                 "regulation_standard_id" => "19",
             ],
-
-
+// --------------------------------------------S U J E C T  C O D E  0 2--------------------------------------------
+            // parameter 12
+            [ 
+                "id" => "19",
+                "parameter_id" => "11",
+                "sampling_time_id" => "1",
+                "regulation_standard_id" => "19",
+            ],
 // parameter 1-9 regulation code 011
 //             [ // 1
 //                 "id" => "1",
