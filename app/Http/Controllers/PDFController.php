@@ -124,8 +124,8 @@ class PDFController extends Controller
             ->pluck('regulation_id')
             ->unique();
 
-        // Mengambil parameter yang terkait dengan daftar regulation_id
-        $parameters = Parameter::whereIn('regulation_id', $regulationsIds)->get();
+        // Mengambil parameter yang terkait langsung dengan daftar subject_id
+        $parameters = Parameter::whereIn('subject_id', $instituteSubjects->pluck('subject_id'))->get();
         
         // Mengambil data SamplingTimeRegulation yang berkaitan dengan parameter yang telah difilter
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parameters->pluck('id'))
@@ -145,7 +145,6 @@ class PDFController extends Controller
         // Mengambil data regulasi berdasarkan regulation_id yang telah difilter
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
 
-        // Membuat PDF menggunakan tampilan Blade 'pdf.ambient_air'
         $pdf = Pdf::loadView('pdf.ambient_air', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'instituteSubjects', 'sampling', 'fieldCondition', 'samplings', 'regulations'
@@ -153,8 +152,6 @@ class PDFController extends Controller
 
         // Mengaktifkan opsi PHP di dalam tampilan PDF
         $pdf->set_option("isPhpEnabled", true);
-        
-        // Mengembalikan PDF sebagai stream dengan nama file yang sesuai
         return $pdf->stream("Ambient_Air_Report{$id}.pdf");
     }
 
