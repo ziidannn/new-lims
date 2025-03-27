@@ -91,8 +91,8 @@
                                 <th class="text-center"><b>Sample No.</b></th>
                                 <th class="text-center"><b>Sampling Location</b></th>
                                 <th class="text-center"><b>Sample Description</b></th>
-                                <th class="text-center"><b>Date</b></th>
-                                <th class="text-center"><b>Time</b></th>
+                                <th class="text-center"><b>Sampling Date</b></th>
+                                <th class="text-center"><b>Sampling Time</b></th>
                                 <th class="text-center"><b>Sampling Method</b></th>
                                 <th class="text-center"><b>Date Received</b></th>
                                 <th class="text-center"><b>Interval Testing Date</b></th>
@@ -116,19 +116,19 @@
                                         value="{{ $instituteSubject->subject->name }}" readonly>
                                 </td>
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
-                                        value="{{ old('sampling_date', $sampling->sampling_date ?? '') }}"></td>
+                                    value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
+                                        value="{{ old('sampling_time', $samplings->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
-                                        value="Grab/24 Hours"></td>
+                                        value="Grab" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
-                                        value="{{ old('date_received', $sampling->date_received ?? '') }}"></td>
+                                        value="{{ old('date_received', $institute->sample_analysis_date ?? '') }}"></td>
                                 <td>
                                     <input type="date" class="form-control text-center" name="itd_start"
-                                        value="{{ old('itd_start', $sampling->itd_start ?? '') }}">
+                                        value="{{ old('itd_start', $institute->sample_analysis_date ?? '') }}">
                                     <span class="mx-2">to</span>
                                     <input type="date" class="form-control text-center" name="itd_end"
-                                        value="{{ old('itd_end', $sampling->itd_end ?? '') }}">
+                                        value="{{ old('itd_end', $institute->report_date ?? '') }}">
                                 </td>
                             </tr>
                         </tbody>
@@ -157,9 +157,9 @@
         <div class="col-xl-12">
             <div class="card-body">
                 <div class="row">
-                    @if($parameters->contains(function($parameter) {
-                    return in_array($parameter->regulation_id, [13, 15])
-                    || in_array($parameter->regulation_code, ['032', '034']);
+                    @if($regulations->contains(function($regulation) {
+                        return in_array($regulation->id, [13, 15])
+                            || ($regulation->subject && ($regulation->subject->id == 3 || $regulation->subject->code == '03'));
                     }))
                     <table class="table table-bordered">
                         <tr>
@@ -172,42 +172,41 @@
                             <th class="text-center"><b>Methods</b></th>
                         </tr>
                         @foreach($parameters as $key => $parameter)
-    @php
-        $result = $results[$parameter->id] ?? ['location' => [], 'testing_result' => [], 'time' => [], 'regulatory_standard' => []];
-    @endphp
-    @for($i = 0; $i < 5; $i++)
-        <tr>
-            <td>{{ ($key * 5) + $i + 1 }}</td>
-            <td>
-                <input type="text" class="form-control text-center" name="location[]"
-                value="{{ old('location.' . (($key * 5) + $i), $result['location'][$i] ?? '') }}">
-            </td>
-            <td>
-                <input type="text" class="form-control text-center" name="testing_result[]"
-                value="{{ old('testing_result.' . (($key * 5) + $i), $result['testing_result'][$i] ?? '') }}">
-            </td>
-            <td>
-                <input type="text" class="form-control text-center" name="time[]"
-                value="{{ old('time.' . (($key * 5) + $i), $result['time'][$i] ?? '') }}">
-            </td>
-            <td>
-                <input type="text" class="form-control text-center" name="regulatory_standard[]"
-                value="{{ old('regulatory_standard.' . (($key * 5) + $i), $result['regulatory_standard'][$i] ?? '') }}">
-            </td>
-            <td>
-                <input type="text" class="form-control text-center"
-                name="unit[{{ $parameter->id }}]"
-                value="{{ old('unit.' . $parameter->id, $parameter->unit ?? '') }}" readonly>
-            </td>
-            <td>
-                <input type="text" class="form-control text-center"
-                name="method[{{ $parameter->id }}]"
-                value="{{ old('method.' . $parameter->id, $parameter->method ?? '') }}" readonly>
-            </td>
-        </tr>
-    @endfor
-@endforeach
-
+                            @php
+                                $result = $results[$parameter->id] ?? ['location' => [], 'testing_result' => [], 'time' => [], 'regulatory_standard' => []];
+                            @endphp
+                            @for($i = 0; $i < 5; $i++)
+                                <tr>
+                                    <td>{{ ($key * 5) + $i + 1 }}</td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="location[]"
+                                        value="{{ old('location.' . (($key * 5) + $i), $result['location'][$i] ?? '') }}">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="testing_result[]"
+                                        value="{{ old('testing_result.' . (($key * 5) + $i), $result['testing_result'][$i] ?? '') }}">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="time[]"
+                                        value="{{ old('time.' . (($key * 5) + $i), $result['time'][$i] ?? '') }}">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="regulatory_standard[]"
+                                        value="{{ old('regulatory_standard.' . (($key * 5) + $i), $result['regulatory_standard'][$i] ?? '') }}">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center"
+                                        name="unit[{{ $parameter->id }}]"
+                                        value="{{ old('unit.' . $parameter->id, $parameter->unit ?? '') }}" readonly>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center"
+                                        name="method[{{ $parameter->id }}]"
+                                        value="{{ old('method.' . $parameter->id, $parameter->method ?? '') }}" readonly>
+                                    </td>
+                                </tr>
+                            @endfor
+                        @endforeach
                     </table>
                     @endif
                 </div>
