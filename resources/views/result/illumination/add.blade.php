@@ -160,45 +160,45 @@
                     <table class="table table-bordered" id="parameterTable">
                         <tr>
                             <th class="text-center"><b>No</b></th>
-                            <th class="text-center"><b>Parameters</b></th>
+                            <th class="text-center"><b>Sampling Location</b></th>
                             <th class="text-center"><b>Testing Result</b></th>
+                            <th class="text-center"><b>Time</b></th>
                             <th class="text-center"><b>Regulatory Standard</b></th>
                             <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
                         </tr>
-                        @foreach ($parameters as $key => $parameter)
-                            <tr>
-                                <td>{{ $key + 1 }}</td>
-                                <td>
-                                    <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
-                                    <input type="text" class="form-control text-center" value="{{ $parameter->name }}" readonly>
-                                </td>
-                                <td>
-                                    @php
-                                        $regulationStandard = $samplingTimeRegulations->where('parameter_id', $parameter->id)->first()->regulationStandards ?? null;
-                                        $resultKey = $parameter->id . '-' . ($regulationStandard->id ?? 'null');
-                                        $testingResult = $results[$resultKey]->testing_result ?? '';
-                                    @endphp
-                                    <input type="text" class="form-control text-center testing-result"
-                                        name="testing_result[{{ $parameter->id }}]"
-                                        value="{{ old('testing_result.' . $parameter->id, $testingResult) }}" required>
-                                </td>
-                                <td>
-                                    @if ($regulationStandard)
-                                        <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}]" value="{{ $regulationStandard->id }}">
-                                        <input type="text" class="form-control text-center" value="{{ $regulationStandard->title }}" readonly>
-                                    @endif
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control text-center" name="unit[{{ $parameter->id }}]"
-                                        value="{{ $parameter->unit ?? '' }}" readonly>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control text-center" name="method[{{ $parameter->id }}]"
-                                        value="{{ $parameter->method ?? '' }}" readonly>
-                                </td>
-                            </tr>
-                        @endforeach
+                            @php $key = 0; @endphp
+                            @for($i = 0; $i < 5; $i++)
+                                <tr>
+                                    <td>{{ $key * 5 + $i + 1 }}</td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="location[]"
+                                        value="{{ old('location') }}">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="testing_result[]"
+                                        value="{{ old('testing_result') }}">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="time[]"
+                                        value="{{ old('time') }}">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center" name="regulatory_standard[]"
+                                        value="{{ old('regulatory_standard') }}">
+                                    </td>
+                                    @endfor
+                                    <td>
+                                        <input type="text" class="form-control text-center"
+                                        name="unit"
+                                        value="{{ old('unit', 'Lux') }}" readonly>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control text-center"
+                                        name="method"
+                                        value="{{ old('method', 'SNI 7062:2019') }}" readonly>
+                                    </td>
+                                </tr>
                     </table>
                                 <div class="card-footer text-end">
                                     <button class="btn btn-primary me-1" type="submit">Save</button>

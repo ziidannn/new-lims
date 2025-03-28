@@ -103,7 +103,7 @@
                                 <td><input type="text" class="form-control text-center me-1" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
-                                        style="width: 60px;" value="{{ old('no_sample', $sampling->no_sample ?? '') }}">
+                                        style="width: 60px;" value="{{ old('no_sample', $samplings->first()->no_sample ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center fst-italic"
                                         name="sampling_location" value="{{ old('sampling_location') }} See Table"
@@ -118,7 +118,7 @@
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                     value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $samplings->sampling_time ?? '') }}"></td>
+                                        value="{{ old('sampling_time', $samplings->first()->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
@@ -178,7 +178,7 @@
 
                                 @foreach(['Upwind', 'Downwind'] as $index => $location)
                                 <tr>
-                                    <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
+                                    <form action="{{ route('result.noise.add', $institute->id) }}" method="POST">
                                         @csrf
                                         <td>{{ $key * 2 + $index + 1 }}</td>
                                         <td>
@@ -231,14 +231,19 @@
                                                 name="regulatory_standard[{{ $key }}]"
                                                 value="{{ old("regulatory_standard.$key", optional($results->where('regulation_id', $regulation->id)->where('location', $location)->first())->regulatory_standard) }}">
                                         </td>
+                                        @php
+                                            $parameter = $parameters->where('subject_id', $subject->id)
+                                                                    ->first();
+                                        @endphp
                                         <td>
-                                            <input type="hidden" name="regulation_id[]" value="{{ $regulation->id }}">
                                             <input type="text" class="form-control text-center"
-                                                name="unit[{{ $regulation->id }}]" value="{{ $regulation->unit ?? '' }}" readonly>
+                                                name="unit[{{ $key }}]"
+                                                value="{{ old("unit.$key", $parameter->unit ?? '') }}" readonly>
                                         </td>
                                         <td>
                                             <input type="text" class="form-control text-center"
-                                                name="method[{{ $regulation->id }}]" value="{{ $regulation->method ?? '' }}" readonly>
+                                                name="method[{{ $key }}]"
+                                                value="{{ old("method.$key", $parameter->method ?? '') }}" readonly>
                                         </td>
                                         <td>
                                             <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">
@@ -248,7 +253,6 @@
                                     </form>
                                 </tr>
                                 @endforeach
-
                             @endif
                         @endforeach
                     </table>

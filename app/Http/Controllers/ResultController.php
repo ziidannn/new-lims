@@ -307,6 +307,7 @@ class ResultController extends Controller
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -339,8 +340,8 @@ class ResultController extends Controller
         }
 
         return view($view, compact(
-            'institute', 'parameters', 'regulations', 'subjects',
-            'samplingTimeRegulations', 'results', 'subject', 'instituteSubject'
+            'institute', 'parameters', 'regulations', 'subjects', 'samplingTimeRegulations',
+            'results', 'subject', 'instituteSubject', 'samplingNoise', 'samplings'
         ));
     }
 
@@ -648,7 +649,7 @@ class ResultController extends Controller
 
         return view('result.heat_stress.add', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'fieldConditions'
+            'regulations', 'subject', 'instituteSubject'
         ));
     }
 

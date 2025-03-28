@@ -206,12 +206,15 @@
                             <th class="text-center"><b>Methods</b></th>
                             <th class="text-center"><b>Action</b></th>
                         </tr>
-                        @foreach($parameters as $key => $parameter)
+                        @php $parameterNumber = 1; @endphp
+                        @foreach ($parameters->filter(function($parameter) {
+                            return $parameter->subject_id == 1 || $parameter->code_subject == '01' || $parameter->subjects->name == 'Ambient Air';
+                        }) as $parameter)
                         <tr>
                             <form class="card" action="{{ route('result.ambient_air.add_4', $institute->id) }}"
                                 method="POST">
                                 @csrf
-                                <td>{{ $key + 1 }}</td>
+                                <td>{{ $parameterNumber++ }}</td>
                                 <td>
                                     <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
                                     <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
