@@ -22,6 +22,7 @@ class Sampling extends Model
         'date_received',
         'itd_start',
         'itd_end',
+        'show_logo',
     ];
 
     public function institute()

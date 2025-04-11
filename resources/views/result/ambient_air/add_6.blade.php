@@ -300,6 +300,35 @@
         </div>
     </form>
 </div>
+
+<div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
+    <form class="card" action="{{ route('result.ambient_air.add_6', $institute->id) }}" method="POST">
+        @csrf
+        <div class="card">
+            <div class="card-body">
+                <label class="form-label d-block"><i>Do you want to give this sample a logo?</i></label>
+                @php
+                    $samplingData = $sampling ? $sampling->where('no_sample', '06')->where('institute_id',
+                    $institute->id)->first() : null;
+                @endphp
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="showLogoYes" name="show_logo" value="1"
+                        {{ old('show_logo', $samplingData->show_logo ?? false) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="showLogoYes"><b>Yes</b></label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="showLogoNo" name="show_logo" value="0"
+                        {{ old('show_logo', $samplingData->show_logo ?? false) ? '' : 'checked' }}>
+                    <label class="form-check-label" for="showLogoNo"><b>No</b></label>
+                </div>
+                <button class="btn btn-primary btn-sm mt-1 custom-button"
+                    type="submit" name="save_all">Save</button>
+                <input type="hidden" name="save_all" id="save_all" value="1">
+            </div>
+        </div>
+    </form>
+</div>
+
 </div>
 </div>
 @endsection

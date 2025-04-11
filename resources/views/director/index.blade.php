@@ -30,7 +30,7 @@
                             <input type="file" class="form-control p-2" id="ttd" name="ttd" accept="image/png, image/jpeg">
                             @if(isset($director->ttd))
                                 <br>
-                                <img src="{{ asset($director->ttd) }}" width="120px" class="mt-2" alt="Signature">
+                                <img src="{{ asset($director->ttd) }}" width="120px" class="mt-2" alt="No Signature">
                             @endif
                         </div>
 
@@ -51,6 +51,7 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Signature</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -58,9 +59,20 @@
                                 <td>{{ $director->name ?? 'No Data' }}</td>
                                 <td>
                                     @if(isset($director->ttd))
-                                        <img src="{{ asset($director->ttd) }}" width="100px" alt="Signature">
+                                        <img src="{{ asset($director->ttd) }}" width="100px" alt="No Signature">
                                     @else
                                         No Signature
+                                    @endif
+                                </td>
+                                <td>
+                                    @if(isset($director->id))
+                                        <form action="{{ route('director.destroy', $director->id) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="menu-icon tf-icons bx bx-trash"></i>
+                                            </button>
+                                        </form>
                                     @endif
                                 </td>
                             </tr>
@@ -68,8 +80,24 @@
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 @endsection
+<script>
+    $(document).ready(function() {
+        $('#example').DataTable({
+            "columns": [{
+                    "data": "name"
+                },
+                {
+                    "data": "ttd"
+                },
+                {
+                    "data": null,
+                    "defaultContent": "<button class='btn btn-danger'>Delete</button>"
+                }
+            ]
+        });
+    });
+</script>

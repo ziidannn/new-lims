@@ -25,6 +25,7 @@ return new class extends Migration
             $table->date('date_received')->nullable();
             $table->date('itd_start')->nullable();
             $table->date('itd_end')->nullable();
+            $table->boolean('show_logo')->default(false);
             $table->timestamp('updated_at')->nullable();
             $table->timestamp('created_at')->nullable();
         });

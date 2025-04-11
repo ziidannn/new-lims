@@ -152,8 +152,7 @@ class ResultController extends Controller
         ));
     }
 
-    public function addWorkplaceAir(Request $request, $id)
-    {
+    public function addWorkplaceAir(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -221,8 +220,7 @@ class ResultController extends Controller
         ));
     }
 
-    public function addNoise(Request $request, $id)
-    {
+    public function addNoise(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $samplingNoise = InstituteSubject::where('subject_id', 3)->first();
@@ -345,8 +343,7 @@ class ResultController extends Controller
         ));
     }
 
-    public function addNoiseNew(Request $request, $id)
-    {
+    public function addNoiseNew(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $samplings = InstituteSubject::where('subject_id', 3)->latest()->first();
@@ -452,8 +449,7 @@ class ResultController extends Controller
         ));
     }
 
-    public function addOdor(Request $request, $id)
-    {
+    public function addOdor(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
 

@@ -232,8 +232,7 @@
                                                 value="{{ old("regulatory_standard.$key", optional($results->where('regulation_id', $regulation->id)->where('location', $location)->first())->regulatory_standard) }}">
                                         </td>
                                         @php
-                                            $parameter = $parameters->where('subject_id', $subject->id)
-                                                                    ->first();
+                                            $parameter = $parameters->where('subject_id', $subject->id)->first();
                                         @endphp
                                         <td>
                                             <input type="text" class="form-control text-center"
@@ -266,7 +265,6 @@
             </div>
         </div>
     </form>
-
 </div>
 
 </div>
