@@ -93,25 +93,15 @@ class CustomerController extends Controller
     public function data(Request $request)
     {
         $data = Customer::all();
-        return DataTables::of($data)
-            ->filter(function ($instance) use ($request) {
-                if (!empty($request->get('select_description'))) {
-                    $instance->whereHas('Subjects', function ($q) use ($request) {
-                        $q->where('subjects.id', $request->get('select_description'));
-                    });
-                }
-                if (!empty($request->get('search'))) {
-                    $search = $request->get('search');
-                    $instance->where(function ($w) use ($search) {
-                        $w->orWhere('no_sample', 'LIKE', "%$search%")
-                            ->orWhere('date', 'LIKE', "%$search%")
-                            ->orWhereHas('Subjects', function ($q) use ($search) {
-                                $q->where('name', 'LIKE', "%$search%");
-                            });
-                    });
-                }
-            })
-            ->make(true);
+
+        if (!empty($search)) {
+            $data->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('contact_name', 'like', "%{$search}%");
+            });
+        }
+
+        return DataTables::of($data)->make(true);
     }
 
     /**

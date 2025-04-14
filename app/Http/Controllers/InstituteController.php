@@ -18,8 +18,8 @@ class InstituteController extends Controller
     public function index(Request $request)
     {
         $data = Sampling::all();
-        $description = Subject::all();
-        return view('institute.index', compact('data', 'description'));
+        $subjects = Subject::all();
+        return view('institute.index', compact('data', 'subjects'));
     }
 
     public function create(Request $request)
@@ -125,7 +125,7 @@ class InstituteController extends Controller
     //Edit institute
     public function edit(Request $request, $id)
     {
-        $data = Institute::with('customer', 'Subjects')->findOrFail($id);
+        $data = Institute::with('customer', 'Subjects.instituteRegulations.regulation')->findOrFail($id);
         $description = Subject::orderBy('name')->get();
         $customer = Customer::all();
 
@@ -148,14 +148,18 @@ class InstituteController extends Controller
                 'report_date' => $request->report_date,
             ]);
 
-            // **1. Hapus data lama di institute_regulations dulu**
             InstituteRegulation::whereIn(
                 'institute_subject_id',
                 InstituteSubject::where('institute_id', $data->id)->pluck('id')
             )->delete();
 
-            // **2. Setelah institute_regulations dihapus, hapus institute_subjects**
-            InstituteSubject::where('institute_id', $data->id)->delete();
+            $instituteSubjectIds = InstituteSubject::where('institute_id', $data->id)->pluck('id');
+
+            FieldCondition::whereIn('institute_subject_id', $instituteSubjectIds)->delete();
+
+            InstituteRegulation::whereIn('institute_subject_id', $instituteSubjectIds)->delete();
+
+            InstituteSubject::whereIn('id', $instituteSubjectIds)->delete();
 
             if ($request->has('subject_id')) {
                 foreach ($request->subject_id as $subjectId) {
@@ -166,7 +170,7 @@ class InstituteController extends Controller
                     ]);
 
                     // Ambil regulation_id berdasarkan subject_id
-                    $regulationIds = Regulation::where('subject_id', $subjectId)->pluck('id')->toArray();
+                    $regulationIds = $request->input('regulation_id') ?? [];
 
                     // Simpan regulation_id ke tabel institute_regulations
                     foreach ($regulationIds as $regulationId) {
@@ -178,16 +182,16 @@ class InstituteController extends Controller
                 }
             }
 
-            return redirect()->route('institute.index')->with('msg', 'Data '. $request->no_coa .' updated successfully');
+            return redirect()->route('institute.index')->with('msg', 'Data ' . $request->no_coa . ' updated successfully');
         }
 
         // Ambil regulasi berdasarkan subject yang sudah ada di institute
         $regulation = Regulation::whereIn('subject_id', $data->Subjects->pluck('id')->toArray())->get();
 
         return view('institute.edit', compact(
-            'data', 'description', 'regulation', 'customer'));
+            'data', 'description', 'regulation', 'customer'
+        ));
     }
-
 
     public function delete(Request $request)
     {
@@ -221,35 +225,40 @@ class InstituteController extends Controller
     //Data institute
     public function data(Request $request)
     {
-    $data = Institute::with(['Subjects' => function ($query) {
-            $query->select('subjects.id', 'subjects.name');
-        }, 'customer']) // Tambahkan relasi customer
+        // Mulai dengan query builder, jangan gunakan ->get()
+        $data = Institute::with([
+            'Subjects' => function ($query) {
+                $query->select('subjects.id', 'subjects.name');
+            },
+            'customer'
+        ])
         ->select('*')
-        ->orderBy("id")
-        ->get();
+        ->orderBy("id");
 
-    return DataTables::of($data)
-        ->filter(function ($instance) use ($request) {
-            if (!empty($request->get('select_description'))) {
-                $instance->whereHas('Subjects', function ($q) use ($request) {
-                    $q->where('subjects.id', $request->get('select_description'));
-                });
-            }
-            if (!empty($request->get('search'))) {
-                $search = $request->get('search');
-                $instance->where(function ($w) use ($search) {
-                    $w->orWhere('no_sample', 'LIKE', "%$search%")
-                        ->orWhere('date', 'LIKE', "%$search%")
-                        ->orWhereHas('Subjects', function ($q) use ($search) {
-                            $q->where('name', 'LIKE', "%$search%");
-                        })
-                        ->orWhereHas('customer', function ($q) use ($search) {
-                            $q->where('name', 'LIKE', "%$search%"); // Filter berdasarkan nama customer
+        // Menambahkan filter pencarian (search)
+        return DataTables::of($data)
+            ->filter(function ($query) use ($request) {
+                // Filter berdasarkan 'select_subject'
+                if (!empty($request->get('select_subject'))) {
+                    $query->whereHas('Subjects', function ($q) use ($request) {
+                        $q->where('subjects.id', $request->get('select_subject'));
+                    });
+                }
+
+                // Filter pencarian berdasarkan no_coa dan nama customer
+                if (!empty($request->get('search')['value'])) {
+                    $search = $request->get('search')['value'];
+                    $query->where(function ($q) use ($search) {
+                        // Filter no_coa
+                        $q->where('no_coa', 'LIKE', "%$search%")
+                        // Filter nama customer
+                        ->orWhereHas('customer', function ($qc) use ($search) {
+                            $qc->where('name', 'LIKE', "%$search%");
                         });
-                });
-            }
-        })
-        ->make(true);
+                    });
+                }
+            })
+            ->make(true);
     }
 
     public function datatables()

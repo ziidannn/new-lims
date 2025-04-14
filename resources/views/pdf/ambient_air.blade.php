@@ -80,11 +80,13 @@
             </div>
             <div align="right" style="width: 50%; float: right;">
                 <div>
-                    <img src="{{ public_path('assets/img/kan.png') }}" alt="" width="100px" style="float: right;">
+                @if($sampling && $sampling->show_logo)
+                    <img src="{{ public_path('assets/img/kan.png') }}" alt="KAN Logo" width="100px" style="float: right;">
                     <div style="clear: right;"></div>
                     <p style="font-size: 9px; font-weight: bold; text-align:right; margin: -5px;">
                         SK-KLHK No 00161/LPJ/Labling-1/LRK/KLHK
                     </p>
+                @endif
                     <p style="font-size: 8px; text-align:right; margin: -5px;">
                         7.8.1/DIL/VII/2018/FORM REV . 2
                     </p>
@@ -93,7 +95,7 @@
                     </p>
                 </div>
             </div>
-        </div>  
+        </div>
     </header>
 <footer>
     <div style="text-align: left; padding-bottom: -5px; margin-bottom: 10;">
@@ -107,7 +109,7 @@
         <tr>
             <td colspan="2" style="font-size: 8px; text-align: center;">*This result (s) relate only to the sample (s) tested and the test report/certificate shall not be reproduced except in full, without written approval of PT Delta Indonesia Laboratory</td>
         </tr>
-    </table>    
+    </table>
 </footer>
 {{-- End Footer --}}
 
@@ -180,7 +182,7 @@
         </tr>
     </table>
 </div>
-    
+
 <div style="width: 100%; margin-top: 50px;">
     <div align="left" style="width: 50%;float: left;"></div>
     <div style="width: 50%; float: right;">
@@ -223,7 +225,7 @@
                     <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
-                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to 
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
                                                 <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
                 </tr>
         </table>
@@ -239,19 +241,19 @@
                 <td style="border: 1px solid; font-weight: bold;">Regulatory <br> Standard**</td>
                 <td style="border: 1px solid; font-weight: bold;">Unit</td>
                 <td style="border: 1px solid; font-weight: bold;">Methods</td>
-            </tr>    
-        
-            @php 
+            </tr>
+
+            @php
                 $counter = 1; // Nomor tetap seperti sebelumnya
             @endphp
-        
+
             @foreach(collect($samplingTimeRegulations)->pluck('parameter')->unique()->sortBy('id') as $parameter)
                 @php
                     $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
                     $rowspan = $samplingTimes->count();
                     $firstRow = true;
                 @endphp
-        
+
                 @foreach ($samplingTimes as $samplingTime)
                     @php
                         $resultKey = "{$parameter->id}-{$samplingTime->samplingTime->id}";
@@ -271,12 +273,12 @@
                             <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->method ?? '-' }}</td>
                         @endif
                     </tr>
-                    @php 
-                        $firstRow = false; 
+                    @php
+                        $firstRow = false;
                     @endphp
                 @endforeach
-        
-                @php 
+
+                @php
                     $counter++; // Tetap seperti sebelumnya
                 @endphp
             @endforeach
@@ -339,7 +341,7 @@
             @if ($regulations->isNotEmpty())
                 @foreach ($regulations as $regulation)
             <tr style="line-height: 1;">
-                <td style="width: 5%;">{{ $loop->iteration }}</td> 
+                <td style="width: 5%;">{{ $loop->iteration }}</td>
                 <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
             </tr>
             @endforeach
@@ -376,7 +378,7 @@
                     <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
-                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to 
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
                                                 <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
                 </tr>
         </table>
@@ -392,19 +394,19 @@
                 <td style="border: 1px solid; font-weight: bold;">Regulatory <br> Standard**</td>
                 <td style="border: 1px solid; font-weight: bold;">Unit</td>
                 <td style="border: 1px solid; font-weight: bold;">Methods</td>
-            </tr>    
-        
-            @php 
+            </tr>
+
+            @php
                 $counter = 1; // Nomor tetap seperti sebelumnya
             @endphp
-        
+
             @foreach(collect($samplingTimeRegulations)->pluck('parameter')->unique()->sortBy('id') as $parameter)
                 @php
                     $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
                     $rowspan = $samplingTimes->count();
                     $firstRow = true;
                 @endphp
-        
+
                 @foreach ($samplingTimes as $samplingTime)
                     @php
                         $resultKey = "{$parameter->id}-{$samplingTime->samplingTime->id}";
@@ -424,12 +426,12 @@
                             <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->method ?? '-' }}</td>
                         @endif
                     </tr>
-                    @php 
-                        $firstRow = false; 
+                    @php
+                        $firstRow = false;
                     @endphp
                 @endforeach
-        
-                @php 
+
+                @php
                     $counter++; // Tetap seperti sebelumnya
                 @endphp
             @endforeach
@@ -492,7 +494,7 @@
             @if ($regulations->isNotEmpty())
                 @foreach ($regulations as $regulation)
             <tr style="line-height: 1;">
-                <td style="width: 5%;">{{ $loop->iteration }}</td> 
+                <td style="width: 5%;">{{ $loop->iteration }}</td>
                 <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
             </tr>
             @endforeach

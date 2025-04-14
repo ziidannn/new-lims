@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('subject_id');
             $table->foreign('subject_id')->references('id')->on('subjects');
-            $table->string('name');
-            $table->string('unit');
-            $table->string('method');
+            $table->string('name')->nullable();
+            $table->string('unit')->nullable();
+            $table->string('method')->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
         });

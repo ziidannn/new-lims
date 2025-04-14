@@ -266,10 +266,10 @@
                                 <td>
                                     @foreach ($samplingTimes as $samplingTime)
                                     @php
-                                    $samplingTimeId = optional($samplingTime->samplingTime)->id;
-                                    $regulationStandardId = optional($samplingTime->regulationStandards)->id;
-                                    $key = "{$parameter->id}-{$samplingTimeId}-{$regulationStandardId}";
-                                    $resultData = $results[$key] ?? collect();
+                                        $samplingTimeId = optional($samplingTime->samplingTime)->id;
+                                        $regulationStandardId = optional($samplingTime->regulationStandards)->id;
+                                        $key = "{$parameter->id}-{$samplingTimeId}-{$regulationStandardId}";
+                                        $resultData = $results[$key] ?? collect();
                                     @endphp
                                     <input type="text" class="form-control text-center testing-result
                                             @error(" testing_result.{$parameter->id}.{$loop->index}") is-invalid
@@ -303,8 +303,7 @@
                                 </td>
                                 <td>
                                     <input type="text" class="form-control text-center"
-                                        name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}"
-                                        readonly>
+                                        name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}" readonly>
                                 </td>
                                 <td>
                                     <div class="button-group">

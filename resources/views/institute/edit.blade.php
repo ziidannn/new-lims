@@ -25,7 +25,8 @@
             <form class="card" method="POST" action="">
                 @csrf
                 <div class="card-header">
-                    <h4 class="card-title mb-0">@yield('title') ( <i>{{ $data->no_coa }} | {{ $data->customer->name }}</i> )</h4>
+                    <h4 class="card-title mb-0">@yield('title') ( <i>{{ $data->no_coa }} |
+                            {{ $data->customer->name }}</i> )</h4>
                     <div class="card-options"><a class="card-options-collapse" href="#"
                             data-bs-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a><a
                             class="card-options-remove" href="#" data-bs-toggle="card-remove"><i
@@ -115,7 +116,7 @@
                         <div class="col-lg-12">
                             <label class="col-form-label">Sample Description & Regulation</label>
                             <div id="subject_id_container">
-                                @foreach($data->subjects as $subject)
+                                @foreach ($data->subjects as $subject)
                                 <div class="row mb-2">
                                     <div class="col-md-5">
                                         <select name="subject_id[]"
@@ -124,7 +125,8 @@
                                             @foreach ($description as $desc)
                                             <option value="{{ $desc->id }}"
                                                 {{ $subject->id == $desc->id ? 'selected' : '' }}>
-                                                {{ $desc->name }}</option>
+                                                {{ $desc->subject_code }} - {{ $desc->name }}
+                                            </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -135,8 +137,8 @@
                                             <option value="">Select Regulation</option>
                                             @foreach ($regulation as $rg)
                                             <option value="{{ $rg->id }}"
-                                                {{ $subject->id == $rg->id ? 'selected' : '' }}>
-                                                {{ $rg->title }}
+                                                {{ in_array($rg->id, $subject->instituteRegulations->pluck('regulation_id')->toArray() ?? []) ? 'selected' : '' }}>
+                                                {{ $rg->regulation_code }} - {{ $rg->title }}
                                             </option>
                                             @endforeach
                                         </select>
@@ -148,7 +150,6 @@
                                 </div>
                                 @endforeach
                             </div>
-
                             <button type="button" class="btn btn-primary mt-2" id="add_more">+ Add More</button>
                         </div>
                     </div>
@@ -174,6 +175,7 @@
             allowClear: true
         });
     });
+
 </script>
 <script>
     $(document).ready(function () {

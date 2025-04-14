@@ -130,13 +130,12 @@
                 <h5 class="modal-title" id="editModalLabel">Edit Subject</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editForm" method="POST">
+            <form id="editForm" action="{{ route('coa.subject.update', ['id' => ':id']) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="editSamplesubjects" class="form-label">Code Subject</label>
-                        <input type="hidden" id="editSamplesubjects" name="subject_id" required>
                         <div class="mb-3">
+                            <label for="editSubjectCode" class="form-label">Code Subject</label>
                             <input type="text" class="form-control" id="editSubjectCode" name="subject_code" required>
                         </div>
                         <div class="mb-3">
@@ -146,7 +145,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Update</button>
                 </div>
             </form>
@@ -238,13 +237,13 @@
                 {
                     render: function (data, type, row, meta) {
                         return `
-                            <a class="badge bg-warning badge-icon edit-btn" title="Edit Regulation"
-                            style="cursor:pointer" data-id="${row.id}" data-title="${row.title}"
-                            data-subject_id="${row.subject_id}">
+                            <a class="badge bg-warning badge-icon edit-btn" title="Edit Subject"
+                            style="cursor:pointer" data-id="${row.id}" data-subject_code="${row.subject_code}"
+                            data-name="${row.name}">
                                 <i class="bx bx-pencil icon-white"></i>
                             </a>
-                            <a class="badge bg-danger badge-icon" title="Delete Regulation" style="cursor:pointer"
-                            onclick="DeleteId('${row.id}', '${row.title}')">
+                            <a class="badge bg-danger badge-icon" title="Delete Subject" style="cursor:pointer"
+                            onclick="DeleteId('${row.id}', '${row.name}')">
                                 <i class='bx bx-trash icon-white'></i>
                             </a>`;
                     },
@@ -311,15 +310,12 @@
     $(document).ready(function () {
         $(document).on('click', '.edit-btn', function () {
             let id = $(this).data('id');
-            let subject_id = $(this).data('subject_id');
-            let title = $(this).data('title');
+            let code = $(this).data('subject_code');
+            let name = $(this).data('name');
 
-            // Set data ke dalam modal
-            $('#editTitle').val(title);
-            $('#editSamplesubjects').val(subject_id);
-            $('#editForm').attr('action', `/coa/subject/update/${id}`);
-
-            // Tampilkan modal
+            $('#editSubjectCode').val(code);
+            $('#editSubjectName').val(name);
+            $('#editForm').data('id', id); // simpan ID ke form
             $('#editModal').modal('show');
         });
 
@@ -328,7 +324,8 @@
             e.preventDefault();
 
             let form = $(this);
-            let url = form.attr('action');
+            let id = form.data('id'); // ambil ID dari form data
+            let url = form.attr('action').replace(':id', id); // ganti placeholder :id dengan id asli
             let formData = form.serialize();
 
             $.ajax({
@@ -337,8 +334,7 @@
                 data: formData,
                 success: function (response) {
                     $('#editModal').modal('hide');
-                    swal("Success!", "Subject updated successfully.",
-                    "success");
+                    swal("Success!", "Subject updated successfully.", "success");
                     $('#datatable').DataTable().ajax.reload();
                 },
                 error: function (xhr) {
