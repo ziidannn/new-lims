@@ -141,14 +141,14 @@ class SamplingTimeRegulationSeeder extends Seeder
             ],
             // parameter 10
             [ 
-                "id" => "19",
+                "id" => "20",
                 "parameter_id" => "10",
                 "sampling_time_id" => "1",
                 "regulation_standard_id" => "18",
             ],
             // parameter 11
             [ 
-                "id" => "19",
+                "id" => "21",
                 "parameter_id" => "11",
                 "sampling_time_id" => "1",
                 "regulation_standard_id" => "19",
@@ -156,11 +156,97 @@ class SamplingTimeRegulationSeeder extends Seeder
 // --------------------------------------------S U J E C T  C O D E  0 2--------------------------------------------
             // parameter 12
             [ 
-                "id" => "19",
-                "parameter_id" => "11",
-                "sampling_time_id" => "1",
-                "regulation_standard_id" => "19",
+                "id" => "22",
+                "parameter_id" => "12",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "46",
             ],
+            // parameter 13
+            [ 
+                "id" => "23",
+                "parameter_id" => "13",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "47",
+            ],
+            // parameter 14
+            [ 
+                "id" => "24",
+                "parameter_id" => "14",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "38",
+            ],
+            // parameter 15
+            [ 
+                "id" => "25",
+                "parameter_id" => "15",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "39",
+            ],
+            // parameter 16
+            [ 
+                "id" => "26",
+                "parameter_id" => "16",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "41",
+            ],
+            // parameter 17
+            [ 
+                "id" => "27",
+                "parameter_id" => "17",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "42",
+            ],
+            // parameter 18
+            [ 
+                "id" => "28",
+                "parameter_id" => "18",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "43",
+            ],
+            // parameter 19
+            [ 
+                "id" => "29",
+                "parameter_id" => "19",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "33",
+            ],
+            // parameter 20
+            [ 
+                "id" => "30",
+                "parameter_id" => "20",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "40",
+            ],
+            // parameter 21
+            [ 
+                "id" => "31",
+                "parameter_id" => "21",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "44",
+            ],
+            // parameter 22
+            [ 
+                "id" => "32",
+                "parameter_id" => "22",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "20",
+            ],
+// --------------------------------------------S U J E C T  C O D E  0 3--------------------------------------------
+            // parameter 23
+            [ 
+                "id" => "33",
+                "parameter_id" => "23",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "52",
+            ],
+            // parameter 24
+            [ 
+                "id" => "34",
+                "parameter_id" => "24",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "53",
+            ],
+
 // parameter 1-9 regulation code 011
 //             [ // 1
 //                 "id" => "1",

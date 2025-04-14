@@ -284,7 +284,8 @@ class AmbientAirController extends Controller
             ->where('no_sample', '02')
             ->latest()
             ->first();
-        $results = collect();
+            
+            $results = collect();
         if ($samplings) {
             $results = Result::where('sampling_id', $samplings->id)
                 ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())

@@ -20,7 +20,7 @@ class DirectorController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'ttd' => 'nullable|mimes:png,jpg,jpeg|max:12048', // Boleh kosong untuk update tanpa ganti gambar
+            'ttd' => 'nullable|mimes:png,jpg,jpeg|max:15000', // Boleh kosong untuk update tanpa ganti gambar
         ]);
 
         // Cari director pertama (Jika sudah ada, update data ini)
