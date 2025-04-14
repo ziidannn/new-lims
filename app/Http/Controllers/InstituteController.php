@@ -43,10 +43,10 @@ class InstituteController extends Controller
                 'report_date' => $request->report_date,
             ]);
 
-            $insertedSubjects = [];
+            $insertedSubjects = []; // Pastikan array kosong sudah diinisialisasi
 
             foreach ($request->subject_id as $key => $subjectId) {
-                if (!in_array($subjectId, $insertedSubjects)) {
+                if (!isset($insertedSubjects[$subjectId])) { // Gunakan isset untuk menghindari error
                     $instituteSubject = InstituteSubject::create([
                         'institute_id' => $Institute->id,
                         'subject_id' => $subjectId,

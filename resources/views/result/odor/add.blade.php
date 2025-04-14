@@ -166,9 +166,12 @@
                             <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
                         </tr>
-                        @foreach ($parameters as $key => $parameter)
+                        @php $parameterNumber = 1; @endphp
+                        @foreach ($parameters->filter(function($parameter) {
+                            return $parameter->subject_id == 4 || $parameter->code_subject == '04' || $parameter->subjects->name == 'Odor';
+                        }) as $parameter)
                             <tr>
-                                <td>{{ $key + 1 }}</td>
+                                <td class="text-center">{{ $parameterNumber++ }}</td>
                                 <td>
                                     <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
                                     <input type="text" class="form-control text-center" value="{{ $parameter->name }}" readonly>

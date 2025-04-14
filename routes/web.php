@@ -142,6 +142,7 @@ Route::get('/ambient_air/{customerId}', [PDFController::class, 'ambientAirPdf'])
 // Director
 Route::get('/directors', [DirectorController::class, 'index'])->name('director.index');
 Route::post('/directors/store', [DirectorController::class, 'store'])->name('director.store');
+Route::delete('/directors/{id}', [DirectorController::class, 'destroy'])->name('director.destroy');
 
 Route::get('log-viewers', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->middleware(['can:log-viewers.read']);
 

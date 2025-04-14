@@ -57,4 +57,14 @@ class DirectorController extends Controller
 
         return redirect()->route('director.index')->with('msg', 'Director berhasil disimpan!');
     }
+    public function destroy($id)
+    {
+        $director = Director::findOrFail($id);
+        if ($director->ttd) {
+            Storage::delete($director->ttd);
+        }
+        $director->delete();
+
+        return redirect()->route('director.index')->with('msg', 'Director berhasil dihapus!');
+    }
 }

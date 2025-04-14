@@ -206,12 +206,15 @@
                             <th class="text-center"><b>Methods</b></th>
                             <th class="text-center"><b>Action</b></th>
                         </tr>
-                        @foreach($parameters as $key => $parameter)
+                        @php $parameterNumber = 1; @endphp
+                        @foreach ($parameters->filter(function($parameter) {
+                            return $parameter->subject_id == 1 || $parameter->code_subject == '01' || $parameter->subjects->name == 'Ambient Air';
+                        }) as $parameter)
                         <tr>
                             <form class="card" action="{{ route('result.ambient_air.add_8', $institute->id) }}"
                                 method="POST">
                                 @csrf
-                                <td>{{ $key + 1 }}</td>
+                                <td>{{ $parameterNumber++ }}</td>
                                 <td>
                                     <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
                                     <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
@@ -292,6 +295,35 @@
         </div>
     </form>
 </div>
+
+<div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
+    <form class="card" action="{{ route('result.ambient_air.add_8', $institute->id) }}" method="POST">
+        @csrf
+        <div class="card">
+            <div class="card-body">
+                <label class="form-label d-block"><i>Do you want to give this sample a logo?</i></label>
+                @php
+                    $samplingData = $sampling ? $sampling->where('no_sample', '08')->where('institute_id',
+                    $institute->id)->first() : null;
+                @endphp
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="showLogoYes" name="show_logo" value="1"
+                        {{ old('show_logo', $samplingData->show_logo ?? false) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="showLogoYes"><b>Yes</b></label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="showLogoNo" name="show_logo" value="0"
+                        {{ old('show_logo', $samplingData->show_logo ?? false) ? '' : 'checked' }}>
+                    <label class="form-check-label" for="showLogoNo"><b>No</b></label>
+                </div>
+                <button class="btn btn-primary btn-sm mt-1 custom-button"
+                    type="submit" name="save_all">Save</button>
+                <input type="hidden" name="save_all" id="save_all" value="1">
+            </div>
+        </div>
+    </form>
+</div>
+
 </div>
 </div>
 @endsection

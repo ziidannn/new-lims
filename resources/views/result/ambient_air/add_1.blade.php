@@ -130,9 +130,9 @@
             <div class="card-header">
                 <h4 class="card-title mb-0">@yield('title')
                     @if ($subject)
-                        <i class="fw-bold">{{ $subject->name }}</i>
+                    <i class="fw-bold">{{ $subject->name }}</i>
                     @else
-                        <i class="fw-bold">No Name Available</i>
+                    <i class="fw-bold">No Name Available</i>
                     @endif
                 </h4>
                 @if ($regulations->isNotEmpty())
@@ -164,7 +164,8 @@
                         <tbody>
                             <tr>
                                 @php
-                                    $samplingData = $sampling ? $sampling->where('no_sample', '01')->where('institute_id', $institute->id)->first() : null;
+                                $samplingData = $sampling ? $sampling->where('no_sample', '01')->where('institute_id',
+                                $institute->id)->first() : null;
                                 @endphp
                                 <td>
                                     <input type="text" class="form-control text-center" name="no_sample"
@@ -214,12 +215,12 @@
 <br>
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    @if(session('msg'))
+    {{-- @if(session('msg'))
     <div class="alert alert-success alert-dismissible" role="alert">
         {{ session('msg') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    @endif
+    @endif --}}
     <form class="card" action="{{ route('result.ambient_air.add_1', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
@@ -236,11 +237,16 @@
                             <th class="text-center"><b>Methods</b></th>
                             <th class="text-center"><b>Action</b></th>
                         </tr>
-                        @foreach($parameters as $key => $parameter)
+                        @php $parameterNumber = 1; @endphp
+                        @foreach ($parameters->filter(function($parameter) {
+                        return $parameter->subject_id == 1 || $parameter->code_subject == '01' ||
+                        $parameter->subjects->name == 'Ambient Air';
+                        }) as $parameter)
                         <tr>
-                            <form class="card" action="{{ route('result.ambient_air.add_1', $institute->id) }}" method="POST">
+                            <form class="card" action="{{ route('result.ambient_air.add_1', $institute->id) }}"
+                                method="POST">
                                 @csrf
-                                <td>{{ $key + 1 }}</td>
+                                <td class="text-center">{{ $parameterNumber++ }}</td>
                                 <td>
                                     <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
                                     <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
@@ -259,15 +265,23 @@
                                 </td>
                                 <td>
                                     @foreach ($samplingTimes as $samplingTime)
-                                        @php
-                                            $samplingTimeId = optional($samplingTime->samplingTime)->id;
-                                            $regulationStandardId = optional($samplingTime->regulationStandards)->id;
-                                            $key = "{$parameter->id}-{$samplingTimeId}-{$regulationStandardId}";
-                                            $resultData = $results[$key] ?? collect();
-                                        @endphp
-                                        <input type="text" class="form-control text-center testing-result"
-                                            name="testing_result[{{ $parameter->id }}][]"
-                                            value="{{ $resultData->isNotEmpty() ? $resultData->first()->testing_result : '' }}" required>
+                                    @php
+                                    $samplingTimeId = optional($samplingTime->samplingTime)->id;
+                                    $regulationStandardId = optional($samplingTime->regulationStandards)->id;
+                                    $key = "{$parameter->id}-{$samplingTimeId}-{$regulationStandardId}";
+                                    $resultData = $results[$key] ?? collect();
+                                    @endphp
+                                    <input type="text" class="form-control text-center testing-result
+                                            @error(" testing_result.{$parameter->id}.{$loop->index}") is-invalid
+                                    @enderror"
+                                    name="testing_result[{{ $parameter->id }}][]" value="{{ old("testing_result.{$parameter->id}.{$loop->index}",
+                                            $resultData->isNotEmpty() ? $resultData->first()->testing_result : '') }}"
+                                    required>
+                                    @error("testing_result.{$parameter->id}.{$loop->index}")
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
                                     @endforeach
                                 </td>
                                 <td>
@@ -296,11 +310,11 @@
                                     <div class="button-group">
                                         <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
                                             name="save">Save</button>
-                                            <button type="button"
-                                                class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
-                                                data-parameter-id="{{ $parameter->id }}">
-                                                Hide
-                                            </button>
+                                        <button type="button"
+                                            class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
+                                            data-parameter-id="{{ $parameter->id }}">
+                                            Hide
+                                        </button>
                                     </div>
                                 </td>
                             </form>
@@ -312,8 +326,10 @@
                             <button id="btn-undo" class="btn btn-warning me-1" style="display: none;">Undo</button>
                         </div>
                         <div class="d-flex">
-                            <button class="btn btn-primary me-2" type="button" onclick="confirmSubmit()">Save All</button>
-                            <a href="{{ route('result.list_result', $institute->id) }}" class="btn btn-outline-secondary">Back</a>
+                            <button class="btn btn-primary me-2" type="button" onclick="confirmSubmit()">Save
+                                All</button>
+                            <a href="{{ route('result.list_result', $institute->id) }}"
+                                class="btn btn-outline-secondary">Back</a>
                         </div>
                     </div>
                 </div>
@@ -321,6 +337,35 @@
         </div>
     </form>
 </div>
+
+<div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
+    <form class="card" action="{{ route('result.ambient_air.add_1', $institute->id) }}" method="POST">
+        @csrf
+        <div class="card">
+            <div class="card-body">
+                <label class="form-label d-block"><i>Do you want to give this sample a logo?</i></label>
+                @php
+                    $samplingData = $sampling ? $sampling->where('no_sample', '01')->where('institute_id',
+                    $institute->id)->first() : null;
+                @endphp
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="showLogoYes" name="show_logo" value="1"
+                        {{ old('show_logo', $samplingData->show_logo ?? false) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="showLogoYes"><b>Yes</b></label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="showLogoNo" name="show_logo" value="0"
+                        {{ old('show_logo', $samplingData->show_logo ?? false) ? '' : 'checked' }}>
+                    <label class="form-check-label" for="showLogoNo"><b>No</b></label>
+                </div>
+                <button class="btn btn-primary btn-sm mt-1 custom-button"
+                    type="submit" name="save_all">Save</button>
+                <input type="hidden" name="save_all" id="save_all" value="1">
+            </div>
+        </div>
+    </form>
+</div>
+
 </div>
 </div>
 @endsection
@@ -332,6 +377,11 @@
 <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script>
+    function confirmSubmit() {
+        document.getElementById('save_all').value = 1;
+        document.querySelector('form.card').submit(); // pastikan ini mengarah ke form utama
+    }
+
     $(document).ready(function () {
         const selectElement = document.querySelector('#is_required');
         selectElement.addEventListener('change', (event) => {
@@ -350,32 +400,36 @@
     });
 
     function confirmSubmit() {
-    swal({
-        title: "Are you sure?",
-        text: "Please make sure all data is correct and complete before submitting.",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-    })
-    .then((willSubmit) => {
-        if (willSubmit) {
-            swal("Submitting...", {
-                icon: "info",
-                buttons: false,
-                timer: 300, // Delay 0.3 detik sebelum redirect
-            }).then(() => {
-                window.location.href = "{{ route('result.list_result', $institute->id) }}?success=1";
+        swal({
+                title: "Are you sure?",
+                text: "Please make sure all data is correct and complete before submitting.",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willSubmit) => {
+                if (willSubmit) {
+                    swal("Submitting...", {
+                        icon: "info",
+                        buttons: false,
+                        timer: 1000, // Delay 0.3 detik sebelum redirect
+                    }).then(() => {
+                        window.location.href =
+                        "{{ route('result.list_result', $institute->id) }}?success=1";
+                    });
+                }
             });
-        }
-    });
-}
+    }
+
 </script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        let regulationId = document.body.getAttribute("data-regulation-id"); // Ambil regulation_id dari atribut di body
+        let regulationId = document.body.getAttribute(
+        "data-regulation-id"); // Ambil regulation_id dari atribut di body
         let storedHiddenParameters = JSON.parse(localStorage.getItem("hidden_parameters")) || {};
-        let hiddenParameters = storedHiddenParameters[regulationId] || []; // Ambil parameter tersembunyi hanya untuk regulation saat ini
+        let hiddenParameters = storedHiddenParameters[regulationId] ||
+    []; // Ambil parameter tersembunyi hanya untuk regulation saat ini
         let undoButton = document.getElementById("btn-undo");
 
         // Tampilkan tombol Undo jika ada parameter yang disembunyikan
@@ -404,7 +458,8 @@
                 if (!hiddenParameters.includes(parameterId)) {
                     hiddenParameters.push(parameterId);
                     storedHiddenParameters[regulationId] = hiddenParameters;
-                    localStorage.setItem("hidden_parameters", JSON.stringify(storedHiddenParameters));
+                    localStorage.setItem("hidden_parameters", JSON.stringify(
+                        storedHiddenParameters));
                 }
 
                 // Sembunyikan baris tanpa refresh
@@ -424,14 +479,16 @@
             event.stopPropagation();
 
             if (hiddenParameters.length > 0) {
-                let lastHiddenParameter = hiddenParameters.pop(); // Ambil parameter terakhir yang di-hide
+                let lastHiddenParameter = hiddenParameters
+            .pop(); // Ambil parameter terakhir yang di-hide
                 storedHiddenParameters[regulationId] = hiddenParameters;
                 localStorage.setItem("hidden_parameters", JSON.stringify(storedHiddenParameters));
 
                 // Munculkan kembali baris yang terakhir di-hide
-                document.querySelectorAll(`[data-parameter-id="${lastHiddenParameter}"]`).forEach(element => {
-                    element.closest("tr").style.display = "";
-                });
+                document.querySelectorAll(`[data-parameter-id="${lastHiddenParameter}"]`).forEach(
+                    element => {
+                        element.closest("tr").style.display = "";
+                    });
 
                 // Sembunyikan tombol Undo jika tidak ada parameter yang di-hide
                 if (hiddenParameters.length === 0) {
@@ -449,5 +506,6 @@
         // Reset hidden parameters jika regulation_id berubah
         document.body.setAttribute("data-regulation-id", regulationId);
     });
+
 </script>
 @endsection

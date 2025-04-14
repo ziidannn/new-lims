@@ -83,7 +83,7 @@
 @if(request()->has('success'))
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            swal("Success!", "Data successfully submitted.", "success");
+            swal("Success!", "Data Sample and Logo Successfully Submitted.", "success");
         });
     </script>
 @endif

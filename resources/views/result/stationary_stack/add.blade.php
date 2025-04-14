@@ -166,9 +166,12 @@
                             <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
                         </tr>
-                        @foreach ($parameters as $key => $parameter)
+                        @php $parameterNumber = 1; @endphp
+                        @foreach ($parameters->filter(function($parameter) {
+                            return $parameter->subject_id == 7 || $parameter->code_subject == '07' || $parameter->subjects->name == 'Stationary Stack';
+                        }) as $parameter)
                             <tr>
-                                <td>{{ $key + 1 }}</td>
+                                <td>{{ $parameterNumber++ }}</td>
                                 <td>
                                     <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
                                     <input type="text" class="form-control text-center" value="{{ $parameter->name }}" readonly>
@@ -182,6 +185,16 @@
                                     <input type="text" class="form-control text-center testing-result"
                                         name="testing_result[{{ $parameter->id }}]"
                                         value="{{ old('testing_result.' . $parameter->id, $testingResult) }}" required>
+                                </td>
+                                <td>
+                                    @php
+                                        $regulationStandard = $samplingTimeRegulations->where('parameter_id', $parameter->id)->first()->regulationStandards ?? null;
+                                        $resultKey = $parameter->id . '-' . ($regulationStandard->id ?? 'null');
+                                        $time = $results[$resultKey]->time ?? '';
+                                    @endphp
+                                    <input type="text" class="form-control text-center"
+                                        name="time[{{ $parameter->id }}]"
+                                        value="{{ old('time.' . $parameter->id, $time) }}" required>
                                 </td>
                                 <td>
                                     @if ($regulationStandard)

@@ -152,8 +152,7 @@ class ResultController extends Controller
         ));
     }
 
-    public function addWorkplaceAir(Request $request, $id)
-    {
+    public function addWorkplaceAir(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -221,8 +220,7 @@ class ResultController extends Controller
         ));
     }
 
-    public function addNoise(Request $request, $id)
-    {
+    public function addNoise(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $samplingNoise = InstituteSubject::where('subject_id', 3)->first();
@@ -307,6 +305,7 @@ class ResultController extends Controller
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -339,13 +338,12 @@ class ResultController extends Controller
         }
 
         return view($view, compact(
-            'institute', 'parameters', 'regulations', 'subjects',
-            'samplingTimeRegulations', 'results', 'subject', 'instituteSubject'
+            'institute', 'parameters', 'regulations', 'subjects', 'samplingTimeRegulations',
+            'results', 'subject', 'instituteSubject', 'samplingNoise', 'samplings'
         ));
     }
 
-    public function addNoiseNew(Request $request, $id)
-    {
+    public function addNoiseNew(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $samplings = InstituteSubject::where('subject_id', 3)->latest()->first();
@@ -451,8 +449,7 @@ class ResultController extends Controller
         ));
     }
 
-    public function addOdor(Request $request, $id)
-    {
+    public function addOdor(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
 
@@ -648,7 +645,7 @@ class ResultController extends Controller
 
         return view('result.heat_stress.add', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'fieldConditions'
+            'regulations', 'subject', 'instituteSubject'
         ));
     }
 
