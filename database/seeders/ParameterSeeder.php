@@ -105,14 +105,112 @@ class ParameterSeeder extends Seeder
                 "method" => "IK-7.4.22 (Spectrophotometry)"
             ],
 // --------------------------------------------S U J E C T  C O D E  0 2--------------------------------------------
-            // Parameter 11
-            // [
-            //     "id" => "12",
-            //     "subject_id" => "2",
-            //     "name" => "Sulphur Dioxide (SO2)*",
-            //     "unit" => "mg/m3(PSD/KTD)",
-            //     "method" => "IK-7.4.3 (Spectrophotometry)"
-            // ],
+            // Parameter 12
+            [
+                "id" => "12",
+                "subject_id" => "2",
+                "name" => "Temperature",
+                "unit" => "°C",
+                "method" => "Direct Reading"
+            ],
+            // Parameter 13
+            [
+                "id" => "13",
+                "subject_id" => "2",
+                "name" => "Relative Humidity (%RH)",
+                "unit" => "%",
+                "method" => "Direct Reading"
+            ],
+            // Parameter 14
+            [
+                "id" => "14",
+                "subject_id" => "2",
+                "name" => "Sulphur Dioxide (SO2)*",
+                "unit" => "mg/m3 (PSD/KTD)",
+                "method" => "IK-7.4.3 (Spectrophotometry)"
+            ],
+            // Parameter 15
+            [
+                "id" => "15",
+                "subject_id" => "2",
+                "name" => "Nitrogen Dioxide (NO2)*",
+                "unit" => "BDS",
+                "method" => "IK-7.4.2 (Spectrophotometry)"
+            ],
+            // Parameter 16
+            [
+                "id" => "16",
+                "subject_id" => "2",
+                "name" => "Carbon Monoxide (CO)*",
+                "unit" => "mg/m3",
+                "method" => "IK 7.4.19 (Direct Reading)"
+            ],
+            // Parameter 17
+            [
+                "id" => "17",
+                "subject_id" => "2",
+                "name" => "Ammonia (NH3)",
+                "unit" => "BDS",
+                "method" => "IK-7.4.1 (Spectrophotometry)"
+            ],
+            // Parameter 18
+            [
+                "id" => "18",
+                "subject_id" => "2",
+                "name" => "Oxidant (Ox)",
+                "unit" => "BDS",
+                "method" => "SNI 7119-8:2017"
+            ],
+            // Parameter 19
+            [
+                "id" => "19",
+                "subject_id" => "2",
+                "name" => "Hydrogen Sulfide (H2S)*",
+                "unit" => "BDS",
+                "method" => "SNI 8605:2018"
+            ],
+            // Parameter 20
+            [
+                "id" => "20",
+                "subject_id" => "2",
+                "name" => "Hydrocarbon (HC)",
+                "unit" => "BDS",
+                "method" => "Gas Chromatography"
+            ],
+            // Parameter 21
+            [
+                "id" => "21",
+                "subject_id" => "2",
+                "name" => "Lead (Pb)",
+                "unit" => "mg/m3",
+                "method" => "ICP-OES"
+            ],
+            // Parameter 22
+            [
+                "id" => "22",
+                "subject_id" => "2",
+                "name" => "Total Suspended Particulates (TSP) ",
+                "unit" => "mg/m3",
+                "method" => "SNI 16-7058-2004"
+            ],
+// --------------------------------------------S U J E C T  C O D E  0 3--------------------------------------------
+            // Parameter 23
+            [
+                "id" => "23",
+                "subject_id" => "3",
+                "name" => "",
+                "unit" => "dBA",
+                "method" => "SNI 8427:2017"
+            ],
+            // Parameter 24
+            [
+                "id" => "24",
+                "subject_id" => "3",
+                "name" => "",
+                "unit" => "dBA",
+                "method" => "SNI 7231:2009"
+            ],
+
 //             // Parameter for Regulation code 011
 //             [
 //                 "id" => "1",

@@ -199,7 +199,7 @@
 {{-- End Resume --}}
 {{-- Ambient Air --}}
 <div class="page_break"></div>
-@foreach($samplings->where('sampling_location', 'Upwind') as $sampling)
+@foreach($samplings->whereNotNull('sampling_location') as $sampling)
 <div>
     <div class="text-center certificate-container" style="margin-top: 20px;">
         <p class="certificate-title">CERTIFICATE OF ANALYSIS (COA)</p>
@@ -232,6 +232,7 @@
     </div>
     {{-- Start Parameters --}}
     <div style="margin-top: 20px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+
         <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center; width: 100%;">
             <tr>
                 <td style="border: 1px solid; font-weight: bold;">NO</td>
@@ -395,7 +396,6 @@
                 <td style="border: 1px solid; font-weight: bold;">Unit</td>
                 <td style="border: 1px solid; font-weight: bold;">Methods</td>
             </tr>
-
             @php
                 $counter = 1; // Nomor tetap seperti sebelumnya
             @endphp
@@ -409,8 +409,8 @@
 
                 @foreach ($samplingTimes as $samplingTime)
                     @php
-                        $resultKey = "{$parameter->id}-{$samplingTime->samplingTime->id}";
-                        $resultData = $results->get($resultKey)?->first();
+                        $resultKey = "{$parameter->id}-{$samplingTime->samplingTime->id}-{$sampling->id}";
+                        $resultData = $results->get($resultKey) ?? collect();
                         $regulationStandard = $samplingTime->regulationStandards ?? null;
                     @endphp
                     <tr >
@@ -419,7 +419,7 @@
                             <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->name }}</td>
                         @endif
                         <td style="border: 1px solid;" >{{ $samplingTime->samplingTime->time }}</td>
-                        <td style="border: 1px solid;">{{ $resultData ? $resultData->testing_result : '-' }}</td>
+                        <td style="border: 1px solid;">{{ $resultData->pluck('testing_result')->implode(', ') ?: '-' }}</td>
                         <td style="border: 1px solid;">{{ $regulationStandard ? $regulationStandard->title : '-' }}</td>
                         @if ($firstRow)
                             <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->unit ?? '-' }}</td>
@@ -447,31 +447,31 @@
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Coordinate</td>
-                <td style="width: 70%;">: {{ $fieldCondition->coordinate ?? 'N/A' }}</td>
+                <td style="width: 70%;">: {{ $fieldCondition['coordinate'] ?? 'N/A' }}</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Temperature</td>
-                <td style="width: 70%;">: {{ $fieldCondition->temperature ?? 'N/A' }} °C</td>
+                <td style="width: 70%;">: {{ $fieldCondition['temperature'] ?? 'N/A' }} °C</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Pressure</td>
-                <td style="width: 70%;">: {{ $fieldCondition->pressure ?? 'N/A' }} mmHg</td>
+                <td style="width: 70%;">: {{ $fieldCondition['pressure'] ?? 'N/A' }} mmHg</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Humidity</td>
-                <td style="width: 70%;">: {{ $fieldCondition->humidity ?? 'N/A' }} %RH</td>
+                <td style="width: 70%;">: {{ $fieldCondition['humidity'] ?? 'N/A' }} %RH</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Wind Speed</td>
-                <td style="width: 70%;">: {{ $fieldCondition->wind_speed ?? 'N/A' }} m/s</td>
+                <td style="width: 70%;">: {{ $fieldCondition['wind_speed'] ?? 'N/A' }} m/s</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Wind Direction</td>
-                <td style="width: 70%;">: {{ $fieldCondition->wind_direction ?? 'N/A' }}</td>
+                <td style="width: 70%;">: {{ $fieldCondition['wind_direction'] ?? 'N/A' }}</td>
             </tr>
             <tr style="line-height: 1;">
                 <td style="width: 30%;">Weather</td>
-                <td style="width: 70%;">: {{ $fieldCondition->weather ?? 'N/A' }}</td>
+                <td style="width: 70%;">: {{ $fieldCondition['weather'] ?? 'N/A' }}</td>
             </tr>
         </table>
     </div>
@@ -495,6 +495,7 @@
                 @foreach ($regulations as $regulation)
             <tr style="line-height: 1;">
                 <td style="width: 5%;">{{ $loop->iteration }}</td>
+                <td style="width: 5%;">{{ $loop->count > 2 ? '**' : '*' }}</td>
                 <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
             </tr>
             @endforeach
@@ -504,6 +505,6 @@
     {{-- End Notes and Regulation --}}
 </div>
 @endforeach
-{{-- End Ambient Air --}}
+
 </body>
 </html>
