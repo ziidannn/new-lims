@@ -99,37 +99,39 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><input type="text" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
-                                    <input type="number" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $samplings->no_sample ?? '') }}">
-                                </td>
-                                <td><input type="text" class="form-control text-center" name="sampling_location"
-                                        value="{{ old('sampling_location', $samplings->sampling_location ?? '') }}"></td>
-                                <td>
-                                    <input type="hidden" name="institute_id" value="{{ $institute->id }}">
-                                    <input type="hidden" name="institute_subject_id"
-                                        value="{{ $instituteSubject->id }}">
-                                    <input type="text" class="form-control text-center"
-                                        value="{{ $instituteSubject->subject->name }}" readonly>
-                                </td>
-                                <td><input type="date" class="form-control text-center" name="sampling_date"
-                                        value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
-                                <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $samplings->sampling_time ?? '') }}"></td>
-                                <td><input type="text" class="form-control text-center" name="sampling_method"
-                                        value="Grab" readonly></td>
-                                <td><input type="date" class="form-control text-center" name="date_received"
-                                        value="{{ old('date_received', $institute->sample_analysis_date ?? '') }}"></td>
-                                <td>
-                                    <input type="date" class="form-control text-center" name="itd_start"
-                                        value="{{ old('itd_start', $institute->sample_analysis_date ?? '') }}">
-                                    <span class="mx-2">to</span>
-                                    <input type="date" class="form-control text-center" name="itd_end"
-                                        value="{{ old('itd_end', $institute->report_date ?? '') }}">
-                                </td>
-                            </tr>
+                            @foreach ($sampling as $sampleNames)
+                                <tr>
+                                    <td><input type="text" class="form-control text-center" name="no_sample"
+                                            value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
+                                        <input type="number" class="form-control text-center" name="no_sample"
+                                            value="{{ old('no_sample', $sampleNames->no_sample ?? '') }}">
+                                    </td>
+                                    <td><input type="text" class="form-control text-center" name="sampling_location"
+                                            value="{{ old('sampling_location', $sampleNames->sampling_location ?? '') }}"></td>
+                                    <td>
+                                        <input type="hidden" name="institute_id" value="{{ $institute->id }}">
+                                        <input type="hidden" name="institute_subject_id"
+                                            value="{{ $instituteSubject->id }}">
+                                        <input type="text" class="form-control text-center"
+                                            value="{{ $instituteSubject->subject->name }}" readonly>
+                                    </td>
+                                    <td><input type="date" class="form-control text-center" name="sampling_date"
+                                            value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
+                                    <td><input type="text" class="form-control text-center" name="sampling_time"
+                                            value="{{ old('sampling_time', $sampleNames->sampling_time ?? '') }}"></td>
+                                    <td><input type="text" class="form-control text-center" name="sampling_method"
+                                            value="Grab" readonly></td>
+                                    <td><input type="date" class="form-control text-center" name="date_received"
+                                            value="{{ old('date_received', $institute->sample_analysis_date ?? '') }}"></td>
+                                    <td>
+                                        <input type="date" class="form-control text-center" name="itd_start"
+                                            value="{{ old('itd_start', $institute->sample_analysis_date ?? '') }}">
+                                        <span class="mx-2">to</span>
+                                        <input type="date" class="form-control text-center" name="itd_end"
+                                            value="{{ old('itd_end', $institute->report_date ?? '') }}">
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -146,12 +148,12 @@
 <br>
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    @if(session('msg'))
+    <!-- @if(session('msg'))
         <div class="alert alert-success alert-dismissible" role="alert">
             {{ session('msg') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    @endif
+    @endif -->
     <form class="card" action="{{ route('result.workplace.add', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">

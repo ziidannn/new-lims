@@ -69,38 +69,6 @@ class InstituteController extends Controller
                         ]);
                     }
                 }
-
-                // **Handle Field Conditions based on subject_id**
-                if ($subjectId == 1 || $subjectId == 7 || $subjectId == 4 || $subjectId == 2) {
-                    $fieldConditionData = [
-                        'institute_id' => $Institute->id,
-                        'institute_subject_id' => $instituteSubject->id,
-                    ];
-
-                    if ($subjectId == 1 || $subjectId == 4) { // Ambient Air & Odor (Semua input)
-                        $fieldConditionData += [
-                            'coordinate' => $request->coordinate,
-                            'temperature' => $request->temperature,
-                            'pressure' => $request->pressure,
-                            'humidity' => $request->humidity,
-                            'wind_speed' => $request->wind_speed,
-                            'wind_direction' => $request->wind_direction,
-                            'weather' => $request->weather,
-                        ];
-                    } elseif ($subjectId == 7) { // Stationary Stack Source Emission (Coordinate & Velocity)
-                        $fieldConditionData += [
-                            'coordinate' => $request->coordinate,
-                            'velocity' => $request->velocity,
-                        ];
-                    } elseif ($subjectId == 2) { // Workplace Air (Temperature & Humidity)
-                        $fieldConditionData += [
-                            'temperature' => $request->temperature,
-                            'humidity' => $request->humidity,
-                        ];
-                    }
-
-                    FieldCondition::create($fieldConditionData);
-                }
             }
 
             return redirect()->route('institute.index')->with('msg', 'Data ' . $request->no_coa . ' added successfully');

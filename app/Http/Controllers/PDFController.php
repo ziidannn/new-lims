@@ -108,18 +108,16 @@ class PDFController extends Controller
     {
         // Mengambil data institute beserta relasi subjects dan customer
         $institute = Institute::with(['subjects', 'customer'])->findOrFail($id);
+
         // Mengambil semua data sampling yang terkait dengan institute_id tertentu
         $samplings = Sampling::where('institute_id', $id)->with('instituteSubject.subject')->get();
         $sampling = $samplings->first(); // Mengambil data sampling pertama jika ada
+
         // Mengambil semua InstituteSubject yang memiliki subject bernama 'Ambient Air'
         $instituteSubjects = InstituteSubject::where('institute_id', $id)
             ->whereHas('subject', fn($q) => $q->where('name', 'Ambient Air'))
             ->with('subject')
             ->get();
-
-        // Mengambil semua data sampling yang terkait dengan institute_id tertentu
-        $samplings = Sampling::where('institute_id', $id)->with('instituteSubject.subject')->get();
-        $sampling = $samplings->first(); // Mengambil data sampling pertama jika ada
 
         // Mengambil ID regulation yang terkait dengan InstituteSubject
         $regulationsIds = InstituteRegulation::whereIn('institute_subject_id', $instituteSubjects->pluck('id'))
@@ -147,12 +145,9 @@ class PDFController extends Controller
             ->whereIn('institute_subject_id', $instituteSubjects->pluck('id'))
             ->first();
 
-<<<<<<< HEAD
         // Mengambil kondisi lapangan dari hasil pertama jika ada
         $fieldCondition = optional($results->flatten()->first())->fieldCondition;
 
-=======
->>>>>>> da34abd54b6ab59bf1d7c709a3a2d754b6007448
         // Mengambil data regulasi berdasarkan regulation_id yang telah difilter
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
 

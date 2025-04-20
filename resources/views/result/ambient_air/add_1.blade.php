@@ -76,54 +76,54 @@
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
         <li class="nav-item"><a class="nav-link active" href="{{ route('result.ambient_air.add_1', $institute->id) }}">
                 <i class="bx bx-current-location me-1"></i>
-                <b><i style="font-size: 1.1rem;">Location - 1</i></b></a></li></a></li>
+                <b><i style="font-size: 1.13rem;">LOC - 1</i></b></a></li></a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_2', $institute->id) }}"><i
                     class="bx bx-current-location me-1"></i>
-                <b><i style="font-size: 1.1rem;">Location - 2</i></b></a></li>
+                <b><i style="font-size: 1.13rem;">LOC - 2</i></b></a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_3',$institute->id) }}">
                 <i class="bx bx-current-location me-1"></i>
-                <b><i style="font-size: 1.1rem;">Location - 3</i></b></a></li></a></li>
+                <b><i style="font-size: 1.13rem;">LOC - 3</i></b></a></li></a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_4', $institute->id) }}"><i
                     class="bx bx-current-location me-1"></i>
-                <b><i style="font-size: 1.1rem;">Location - 4</i></b></a></li>
+                <b><i style="font-size: 1.13rem;">LOC - 4</i></b></a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_5',$institute->id) }}">
                 <i class="bx bx-current-location me-1"></i>
-                <b><i style="font-size: 1.1rem;">Location - 5</i></b></a></li></a></li>
+                <b><i style="font-size: 1.13rem;">LOC - 5</i></b></a></li></a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_6', $institute->id) }}"><i
                     class="bx bx-current-location me-1"></i>
-                <b><i style="font-size: 1.1rem;">Location - 6</i></b></a></li>
+                <b><i style="font-size: 1.13rem;">LOC - 6</i></b></a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_7',$institute->id) }}">
                 <i class="bx bx-current-location me-1"></i>
-                <b><i style="font-size: 1.1rem;">Location - 7</i></b></a></li></a></li>
+                <b><i style="font-size: 1.13rem;">LOC - 7</i></b></a></li></a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_8', $institute->id) }}"><i
                     class="bx bx-current-location me-1"></i>
-                <b><i style="font-size: 1.1rem;">Location - 8</i></b></a></li>
+                <b><i style="font-size: 1.13rem;">LOC - 8</i></b></a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_9',$institute->id) }}">
                 <i class="bx bx-current-location me-1"></i>
-                <b><i style="font-size: 1.1rem;">Location - 9</i></b></a></li></a></li>
+                <b><i style="font-size: 1.13rem;">LOC - 9</i></b></a></li></a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('result.ambient_air.add_10', $institute->id) }}"><i
                     class="bx bx-current-location me-1"></i>
-                <b><i style="font-size: 1.1rem;">Location - 10</i></b></a></li>
+                <b><i style="font-size: 1.13rem;">LOC - 10</i></b></a></li>
     </ul>
 </div>
-<div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    @if(session('msg'))
-    <div class="alert alert-success alert-dismissible" role="alert">
-        {{ session('msg') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
+@if(session('msg'))
+<div class="alert alert-success alert-dismissible" role="alert">
+    {{ session('msg') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
 
-    @if($errors->any())
-    <div class="alert alert-danger alert-dismissible" role="alert">
-        <ul>
-            @foreach($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
+@if($errors->any())
+<div class="alert alert-danger alert-dismissible" role="alert">
+    <ul>
+        @foreach($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
+<div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
     <form class="card" action="{{ route('result.add_sample', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
@@ -138,7 +138,7 @@
                 @if ($regulations->isNotEmpty())
                 @foreach ($regulations as $regulation)
                 <i class="fw-bold"
-                    style="font-size: 1.1rem; color: darkred;">{{ $regulation->title ?? 'No Name Available' }}</i>
+                    style="font-size: 1.08rem; color: darkred;">{{ $regulation->title ?? 'No Name Available' }}</i>
                 @endforeach
                 @endif
             </div>
@@ -215,13 +215,7 @@
 <br>
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    {{-- @if(session('msg'))
-    <div class="alert alert-success alert-dismissible" role="alert">
-        {{ session('msg') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif --}}
-    <form class="card" action="{{ route('result.ambient_air.add_1', $institute->id) }}" method="POST">
+    <form class="card" id="mainForm" action="{{ route('result.ambient_air.add_1', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
@@ -266,10 +260,10 @@
                                 <td>
                                     @foreach ($samplingTimes as $samplingTime)
                                     @php
-                                        $samplingTimeId = optional($samplingTime->samplingTime)->id;
-                                        $regulationStandardId = optional($samplingTime->regulationStandards)->id;
-                                        $key = "{$parameter->id}-{$samplingTimeId}-{$regulationStandardId}";
-                                        $resultData = $results[$key] ?? collect();
+                                    $samplingTimeId = optional($samplingTime->samplingTime)->id;
+                                    $regulationStandardId = optional($samplingTime->regulationStandards)->id;
+                                    $key = "{$parameter->id}-{$samplingTimeId}-{$regulationStandardId}";
+                                    $resultData = $results[$key] ?? collect();
                                     @endphp
                                     <input type="text" class="form-control text-center testing-result
                                             @error(" testing_result.{$parameter->id}.{$loop->index}") is-invalid
@@ -303,7 +297,8 @@
                                 </td>
                                 <td>
                                     <input type="text" class="form-control text-center"
-                                        name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}" readonly>
+                                        name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}"
+                                        readonly>
                                 </td>
                                 <td>
                                     <div class="button-group">
@@ -324,42 +319,92 @@
                         <div class="d-flex">
                             <button id="btn-undo" class="btn btn-warning me-1" style="display: none;">Undo</button>
                         </div>
-                        <div class="d-flex">
-                            <button class="btn btn-primary me-2" type="button" onclick="confirmSubmit()">Save
-                                All</button>
-                            <a href="{{ route('result.list_result', $institute->id) }}"
-                                class="btn btn-outline-secondary">Back</a>
-                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </form>
-</div>
 
-<div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('result.ambient_air.add_1', $institute->id) }}" method="POST">
-        @csrf
-        <div class="card">
-            <div class="card-body">
-                <label class="form-label d-block"><i>Do you want to give this sample a logo?</i></label>
+                <hr style="display: block; color: #000;height: 1px;width: 100%;margin: 1rem 0;">
+                <div>
                 @php
-                    $samplingData = $sampling ? $sampling->where('no_sample', '01')->where('institute_id',
-                    $institute->id)->first() : null;
+                    $fieldCondition = \App\Models\FieldCondition::where('institute_subject_id', $instituteSubject->id)->first();
                 @endphp
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" id="showLogoYes" name="show_logo" value="1"
-                        {{ old('show_logo', $samplingData->show_logo ?? false) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="showLogoYes"><b>Yes</b></label>
+                    <h4 class="mb-3">Ambient Environmental Condition</h4>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 field-condition" id="coordinate">
+                            <label class="form-label">Coordinate</label>
+                            <input type="text" class="form-control" name="coordinate" placeholder="Input Coordinate"
+                                value="{{ old('coordinate', $fieldCondition->coordinate ?? '') }}">
+                        </div>
+                        <div class="col-lg-6 col-md-6 field-condition" id="temperature">
+                            <label class="form-label">Temperature</label>
+                            <input type="text" class="form-control" name="temperature" placeholder="Input Temperature"
+                                value="{{ old('temperature', $fieldCondition->temperature ?? '') }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 field-condition" id="pressure">
+                            <label class="form-label">Pressure</label>
+                            <input type="text" class="form-control" name="pressure" placeholder="Input Pressure"
+                                value="{{ old('pressure', $fieldCondition->pressure ?? '') }}">
+                        </div>
+                        <div class="col-lg-6 col-md-6 field-condition" id="humidity">
+                            <label class="form-label">Humidity</label>
+                            <input type="text" class="form-control" name="humidity" placeholder="Input Humidity"
+                                value="{{ old('humidity', $fieldCondition->humidity ?? '') }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 field-condition" id="wind_speed">
+                            <label class="form-label">Wind Speed</label>
+                            <input type="text" class="form-control" name="wind_speed" placeholder="Input Wind Speed"
+                                value="{{ old('wind_speed', $fieldCondition->wind_speed ?? '') }}">
+                        </div>
+                        <div class="col-lg-6 col-md-6 field-condition" id="wind_direction">
+                            <label class="form-label">Wind Direction</label>
+                            <input type="text" class="form-control" name="wind_direction"
+                                placeholder="Input Wind Direction" value="{{ old('wind_direction', $fieldCondition->wind_direction ?? '') }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 field-condition" id="weather">
+                            <label class="form-label">Weather</label>
+                            <input type="text" class="form-control" name="weather" placeholder="Input Weather"
+                                value="{{ old('weather', $fieldCondition->weather ?? '') }}">
+                        </div>
+                        <div class="col-lg-6 col-md-6 field-condition" id="velocity">
+                            <label class="form-label">Velocity</label>
+                            <input type="text" class="form-control" name="velocity" placeholder="Input Velocity"
+                                value="{{ old('velocity', $fieldCondition->velocity ?? '') }}">
+                        </div>
+                    </div>
+
+                    <hr style="display: block; color: #000;height: 1px;width: 100%;margin: 1rem 0;">
+
+                    <label class="form-label d-block"><i>Do you want to give this sample a logo?</i></label>
+                    @php
+                        $samplingData = $sampling ? $sampling->where('no_sample', '01')->where('institute_id',
+                    $institute->id)->first() : null;
+                    @endphp
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" id="showLogoYes" name="show_logo" value="1"
+                            {{ old('show_logo', $samplingData->show_logo ?? false) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="showLogoYes"><b>Yes</b></label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" id="showLogoNo" name="show_logo" value="0"
+                            {{ old('show_logo', $samplingData->show_logo ?? false) ? '' : 'checked' }}>
+                        <label class="form-check-label" for="showLogoNo"><b>No</b></label>
+                    </div>
+                    <hr style="display: block; color: #000;height: 1px;width: 100%;margin: 10urem 0;">
+                    <div class="card-footer text-end">
+                        <button class="btn btn-primary me-2" type="submit" onclick="confirmSubmit(event)">Save All</button>
+                        <input type="hidden" name="save_all" id="save_all" value="1">
+                        <a href="{{ route('result.list_result', $institute->id) }}"
+                            class="btn btn-outline-secondary">Back</a>
+                    </div>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" id="showLogoNo" name="show_logo" value="0"
-                        {{ old('show_logo', $samplingData->show_logo ?? false) ? '' : 'checked' }}>
-                    <label class="form-check-label" for="showLogoNo"><b>No</b></label>
-                </div>
-                <button class="btn btn-primary btn-sm mt-1 custom-button"
-                    type="submit" name="save_all">Save</button>
-                <input type="hidden" name="save_all" id="save_all" value="1">
             </div>
         </div>
     </form>
@@ -376,11 +421,6 @@
 <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script>
-    function confirmSubmit() {
-        document.getElementById('save_all').value = 1;
-        document.querySelector('form.card').submit(); // pastikan ini mengarah ke form utama
-    }
-
     $(document).ready(function () {
         const selectElement = document.querySelector('#is_required');
         selectElement.addEventListener('change', (event) => {
@@ -398,34 +438,34 @@
         });
     });
 
-    function confirmSubmit() {
-        swal({
-                title: "Are you sure?",
-                text: "Please make sure all data is correct and complete before submitting.",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then((willSubmit) => {
-                if (willSubmit) {
-                    swal("Submitting...", {
-                        icon: "info",
-                        buttons: false,
-                        timer: 1000, // Delay 0.3 detik sebelum redirect
-                    }).then(() => {
-                        window.location.href =
-                        "{{ route('result.list_result', $institute->id) }}?success=1";
-                    });
-                }
-            });
-    }
+    function confirmSubmit(e) {
+    e.preventDefault(); // Stop form from submitting immediately
 
+    swal({
+        title: "Are you sure?",
+        text: "Please make sure all data is correct and complete before submitting.",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    }).then((willSubmit) => {
+        if (willSubmit) {
+            swal("Submitting...", {
+                icon: "info",
+                buttons: false,
+                timer: 1000,
+            }).then(() => {
+                // Submit the form manually
+                document.getElementById("mainForm").submit();
+            });
+        }
+    });
+}
 </script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         let regulationId = document.body.getAttribute(
-        "data-regulation-id"); // Ambil regulation_id dari atribut di body
+            "data-regulation-id"); // Ambil regulation_id dari atribut di body
         let storedHiddenParameters = JSON.parse(localStorage.getItem("hidden_parameters")) || {};
         let hiddenParameters = storedHiddenParameters[regulationId] ||
     []; // Ambil parameter tersembunyi hanya untuk regulation saat ini
@@ -479,7 +519,7 @@
 
             if (hiddenParameters.length > 0) {
                 let lastHiddenParameter = hiddenParameters
-            .pop(); // Ambil parameter terakhir yang di-hide
+                    .pop(); // Ambil parameter terakhir yang di-hide
                 storedHiddenParameters[regulationId] = hiddenParameters;
                 localStorage.setItem("hidden_parameters", JSON.stringify(storedHiddenParameters));
 

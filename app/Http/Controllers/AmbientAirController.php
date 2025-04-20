@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FieldCondition;
 use Illuminate\Http\Request;
 use App\Models\Institute;
 use App\Models\InstituteRegulation;
@@ -135,20 +136,38 @@ class AmbientAirController extends Controller
 
         // Check if the request has 'save_all' parameter
         if ($request->has('save_all')) {
-            $showLogo = $request->input('show_logo', false);
 
-            // Update or create sampling with show_logo
+            // Update or create Sampling
             Sampling::updateOrCreate(
                 [
                     'institute_subject_id' => $instituteSubject->id,
                     'no_sample' => '01',
                 ],
                 [
-                    'show_logo' => $showLogo,
+                    'show_logo' => $request->input('show_logo', false),
                 ]
             );
 
-            return redirect()->back()->with('msg', 'All data saved successfully, including show_logo!');
+            // Update or create FieldCondition
+            FieldCondition::updateOrCreate(
+                [
+                    'institute_id' => $institute->id,
+                    'institute_subject_id' => $instituteSubject->id,
+                ],
+                [
+                    'coordinate' => $request->input('coordinate'),
+                    'temperature' => $request->input('temperature'),
+                    'pressure' => $request->input('pressure'),
+                    'humidity' => $request->input('humidity'),
+                    'wind_speed' => $request->input('wind_speed'),
+                    'wind_direction' => $request->input('wind_direction'),
+                    'weather' => $request->input('weather'),
+                    'velocity' => $request->input('velocity'),
+                ]
+            );
+
+            return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Data and Logo saved successfully!');
         }
 
         // Handle POST request
@@ -234,20 +253,38 @@ class AmbientAirController extends Controller
 
         // Check if the request has 'save_all' parameter
         if ($request->has('save_all')) {
-            $showLogo = $request->input('show_logo', false);
 
-            // Update or create sampling with show_logo
+            // Update or create Sampling
             Sampling::updateOrCreate(
                 [
                     'institute_subject_id' => $instituteSubject->id,
                     'no_sample' => '02',
                 ],
                 [
-                    'show_logo' => $showLogo,
+                    'show_logo' => $request->input('show_logo', false),
                 ]
             );
 
-            return redirect()->back()->with('msg', 'All data saved successfully, including show_logo!');
+            // Update or create FieldCondition
+            FieldCondition::updateOrCreate(
+                [
+                    'institute_id' => $institute->id,
+                    'institute_subject_id' => $instituteSubject->id,
+                ],
+                [
+                    'coordinate' => $request->input('coordinate'),
+                    'temperature' => $request->input('temperature'),
+                    'pressure' => $request->input('pressure'),
+                    'humidity' => $request->input('humidity'),
+                    'wind_speed' => $request->input('wind_speed'),
+                    'wind_direction' => $request->input('wind_direction'),
+                    'weather' => $request->input('weather'),
+                    'velocity' => $request->input('velocity'),
+                ]
+            );
+
+            return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Data and Logo saved successfully!');
         }
 
         if ($request->isMethod('POST')) {
@@ -308,7 +345,7 @@ class AmbientAirController extends Controller
             ->where('no_sample', '02')
             ->latest()
             ->first();
-            
+
             $results = collect();
         if ($samplings) {
             $results = Result::where('sampling_id', $samplings->id)
@@ -333,20 +370,38 @@ class AmbientAirController extends Controller
 
         // Check if the request has 'save_all' parameter
         if ($request->has('save_all')) {
-            $showLogo = $request->input('show_logo', false);
 
-            // Update or create sampling with show_logo
+            // Update or create Sampling
             Sampling::updateOrCreate(
                 [
                     'institute_subject_id' => $instituteSubject->id,
                     'no_sample' => '03',
                 ],
                 [
-                    'show_logo' => $showLogo,
+                    'show_logo' => $request->input('show_logo', false),
                 ]
             );
 
-            return redirect()->back()->with('msg', 'All data saved successfully, including show_logo!');
+            // Update or create FieldCondition
+            FieldCondition::updateOrCreate(
+                [
+                    'institute_id' => $institute->id,
+                    'institute_subject_id' => $instituteSubject->id,
+                ],
+                [
+                    'coordinate' => $request->input('coordinate'),
+                    'temperature' => $request->input('temperature'),
+                    'pressure' => $request->input('pressure'),
+                    'humidity' => $request->input('humidity'),
+                    'wind_speed' => $request->input('wind_speed'),
+                    'wind_direction' => $request->input('wind_direction'),
+                    'weather' => $request->input('weather'),
+                    'velocity' => $request->input('velocity'),
+                ]
+            );
+
+            return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Data and Logo saved successfully!');
         }
 
         if ($request->isMethod('POST')) {
@@ -431,20 +486,38 @@ class AmbientAirController extends Controller
 
         // Check if the request has 'save_all' parameter
         if ($request->has('save_all')) {
-            $showLogo = $request->input('show_logo', false);
 
-            // Update or create sampling with show_logo
+            // Update or create Sampling
             Sampling::updateOrCreate(
                 [
                     'institute_subject_id' => $instituteSubject->id,
                     'no_sample' => '04',
                 ],
                 [
-                    'show_logo' => $showLogo,
+                    'show_logo' => $request->input('show_logo', false),
                 ]
             );
 
-            return redirect()->back()->with('msg', 'All data saved successfully, including show_logo!');
+            // Update or create FieldCondition
+            FieldCondition::updateOrCreate(
+                [
+                    'institute_id' => $institute->id,
+                    'institute_subject_id' => $instituteSubject->id,
+                ],
+                [
+                    'coordinate' => $request->input('coordinate'),
+                    'temperature' => $request->input('temperature'),
+                    'pressure' => $request->input('pressure'),
+                    'humidity' => $request->input('humidity'),
+                    'wind_speed' => $request->input('wind_speed'),
+                    'wind_direction' => $request->input('wind_direction'),
+                    'weather' => $request->input('weather'),
+                    'velocity' => $request->input('velocity'),
+                ]
+            );
+
+            return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Data and Logo saved successfully!');
         }
 
         if ($request->isMethod('POST')) {
@@ -529,20 +602,38 @@ class AmbientAirController extends Controller
 
         // Check if the request has 'save_all' parameter
         if ($request->has('save_all')) {
-            $showLogo = $request->input('show_logo', false);
 
-            // Update or create sampling with show_logo
+            // Update or create Sampling
             Sampling::updateOrCreate(
                 [
                     'institute_subject_id' => $instituteSubject->id,
                     'no_sample' => '05',
                 ],
                 [
-                    'show_logo' => $showLogo,
+                    'show_logo' => $request->input('show_logo', false),
                 ]
             );
 
-            return redirect()->back()->with('msg', 'All data saved successfully, including show_logo!');
+            // Update or create FieldCondition
+            FieldCondition::updateOrCreate(
+                [
+                    'institute_id' => $institute->id,
+                    'institute_subject_id' => $instituteSubject->id,
+                ],
+                [
+                    'coordinate' => $request->input('coordinate'),
+                    'temperature' => $request->input('temperature'),
+                    'pressure' => $request->input('pressure'),
+                    'humidity' => $request->input('humidity'),
+                    'wind_speed' => $request->input('wind_speed'),
+                    'wind_direction' => $request->input('wind_direction'),
+                    'weather' => $request->input('weather'),
+                    'velocity' => $request->input('velocity'),
+                ]
+            );
+
+            return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Data and Logo saved successfully!');
         }
 
         if ($request->isMethod('POST')) {
@@ -627,20 +718,38 @@ class AmbientAirController extends Controller
 
         // Check if the request has 'save_all' parameter
         if ($request->has('save_all')) {
-            $showLogo = $request->input('show_logo', false);
 
-            // Update or create sampling with show_logo
+            // Update or create Sampling
             Sampling::updateOrCreate(
                 [
                     'institute_subject_id' => $instituteSubject->id,
                     'no_sample' => '06',
                 ],
                 [
-                    'show_logo' => $showLogo,
+                    'show_logo' => $request->input('show_logo', false),
                 ]
             );
 
-            return redirect()->back()->with('msg', 'All data saved successfully, including show_logo!');
+            // Update or create FieldCondition
+            FieldCondition::updateOrCreate(
+                [
+                    'institute_id' => $institute->id,
+                    'institute_subject_id' => $instituteSubject->id,
+                ],
+                [
+                    'coordinate' => $request->input('coordinate'),
+                    'temperature' => $request->input('temperature'),
+                    'pressure' => $request->input('pressure'),
+                    'humidity' => $request->input('humidity'),
+                    'wind_speed' => $request->input('wind_speed'),
+                    'wind_direction' => $request->input('wind_direction'),
+                    'weather' => $request->input('weather'),
+                    'velocity' => $request->input('velocity'),
+                ]
+            );
+
+            return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Data and Logo saved successfully!');
         }
 
         if ($request->isMethod('POST')) {
@@ -725,20 +834,38 @@ class AmbientAirController extends Controller
 
         // Check if the request has 'save_all' parameter
         if ($request->has('save_all')) {
-            $showLogo = $request->input('show_logo', false);
 
-            // Update or create sampling with show_logo
+            // Update or create Sampling
             Sampling::updateOrCreate(
                 [
                     'institute_subject_id' => $instituteSubject->id,
                     'no_sample' => '07',
                 ],
                 [
-                    'show_logo' => $showLogo,
+                    'show_logo' => $request->input('show_logo', false),
                 ]
             );
 
-            return redirect()->back()->with('msg', 'All data saved successfully, including show_logo!');
+            // Update or create FieldCondition
+            FieldCondition::updateOrCreate(
+                [
+                    'institute_id' => $institute->id,
+                    'institute_subject_id' => $instituteSubject->id,
+                ],
+                [
+                    'coordinate' => $request->input('coordinate'),
+                    'temperature' => $request->input('temperature'),
+                    'pressure' => $request->input('pressure'),
+                    'humidity' => $request->input('humidity'),
+                    'wind_speed' => $request->input('wind_speed'),
+                    'wind_direction' => $request->input('wind_direction'),
+                    'weather' => $request->input('weather'),
+                    'velocity' => $request->input('velocity'),
+                ]
+            );
+
+            return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Data and Logo saved successfully!');
         }
 
         if ($request->isMethod('POST')) {
@@ -823,20 +950,38 @@ class AmbientAirController extends Controller
 
         // Check if the request has 'save_all' parameter
         if ($request->has('save_all')) {
-            $showLogo = $request->input('show_logo', false);
 
-            // Update or create sampling with show_logo
+            // Update or create Sampling
             Sampling::updateOrCreate(
                 [
                     'institute_subject_id' => $instituteSubject->id,
                     'no_sample' => '08',
                 ],
                 [
-                    'show_logo' => $showLogo,
+                    'show_logo' => $request->input('show_logo', false),
                 ]
             );
 
-            return redirect()->back()->with('msg', 'All data saved successfully, including show_logo!');
+            // Update or create FieldCondition
+            FieldCondition::updateOrCreate(
+                [
+                    'institute_id' => $institute->id,
+                    'institute_subject_id' => $instituteSubject->id,
+                ],
+                [
+                    'coordinate' => $request->input('coordinate'),
+                    'temperature' => $request->input('temperature'),
+                    'pressure' => $request->input('pressure'),
+                    'humidity' => $request->input('humidity'),
+                    'wind_speed' => $request->input('wind_speed'),
+                    'wind_direction' => $request->input('wind_direction'),
+                    'weather' => $request->input('weather'),
+                    'velocity' => $request->input('velocity'),
+                ]
+            );
+
+            return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Data and Logo saved successfully!');
         }
 
         if ($request->isMethod('POST')) {
@@ -921,20 +1066,38 @@ class AmbientAirController extends Controller
 
         // Check if the request has 'save_all' parameter
         if ($request->has('save_all')) {
-            $showLogo = $request->input('show_logo', false);
 
-            // Update or create sampling with show_logo
+            // Update or create Sampling
             Sampling::updateOrCreate(
                 [
                     'institute_subject_id' => $instituteSubject->id,
                     'no_sample' => '09',
                 ],
                 [
-                    'show_logo' => $showLogo,
+                    'show_logo' => $request->input('show_logo', false),
                 ]
             );
 
-            return redirect()->back()->with('msg', 'All data saved successfully, including show_logo!');
+            // Update or create FieldCondition
+            FieldCondition::updateOrCreate(
+                [
+                    'institute_id' => $institute->id,
+                    'institute_subject_id' => $instituteSubject->id,
+                ],
+                [
+                    'coordinate' => $request->input('coordinate'),
+                    'temperature' => $request->input('temperature'),
+                    'pressure' => $request->input('pressure'),
+                    'humidity' => $request->input('humidity'),
+                    'wind_speed' => $request->input('wind_speed'),
+                    'wind_direction' => $request->input('wind_direction'),
+                    'weather' => $request->input('weather'),
+                    'velocity' => $request->input('velocity'),
+                ]
+            );
+
+            return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Data and Logo saved successfully!');
         }
 
         if ($request->isMethod('POST')) {
@@ -1019,20 +1182,38 @@ class AmbientAirController extends Controller
 
         // Check if the request has 'save_all' parameter
         if ($request->has('save_all')) {
-            $showLogo = $request->input('show_logo', false);
 
-            // Update or create sampling with show_logo
+            // Update or create Sampling
             Sampling::updateOrCreate(
                 [
                     'institute_subject_id' => $instituteSubject->id,
                     'no_sample' => '010',
                 ],
                 [
-                    'show_logo' => $showLogo,
+                    'show_logo' => $request->input('show_logo', false),
                 ]
             );
 
-            return redirect()->back()->with('msg', 'All data saved successfully, including show_logo!');
+            // Update or create FieldCondition
+            FieldCondition::updateOrCreate(
+                [
+                    'institute_id' => $institute->id,
+                    'institute_subject_id' => $instituteSubject->id,
+                ],
+                [
+                    'coordinate' => $request->input('coordinate'),
+                    'temperature' => $request->input('temperature'),
+                    'pressure' => $request->input('pressure'),
+                    'humidity' => $request->input('humidity'),
+                    'wind_speed' => $request->input('wind_speed'),
+                    'wind_direction' => $request->input('wind_direction'),
+                    'weather' => $request->input('weather'),
+                    'velocity' => $request->input('velocity'),
+                ]
+            );
+
+            return redirect()->route('result.list_result', $institute->id)
+            ->with('msg', 'Data and Logo saved successfully!');
         }
 
         if ($request->isMethod('POST')) {

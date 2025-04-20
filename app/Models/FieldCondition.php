@@ -21,5 +21,8 @@ class FieldCondition extends Model
         'wind_speed',
         'wind_direction',
         'weather',
+        'velocity',
+        'created_at',
+        'updated_at'
     ];
 }

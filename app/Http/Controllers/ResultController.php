@@ -323,21 +323,7 @@ class ResultController extends Controller
                 ->get()
             : collect();
 
-            if ($regulations->contains(fn($regulation) =>
-            in_array($regulation->id, [13, 15]) ||
-            ($regulation->subject && ($regulation->subject->id == 3 || $regulation->subject->code == '03'))
-        )) {
-            $view = 'result.noise.add_new';
-        } elseif ($regulations->contains(fn($regulation) =>
-            in_array($regulation->id, [12, 14]) ||
-            ($regulation->subject && ($regulation->subject->id == 3 || $regulation->subject->code == '03'))
-        )) {
-            $view = 'result.noise.add';
-        } else {
-            abort(404, 'Halaman tidak ditemukan');
-        }
-
-        return view($view, compact(
+        return view('result.noise.add',compact(
             'institute', 'parameters', 'regulations', 'subjects', 'samplingTimeRegulations',
             'results', 'subject', 'instituteSubject', 'samplingNoise', 'samplings'
         ));
@@ -429,21 +415,7 @@ class ResultController extends Controller
             ->get();
         $results = Result::where('sampling_id', $samplings->id)->get();
 
-        if ($regulations->contains(fn($regulation) =>
-            in_array($regulation->id, [13, 15]) ||
-            ($regulation->subject && ($regulation->subject->id == 3 || $regulation->subject->code == '03'))
-        )) {
-            $view = 'result.noise.add_new';
-        } elseif ($regulations->contains(fn($regulation) =>
-            in_array($regulation->id, [12, 14]) ||
-            ($regulation->subject && ($regulation->subject->id == 3 || $regulation->subject->code == '03'))
-        )) {
-            $view = 'result.noise.add';
-        } else {
-            abort(404, 'Halaman tidak ditemukan');
-        }
-
-        return view($view, compact(
+        return view('result.noise.add_new',compact(
             'institute', 'parameters', 'regulations', 'subjects',
             'samplingTimeRegulations', 'results', 'subject', 'instituteSubject'
         ));
