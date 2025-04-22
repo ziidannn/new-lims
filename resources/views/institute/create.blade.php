@@ -151,7 +151,8 @@
                         </div> -->
                         <div class="col-lg-12">
                             <div id="subject_id_container">
-                                <label class="col-form-label">Subject Description And Regulatiom<i class="text-danger">*</i></label>
+                                <label class="col-form-label">Subject Description And Regulatiom<i
+                                        class="text-danger">*</i></label>
                                 <div class="row mb-2">
                                     <div class="col-md-5">
                                         <select id="subject_select" name="subject_id[]"
@@ -181,10 +182,9 @@
                             </div>
                             <button type="button" class="btn btn-primary mt-2 mb-3" id="add_more">+ Add More</button>
                         </div>
-                        <hr style="color: #333;">
+                        <!-- <hr style="color: #333;">
                         <div id="condition_section">
                             <h4 class="mb-3">Ambient Environmental Condition</h4>
-
                             <div class="row">
                                 <div class="col-lg-6 col-md-6 field-condition" id="coordinate">
                                     <label class="form-label">Coordinate:</label>
@@ -198,7 +198,6 @@
                                         placeholder="Input Temperature" value="{{ old('temperature') }}">
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="col-lg-6 col-md-6 field-condition" id="pressure">
                                     <label class="form-label">Pressure:</label>
@@ -240,8 +239,7 @@
                                         value="{{ old('velocity') }}">
                                 </div>
                             </div>
-                        </div>
-
+                        </div> -->
                     </div>
                 </div>
                 <div class="card-footer text-end">
@@ -265,6 +263,7 @@
             allowClear: true
         });
     });
+
 </script>
 <script>
     $(document).on('change', 'select[name="subject_id[]"]', function () {
@@ -394,27 +393,28 @@
 </script>
 <script>
     $(document).ready(function () {
-    $('#condition_section').hide();
-
-    $('#subject_select').on('change', function () {
-        let selectedValue = $(this).val();
         $('#condition_section').hide();
-        $('.field-condition').hide();
 
-        if (selectedValue == 1 || selectedValue == 4) { // Ambient Air & Odor (Semua input)
-            $('#condition_section').show();
-            $('.field-condition').show();
-            $('#velocity').hide(); // Sembunyikan velocity
-        }
-        if (selectedValue == 7) { // Stationary Stack Source Emission (Coordinate & Velocity)
-            $('#condition_section').show();
-            $('#coordinate, #velocity').show();
-        }
-        if (selectedValue == 2) { // Workplace Air (Temperature & Humidity)
-            $('#condition_section').show();
-            $('#temperature, #humidity').show();
-        }
+        $('#subject_select').on('change', function () {
+            let selectedValue = $(this).val();
+            $('#condition_section').hide();
+            $('.field-condition').hide();
+
+            if (selectedValue == 1 || selectedValue == 4) { // Ambient Air & Odor (Semua input)
+                $('#condition_section').show();
+                $('.field-condition').show();
+                $('#velocity').hide(); // Sembunyikan velocity
+            }
+            if (selectedValue == 7) { // Stationary Stack Source Emission (Coordinate & Velocity)
+                $('#condition_section').show();
+                $('#coordinate, #velocity').show();
+            }
+            if (selectedValue == 2) { // Workplace Air (Temperature & Humidity)
+                $('#condition_section').show();
+                $('#temperature, #humidity').show();
+            }
+        });
     });
-});
+
 </script>
 @endsection

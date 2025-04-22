@@ -80,11 +80,11 @@
                                 <label class="form-label" for="basicDate">Sample subjects</label>
                                 <div class="input-group input-group-merge has-validation">
                                     <div class="mb-3">
-                                        <label for="editSamplesubjects" class="form-label">Code Subject</label>
-                                        <select class="form-select" id="editSamplesubjects" name="subject_id" required>
-                                            <option value="">-- Select Sample subjects --</option>
+                                        <label for="editSampleSubjects" class="form-label">Code Subject</label>
+                                        <select class="form-select" id="editSampleSubjects" name="subject_id" required>
+                                            <option value="">-- Select Sample Subjects --</option>
                                             @foreach($subjects as $p)
-                                            <option value="{{ $p->id }}">{{ $p->subject_code }} - {{ $p->name }}</option>
+                                                <option value="{{ $p->id }}">{{ $p->subject_code }} - {{ $p->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -121,7 +121,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            
+
                             <div class="col-sm-12 mt-4">
                                 <button type="submit" class="btn btn-primary data-submit me-sm-3 me-1">Create</button>
                                 <button type="reset" class="btn btn-outline-secondary"
@@ -153,31 +153,33 @@
                 <h5 class="modal-title" id="editModalLabel">Edit Regulation</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editForm" method="POST">
+            <form id="editForm" action="{{ route('coa.regulation.update', ['id' => ':id']) }}">
                 @csrf
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="editSamplesubjects" class="form-label">Sample subjects</label>
-                        <select class="form-select" id="editSamplesubjects" name="subject_id" required>
+                    <!-- <div class="mb-3">
+                        <label for="editSampleSubjects" class="form-label">Sample subjects</label>
+                        <select class="form-select" id="editSampleSubjects" name="subject_id" required>
                             <option value="">-- Select Sample subjects --</option>
-                            @foreach($subjects as $p)
-                            <option value="{{ $p->id }}">{{ $p->subject_code }} - {{ $p->name }}</option>
+                            @foreach($subjects as $c)
+                                <option value="{{ $c->id }}" {{ old('subject_id') == $c->id ? 'selected' : '' }}>
+                                    {{ $c->subject_code }} - {{$c->name}}
+                                </option>
                             @endforeach
                         </select>
-                    </div>
+                    </div> -->
                     <div class="mb-3">
-                        <label for="editTitle" class="form-label">Code Regulation</label>
-                        <textarea type="text" class="form-control" id="editTitle" name="regulation_code" required maxlength="120"
-                            placeholder="Input The New Code"></textarea>
+                        <label for="editCodeRegulation" class="form-label">Code Regulation</label>
+                        <input type="text" class="form-control" id="editCodeRegulation" name="regulation_code" required maxlength="120"
+                            placeholder="Input The New Code">
                     </div>
                     <div class="mb-3">
                         <label for="editTitle" class="form-label">Title</label>
-                        <textarea type="text" class="form-control" id="editTitle" name="title" required maxlength="120"
-                            placeholder="Input The New Title"></textarea>
+                        <textarea type="text" class="form-control" id="editTitle" name="title" maxlength="120" rows="5"
+                            placeholder="Input The New Title" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Update</button>
                 </div>
             </form>
@@ -283,8 +285,8 @@
                     render: function (data, type, row, meta) {
                         return `
                             <a class="badge bg-warning badge-icon edit-btn" title="Edit Regulation"
-                            style="cursor:pointer" data-id="${row.id}" data-title="${row.title}"
-                            data-subject_id="${row.subject_id}">
+                            style="cursor:pointer" data-id="${row.id}" data-subject_id="${row.subject_id}"
+                            data-regulation_code="${row.regulation_code}" data-title="${row.title}">
                                 <i class="bx bx-pencil icon-white"></i>
                             </a>
                             <a class="badge bg-danger badge-icon" title="Delete Regulation" style="cursor:pointer"
@@ -356,12 +358,14 @@
         $(document).on('click', '.edit-btn', function () {
             let id = $(this).data('id');
             let subject_id = $(this).data('subject_id');
+            let regulation_code = $(this).data('regulation_code');
             let title = $(this).data('title');
 
             // Set data ke dalam modal
+            $('#editSampleSubjects').val(subject_id);
+            $('#editCodeRegulation').val(regulation_code);
             $('#editTitle').val(title);
-            $('#editSamplesubjects').val(subject_id);
-            $('#editForm').attr('action', `/coa/regulation/update/${id}`);
+            $('#editForm').data('id', id); // simpan ID ke form
 
             // Tampilkan modal
             $('#editModal').modal('show');
@@ -372,7 +376,8 @@
             e.preventDefault();
 
             let form = $(this);
-            let url = form.attr('action');
+            let id = form.data('id'); // ambil ID dari form data
+            let url = form.attr('action').replace(':id', id); // ganti placeholder :id dengan id asli
             let formData = form.serialize();
 
             $.ajax({

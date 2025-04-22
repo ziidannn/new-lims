@@ -30,4 +30,17 @@ class Subject extends Model
     {
         return $this->hasMany(InstituteSubject::class, 'subject_id');
     }
+    // In the Subject model (app/Models/Subject.php)
+
+    public function instituteRegulations()
+    {
+        return $this->hasManyThrough(
+            InstituteRegulation::class,    // The model we want to access (InstituteRegulation)
+            InstituteSubject::class,       // The intermediate model (InstituteSubject)
+            'subject_id',                  // Foreign key on the intermediate model (InstituteSubject)
+            'institute_subject_id',        // Foreign key on the target model (InstituteRegulation)
+            'id',                          // Local key on the first model (Subject)
+            'id'                           // Local key on the intermediate model (InstituteSubject)
+        );
+    }
 }

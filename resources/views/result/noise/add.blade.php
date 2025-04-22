@@ -40,9 +40,17 @@
 </style>
 @endsection
 
-@section('breadcrumb-title')
-@endsection
 @section('content')
+<div class="col-md-12">
+    <ul class="nav nav-pills flex-column flex-sm-row mb-4">
+        <li class="nav-item"><a class="nav-link active" href="{{ route('result.noise.add', $institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 1</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.noise.add_new', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 2</i></b></a></li>
+    </ul>
+</div>
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
     @if(session('msg'))
     <div class="alert alert-success alert-dismissible" role="alert">

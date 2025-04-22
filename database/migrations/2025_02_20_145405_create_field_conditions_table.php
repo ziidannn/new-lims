@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('wind_speed')->nullable();
             $table->string('wind_direction')->nullable();
             $table->string('weather')->nullable();
+            $table->string('velocity')->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
         });

@@ -232,9 +232,6 @@
             },
             ajax: {
                 url: "{{ route('customer.data') }}",
-                data: function (d) {
-                    d.search = $('input[type="search"]').val()
-                },
             },
             columnDefs: [{
                 "defaultContent": "-",
@@ -295,9 +292,6 @@
                     className: "text-md-center"
                 }
             ]
-        });
-        $('#select_subjects').change(function () {
-            table.draw();
         });
     });
 

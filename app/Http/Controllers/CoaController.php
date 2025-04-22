@@ -23,56 +23,36 @@ class CoaController extends Controller
     }
 
     public function create_subject(Request $request)
-{
-    if ($request->isMethod('post')) { // 'post' harus dalam lowercase
-        $this->validate($request, [
-            'subject_code' => 'required',
-            'name' => 'required',
-        ]);
-
-        $data = Subject::create([
-            'subject_code' => $request->subject_code,
-            'name' => $request->name,
-        ]);
-
-        return redirect()->route('coa.subject.index')->with('msg', 'Subject (' . $request->name . ') added successfully');
-    }
-
-    return view('coa.subject.create'); // Tidak perlu mengirimkan $data ke view
-}
-    // Data_Subject
-    public function data_subject(Request $request)
     {
-        $data = Subject::all();
-        return DataTables::of($data)
-            ->filter(function ($instance) use ($request) {
-                if (!empty($request->get('search'))) {
-                    $search = $request->get('search');
-                    $instance->where(function ($w) use ($search) {
-                        $w->orWhere('subject_code', 'LIKE', "%$search%")
-                            ->orWhere('name', 'LIKE', "%$search%");
-                    });
-                }
-            })
-            ->make(true);
-    }
-    // Edit_Subject
-    public function edit_subject(Request $request, $id)
-    {
-        $data = Subject::findOrFail($id);
-        if ($request->isMethod('POST')) {
+        if ($request->isMethod('post')) { // 'post' harus dalam lowercase
             $this->validate($request, [
                 'subject_code' => 'required',
                 'name' => 'required',
             ]);
-            $data->update([
+
+            $data = Subject::create([
                 'subject_code' => $request->subject_code,
                 'name' => $request->name,
             ]);
-            return redirect()->route('coa.subject.index')->with('msg', 'Subject updated successfully.');
+
+            return redirect()->route('coa.subject.index')->with('msg', 'Subject (' . $request->name . ') added successfully');
         }
-        return view('coa.subject.edit', compact('data'));
+
+        return view('coa.subject.index'); // Tidak perlu mengirimkan $data ke view
     }
+
+    // Edit_Subject
+    public function edit_subject(Request $request, $id)
+    {
+        $subject = Subject::findOrFail($id); // atau model kamu sendiri
+        $subject->update([
+            'subject_code' => $request->subject_code,
+            'name' => $request->name,
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
     // Delete_Subject
     public function delete_subject(Request $request){
         $data = Subject::find($request->id);
@@ -88,6 +68,23 @@ class CoaController extends Controller
                 'message' => 'Failed to delete! Data not found'
             ]);
         }
+    }
+
+    // Data_Subject
+    public function data_subject(Request $request)
+    {
+        $data = Subject::all();
+        return DataTables::of($data)
+            ->filter(function ($instance) use ($request) {
+                if (!empty($request->get('search'))) {
+                    $search = $request->get('search');
+                    $instance->where(function ($w) use ($search) {
+                        $w->orWhere('subject_code', 'LIKE', "%$search%")
+                            ->orWhere('name', 'LIKE', "%$search%");
+                    });
+                }
+            })
+            ->make(true);
     }
 
     //----------------------------------------------- R E G U L A T I O N ----------------------------------------------------//
@@ -113,29 +110,35 @@ class CoaController extends Controller
         }
 
         $data = Regulation::all();
-        $subjects = Subject::orderBy('name')->get();
+        $subjects = Subject::all();
         return view('coa.regulation.index', compact('data', 'subjects'));
     }
+
     // Edit Regulation
     public function edit_regulation(Request $request, $id){
-        $data = Regulation::findOrFail($id);
+        $data = Regulation::with('subjects')->findOrFail($id);
+        $subjects = Subject::all();
+
         if ($request->isMethod('POST')) {
             $this->validate($request, [
-            'title'    => 'string', 'max:191',
-            'regulation_code' => 'string',
-            'subject_id' => 'string'
-        ]);
+                'title'    => 'string|max:191',
+                'regulation_code' => 'string',
+                'subject_id' => 'string'
+            ]);
 
-        $data->update([
-            'title'=> $request->title,
-            'subject_id'=> $request->subject_id,
-        ]);
-            return redirect()->route('coa.regulation.index')->with('msg', 'Regulation updated successfully.');
+            $data->update([
+                'title'=> $request->title,
+                'regulation_code'=> $request->regulation_code,
+                'subject_id'=> $request->subject_id,
+            ]);
+
+            return redirect()->route('coa.regulation.index')
+                ->with('msg', 'Regulation updated successfully.');
         }
 
-        $subjects = Subject::orderBy('name')->get();
         return view('coa.regulation.edit', compact('data', 'subjects'));
     }
+
     // Delete Regulation
     public function delete_regulation(Request $request){
         $data = Regulation::find($request->id);
@@ -231,13 +234,21 @@ class CoaController extends Controller
     {
         if ($request->isMethod('POST')) {
             $this->validate($request, [
-                'name' => ['required'],
-                'sampling_time_id' => ['required', 'array'],
-                'regulation_standard_id' => ['required', 'array'],
                 'unit' => ['required'],
                 'method' => ['required'],
                 'subject_id' => ['required'],
             ]);
+
+            // Cek apakah subject yang dipilih adalah '01' (misalnya Ambient Air)
+            $subject = Subject::find($request->subject_id);
+
+            if ($subject && $subject->subject_code === '01') {
+                $request->validate([
+                    'name' => ['required'],
+                    'sampling_time_id' => ['required', 'array'],
+                    'regulation_standard_id' => ['required', 'array'],
+                ]);
+            }
 
             $parameter = Parameter::create([
                 'name' => $request->name,
@@ -246,17 +257,17 @@ class CoaController extends Controller
                 'subject_id' => $request->subject_id,
             ]);
 
-            foreach ($request->sampling_time_id as $key => $samplingTimeId) {
-                SamplingTimeRegulation::create([
-                    'parameter_id' => $parameter->id,
-                    'sampling_time_id' => $samplingTimeId,
-                    'regulation_standard_id' => $request->regulation_standard_id[$key],
-                ]);
+            if ($subject && $subject->subject_code === '01') {
+                foreach ($request->sampling_time_id as $key => $samplingTimeId) {
+                    SamplingTimeRegulation::create([
+                        'parameter_id' => $parameter->id,
+                        'sampling_time_id' => $samplingTimeId,
+                        'regulation_standard_id' => $request->regulation_standard_id[$key],
+                    ]);
+                }
             }
 
-            if ($parameter) {
-                return redirect()->route('coa.parameter.index')->with('msg', 'Parameter (' . $request->name . ') added successfully');
-            }
+            return redirect()->route('coa.parameter.index')->with('msg', 'Parameter (' . $request->name . ') added successfully');
         }
 
         $data = Parameter::all();
@@ -266,6 +277,7 @@ class CoaController extends Controller
 
         return view('coa.parameter.add_parameter', compact('data', 'subjects', 'samplingTime', 'regulationStandards'));
     }
+
     // Edit Parameter
     public function edit_parameter(Request $request, $id)
     {
@@ -316,7 +328,8 @@ class CoaController extends Controller
             'data', 'samplingTime', 'regulationStandards', 'existingSamplingTimes'
         ));
     }
-    // Delete Parameter 
+
+    // Delete Parameter
     public function delete_parameter(Request $request){
         $data = Parameter::find($request->id);
         if($data){
@@ -352,7 +365,7 @@ class CoaController extends Controller
                 return !empty($regulationStandards) ? implode(', ', $regulationStandards) : '-';
             })
             ->rawColumns(['samplingTime', 'regulationStandards'])
-            ->make(true);     
+            ->make(true);
     }
 
     //----------------------------------- S A M P L I N G  T I M E ------------------------------------------//

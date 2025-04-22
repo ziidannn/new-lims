@@ -80,11 +80,13 @@
             </div>
             <div align="right" style="width: 50%; float: right;">
                 <div>
-                    <img src="{{ public_path('assets/img/kan.png') }}" alt="" width="100px" style="float: right;">
+                @if($sampling && $sampling->show_logo)
+                    <img src="{{ public_path('assets/img/kan.png') }}" alt="KAN Logo" width="100px" style="float: right;">
                     <div style="clear: right;"></div>
                     <p style="font-size: 9px; font-weight: bold; text-align:right; margin: -5px;">
                         SK-KLHK No 00161/LPJ/Labling-1/LRK/KLHK
                     </p>
+                @endif
                     <p style="font-size: 8px; text-align:right; margin: -5px;">
                         7.8.1/DIL/VII/2018/FORM REV . 2
                     </p>
@@ -93,7 +95,7 @@
                     </p>
                 </div>
             </div>
-        </div>  
+        </div>
     </header>
 <footer>
     <div style="text-align: left; padding-bottom: -5px; margin-bottom: 10;">
@@ -107,7 +109,7 @@
         <tr>
             <td colspan="2" style="font-size: 8px; text-align: center;">*This result (s) relate only to the sample (s) tested and the test report/certificate shall not be reproduced except in full, without written approval of PT Delta Indonesia Laboratory</td>
         </tr>
-    </table>    
+    </table>
 </footer>
 {{-- End Footer --}}
 
@@ -180,7 +182,7 @@
         </tr>
     </table>
 </div>
-    
+
 <div style="width: 100%; margin-top: 50px;">
     <div align="left" style="width: 50%;float: left;"></div>
     <div style="width: 50%; float: right;">
@@ -224,14 +226,14 @@
                     <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
-                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to 
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
                                                 <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
                 </tr>
         </table>
     </div>
     {{-- Start Parameters --}}
     <div style="margin-top: 20px;"> <!-- Adjusted margin-top to add space between the title and the table -->
-        
+
         <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center; width: 100%;">
             <tr>
             <td style="border: 1px solid; font-weight: bold;">NO</td>
@@ -245,8 +247,21 @@
 
             @php 
             $counter = 1;
+=======
+                <td style="border: 1px solid; font-weight: bold;">NO</td>
+                <td style="border: 1px solid; font-weight: bold;">Parameters</td>
+                <td style="border: 1px solid; font-weight: bold;">Sampling Time</td>
+                <td style="border: 1px solid; font-weight: bold;">Testing Result</td>
+                <td style="border: 1px solid; font-weight: bold;">Regulatory <br> Standard**</td>
+                <td style="border: 1px solid; font-weight: bold;">Unit</td>
+                <td style="border: 1px solid; font-weight: bold;">Methods</td>
+            </tr>
+
+            @php
+                $counter = 1; // Nomor tetap seperti sebelumnya
+>>>>>>> 4a11a7d381dd1a2be647a9306988a86b22236334
             @endphp
-        
+
             @foreach(collect($samplingTimeRegulations)->pluck('parameter')->unique()->sortBy('id') as $parameter)
             @php
                 $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
@@ -277,6 +292,186 @@
                 </tr>
                 @php 
                     $firstRow = false; 
+=======
+                @foreach ($samplingTimes as $samplingTime)
+                    @php
+                        $resultKey = "{$parameter->id}-{$samplingTime->samplingTime->id}";
+                        $resultData = $results->get($resultKey)?->first();
+                        $regulationStandard = $samplingTime->regulationStandards ?? null;
+                    @endphp
+                    <tr >
+                        @if ($firstRow)
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $counter }}</td>
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->name }}</td>
+                        @endif
+                        <td style="border: 1px solid;" >{{ $samplingTime->samplingTime->time }}</td>
+                        <td style="border: 1px solid;">{{ $resultData ? $resultData->testing_result : '-' }}</td>
+                        <td style="border: 1px solid;">{{ $regulationStandard ? $regulationStandard->title : '-' }}</td>
+                        @if ($firstRow)
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->unit ?? '-' }}</td>
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->method ?? '-' }}</td>
+                        @endif
+                    </tr>
+                    @php
+                        $firstRow = false;
+                    @endphp
+                @endforeach
+
+                @php
+                    $counter++; // Tetap seperti sebelumnya
+                @endphp
+            @endforeach
+        </table>
+    </div>
+    {{-- End Parameters --}}
+    {{-- Start Condition  --}}
+    <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+        <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: left; width: 100%;">
+            <tr style="line-height: 1;">
+                <td style="width: 30%;">Ambient Environmental Condition</td>
+                <td style="width: 70%;"></td>
+            </tr>
+            <tr style="line-height: 1;">
+                <td style="width: 30%;">Coordinate</td>
+                <td style="width: 70%;">: {{ $fieldCondition->coordinate ?? 'N/A' }}</td>
+            </tr>
+            <tr style="line-height: 1;">
+                <td style="width: 30%;">Temperature</td>
+                <td style="width: 70%;">: {{ $fieldCondition->temperature ?? 'N/A' }} °C</td>
+            </tr>
+            <tr style="line-height: 1;">
+                <td style="width: 30%;">Pressure</td>
+                <td style="width: 70%;">: {{ $fieldCondition->pressure ?? 'N/A' }} mmHg</td>
+            </tr>
+            <tr style="line-height: 1;">
+                <td style="width: 30%;">Humidity</td>
+                <td style="width: 70%;">: {{ $fieldCondition->humidity ?? 'N/A' }} %RH</td>
+            </tr>
+            <tr style="line-height: 1;">
+                <td style="width: 30%;">Wind Speed</td>
+                <td style="width: 70%;">: {{ $fieldCondition->wind_speed ?? 'N/A' }} m/s</td>
+            </tr>
+            <tr style="line-height: 1;">
+                <td style="width: 30%;">Wind Direction</td>
+                <td style="width: 70%;">: {{ $fieldCondition->wind_direction ?? 'N/A' }}</td>
+            </tr>
+            <tr style="line-height: 1;">
+                <td style="width: 30%;">Weather</td>
+                <td style="width: 70%;">: {{ $fieldCondition->weather ?? 'N/A' }}</td>
+            </tr>
+        </table>
+    </div>
+    {{-- End Condition  --}}
+    {{-- Start Notes and Regulation --}}
+    <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+        <table style="font-size: 10px; margin: 0 auto;  border-collapse: collapse; text-align: left; width: 100%;">
+            <tr style="line-height: 1;">
+                <td style="width: 10%; font-weight: bold;">Notes:</td>
+                {{-- <td style="width: 90%;">: Xxxxxx</td> --}}
+            </tr>
+            <tr style="line-height: 1;">
+                <td style="width: 0%;"> &lt; </td>
+                <td style="width: 100%;">Less Than MDL (Method Detection Limit) </td>
+            </tr>
+            <tr style="line-height: 1;">
+                <td style="width: 0%;"> * </td>
+                <td style="width: 95%;">Accredited Parameters </td>
+            </tr>
+            @if ($regulations->isNotEmpty())
+                @foreach ($regulations as $regulation)
+            <tr style="line-height: 1;">
+                <td style="width: 5%;">{{ $loop->iteration }}</td>
+                <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
+            </tr>
+            @endforeach
+            @endif
+        </table>
+    </div>
+    {{-- End Notes and Regulation --}}
+</div>
+
+@endforeach
+@foreach($samplings->where('sampling_location', 'Downwind') as $sampling)
+<div>
+    <div class="text-center certificate-container" style="margin-top: 20px;">
+        <p class="certificate-title">CERTIFICATE OF ANALYSIS (COA)</p>
+        <div class="text-center" style="font-size: 12px; margin-left: 90px; margin-top: -10px;">Certificate No. {{ $institute->no_coa ?? 'N/A' }}</div>
+    </div>
+    <div style="margin-top: 5px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+        <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center;">
+            <tr>
+                <td style="border: 1px solid; font-weight: bold;">SAMPEL NO</td>
+                <td style="border: 1px solid; font-weight: bold;">SAMPLING LOCATION</td>
+                <td style="border: 1px solid; font-weight: bold;">SAMPLING DESCRIPTION</td>
+                <td style="border: 1px solid; font-weight: bold;">SAMPLING DATE</td>
+                <td style="border: 1px solid; font-weight: bold;">SAMPLING TIME</td>
+                <td style="border: 1px solid; font-weight: bold;">SAMPLING METHODS</td>
+                <td style="border: 1px solid; font-weight: bold;">DATE RECEIVED</td>
+                <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
+            </tr>
+                <tr>
+                    <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
+                                                <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
+                </tr>
+        </table>
+    </div>
+    {{-- Start Parameters --}}
+    <div style="margin-top: 20px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+        <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center; width: 100%;">
+            <tr>
+                <td style="border: 1px solid; font-weight: bold;">NO</td>
+                <td style="border: 1px solid; font-weight: bold;">Parameters</td>
+                <td style="border: 1px solid; font-weight: bold;">Sampling Time</td>
+                <td style="border: 1px solid; font-weight: bold;">Testing Result</td>
+                <td style="border: 1px solid; font-weight: bold;">Regulatory <br> Standard**</td>
+                <td style="border: 1px solid; font-weight: bold;">Unit</td>
+                <td style="border: 1px solid; font-weight: bold;">Methods</td>
+            </tr>
+            @php
+                $counter = 1; // Nomor tetap seperti sebelumnya
+            @endphp
+
+            @foreach(collect($samplingTimeRegulations)->pluck('parameter')->unique()->sortBy('id') as $parameter)
+                @php
+                    $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
+                    $rowspan = $samplingTimes->count();
+                    $firstRow = true;
+                @endphp
+
+                @foreach ($samplingTimes as $samplingTime)
+                    @php
+                        $resultKey = "{$parameter->id}-{$samplingTime->samplingTime->id}-{$sampling->id}";
+                        $resultData = $results->get($resultKey) ?? collect();
+                        $regulationStandard = $samplingTime->regulationStandards ?? null;
+                    @endphp
+                    <tr >
+                        @if ($firstRow)
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $counter }}</td>
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->name }}</td>
+                        @endif
+                        <td style="border: 1px solid;" >{{ $samplingTime->samplingTime->time }}</td>
+                        <td style="border: 1px solid;">{{ $resultData->pluck('testing_result')->implode(', ') ?: '-' }}</td>
+                        <td style="border: 1px solid;">{{ $regulationStandard ? $regulationStandard->title : '-' }}</td>
+                        @if ($firstRow)
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->unit ?? '-' }}</td>
+                            <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->method ?? '-' }}</td>
+                        @endif
+                    </tr>
+                    @php
+                        $firstRow = false;
+                    @endphp
+                @endforeach
+
+                @php
+                    $counter++; // Tetap seperti sebelumnya
+>>>>>>> 4a11a7d381dd1a2be647a9306988a86b22236334
                 @endphp
                 @endif
             @endforeach
@@ -344,7 +539,12 @@
             @if ($regulations->isNotEmpty())
                 @foreach ($regulations as $regulation)
             <tr style="line-height: 1;">
+<<<<<<< HEAD
                 <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
+=======
+                <td style="width: 5%;">{{ $loop->iteration }}</td>
+                <td style="width: 5%;">{{ $loop->count > 2 ? '**' : '*' }}</td>
+
                 <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
             </tr>
             @endforeach

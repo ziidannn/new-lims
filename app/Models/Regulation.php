@@ -20,6 +20,6 @@ class Regulation extends Model
     ];
     public function subjects()
     {
-        return $this->belongsTo(Subject::class, 'subject_id', 'id');
+        return $this->belongsTo(Subject::class, 'subject_id');
     }
 }

@@ -31,12 +31,14 @@
     <div class="card-datatable table-responsive">
         <div class="card-header">
                 <div class="row">
-                    <!-- <div class="col-md-3">
-                        <select id="select_description" class="form-control input-sm select2" data-placeholder="Description">
-                            <option value="">Select Description</option>
-
+                    <div class="col-md-3">
+                        <select id="select_subject" class="form-control input-sm select2" data-placeholder="Subject">
+                            <option value="">Select subject</option>
+                            @forEach($subjects as $subject)
+                                <option value="{{ $subject->id }}">{{ $subject->subject_code }} - {{ $subject->name }}</option>
+                            @endforeach
                         </select>
-                    </div> -->
+                    </div>
                     <div class="col-md d-flex justify-content-center justify-content-md-end">
                         <a class="btn btn-primary btn-block btn-mail" title="Add new"
                             href="{{ route('institute.create')}}">
@@ -114,8 +116,7 @@
             ajax: {
                 url: "{{ route('institute.data') }}",
                 data: function (d) {
-                    d.search = $('input[type="search"]').val(),
-                    d.select_description = $('#select_description').val()
+                    d.select_subject = $('#select_subject').val()
                 },
             },
             columnDefs: [{
@@ -199,7 +200,7 @@
                 }
             ]
         });
-        $('#select_description').change(function () {
+        $('#select_subject').change(function () {
             table.draw();
         });
     });
