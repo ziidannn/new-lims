@@ -81,7 +81,7 @@
                     </table>
                 </div>
             </div>
-<<<<<<< HEAD
+
 
             <!-- Card Header Title -->
             <div class="card mb-4">
@@ -113,10 +113,6 @@
                 </div>
             </div>
 
-            
-
-=======
->>>>>>> b652e3676f0b67f547ee4bcb8002080d380dbbc6
         </div>
     </div>
 </div>
