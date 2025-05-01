@@ -210,7 +210,117 @@ class ParameterSeeder extends Seeder
                 "unit" => "dBA",
                 "method" => "SNI 7231:2009"
             ],
-
+// Parameter for Regulation code 041
+            [
+                "id" => "25",
+                "subject_id" => "4",
+                "name" => "Ethyl Acetate",
+                "unit" => "BDS",
+                "method" => "Gas Chromatography"
+            ],
+            [
+                "id" => "26",
+                "subject_id" => "4",
+                "name" => "Benzene",
+                "unit" => "BDS",
+                "method" => "Gas Chromatography"
+            ],
+            [
+                "id" => "27",
+                "subject_id" => "4",
+                "name" => "Toluene",
+                "unit" => "BDS",
+                "method" => "Gas Chromatography"
+            ],
+            [
+                "id" => "28",
+                "subject_id" => "4",
+                "name" => "Xylene",
+                "unit" => "BDS",
+                "method" => "Gas Chromatography"
+            ],
+            // Parameter for Regulation code 042
+            [
+                "id" => "29",
+                "subject_id" => "4",
+                "name" => "Methyl Ethyl Ketone (C4H8O)",
+                "unit" => "BDS",
+                "method" => "Gas Chromatography"
+            ],
+            [
+                "id" => "30",
+                "subject_id" => "4",
+                "name" => "Aceton (C3H6O)",
+                "unit" => "BDS",
+                "method" => "Gas Chromatography"
+            ],
+            [
+                "id" => "31",
+                "subject_id" => "4",
+                "name" => "Toluene (C7H8)",
+                "unit" => "BDS",
+                "method" => "Gas Chromatography"
+            ],
+            // Parameter for Regulation code 043
+            [
+                "id" => "32",
+                "subject_id" => "4",
+                "name" => "Ammonia (NH3)*",
+                "unit" => "ppm",
+                "method" => "SNI 7119.1-2005"
+            ],
+            [
+                "id" => "33",
+                "subject_id" => "4",
+                "name" => "Methyl Mercaptan (CH3SH)",
+                "unit" => "ppm",
+                "method" => "NIOSH 2542"
+            ],
+            [
+                "id" => "34",
+                "subject_id" => "4",
+                "name" => "Hydrogen Sulfide (H2S)",
+                "unit" => "ppm",
+                "method" => "IK-7.4.22 (Spectrophotometry)"
+            ],
+            [
+                "id" => "35",
+                "subject_id" => "4",
+                "name" => "Methyl Sulfide ((CH3)2)S",
+                "unit" => "ppm",
+                "method" => "OSHA PV2210"
+            ],
+            [
+                "id" => "36",
+                "subject_id" => "4",
+                "name" => "Styrene (C6H5CHCH2)",
+                "unit" => "ppm",
+                "method" => "Gas Chromatography"
+            ],
+            // Parameter for Regulation code 051
+            [
+                "id" => "37",
+                "subject_id" => "5",
+                "name" => "",
+                "unit" => "Lux",
+                "method" => "SNI 7062:2019"
+            ],
+            // Parameter for Regulation code 052
+            [
+                "id" => "38",
+                "subject_id" => "5",
+                "name" => "",
+                "unit" => "Lux",
+                "method" => "SNI 7062:2019"
+            ],
+            // Parameter for Regulation code 053
+            [
+                "id" => "39",
+                "subject_id" => "5",
+                "name" => "",
+                "unit" => "Lux",
+                "method" => "SNI 7062:2019"
+            ],
 //             // Parameter for Regulation code 011
 //             [
 //                 "id" => "1",
@@ -1009,117 +1119,6 @@ class ParameterSeeder extends Seeder
 //                 "name" => "",
 //                 "unit" => "dBA",
 //                 "method" => "SNI 7231:2009"
-//             ],
-// // Parameter for Regulation code 041
-//             [
-//                 "id" => "113",
-//                 "regulation_id" => "16",
-//                 "name" => "Ethyl Acetate",
-//                 "unit" => "BDS",
-//                 "method" => "Gas Chromatography"
-//             ],
-//             [
-//                 "id" => "114",
-//                 "regulation_id" => "16",
-//                 "name" => "Benzene",
-//                 "unit" => "BDS",
-//                 "method" => "Gas Chromatography"
-//             ],
-//             [
-//                 "id" => "115",
-//                 "regulation_id" => "16",
-//                 "name" => "Toluene",
-//                 "unit" => "BDS",
-//                 "method" => "Gas Chromatography"
-//             ],
-//             [
-//                 "id" => "116",
-//                 "regulation_id" => "16",
-//                 "name" => "Xylene",
-//                 "unit" => "BDS",
-//                 "method" => "Gas Chromatography"
-//             ],
-// // Parameter for Regulation code 042
-//             [
-//                 "id" => "117",
-//                 "regulation_id" => "17",
-//                 "name" => "Methyl Ethyl Ketone (C4H8O)",
-//                 "unit" => "BDS",
-//                 "method" => "Gas Chromatography"
-//             ],
-//             [
-//                 "id" => "118",
-//                 "regulation_id" => "17",
-//                 "name" => "Aceton (C3H6O)",
-//                 "unit" => "BDS",
-//                 "method" => "Gas Chromatography"
-//             ],
-//             [
-//                 "id" => "119",
-//                 "regulation_id" => "17",
-//                 "name" => "Toluene (C7H8)",
-//                 "unit" => "BDS",
-//                 "method" => "Gas Chromatography"
-//             ],
-// // Parameter for Regulation code 043
-//             [
-//                 "id" => "120",
-//                 "regulation_id" => "18",
-//                 "name" => "Ammonia (NH3)*",
-//                 "unit" => "ppm",
-//                 "method" => "SNI 7119.1-2005"
-//             ],
-//             [
-//                 "id" => "121",
-//                 "regulation_id" => "18",
-//                 "name" => "Methyl Mercaptan (CH3SH)",
-//                 "unit" => "ppm",
-//                 "method" => "NIOSH 2542"
-//             ],
-//             [
-//                 "id" => "122",
-//                 "regulation_id" => "18",
-//                 "name" => "Hydrogen Sulfide (H2S)",
-//                 "unit" => "ppm",
-//                 "method" => "IK-7.4.22 (Spectrophotometry)"
-//             ],
-//             [
-//                 "id" => "123",
-//                 "regulation_id" => "18",
-//                 "name" => "Methyl Sulfide ((CH3)2)S",
-//                 "unit" => "ppm",
-//                 "method" => "OSHA PV2210"
-//             ],
-//             [
-//                 "id" => "124",
-//                 "regulation_id" => "18",
-//                 "name" => "Styrene (C6H5CHCH2)",
-//                 "unit" => "ppm",
-//                 "method" => "Gas Chromatography"
-//             ],
-// // Parameter for Regulation code 051
-//             [
-//                 "id" => "125",
-//                 "regulation_id" => "19",
-//                 "name" => "",
-//                 "unit" => "Lux",
-//                 "method" => "SNI 7062:2019"
-//             ],
-// // Parameter for Regulation code 052
-//             [
-//                 "id" => "126",
-//                 "regulation_id" => "20",
-//                 "name" => "",
-//                 "unit" => "Lux",
-//                 "method" => "SNI 7062:2019"
-//             ],
-// // Parameter for Regulation code 053
-//             [
-//                 "id" => "127",
-//                 "regulation_id" => "21",
-//                 "name" => "",
-//                 "unit" => "Lux",
-//                 "method" => "SNI 7062:2019"
 //             ],
 // Parameter for Regulation code 061
             // [

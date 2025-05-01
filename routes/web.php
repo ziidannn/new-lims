@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DirectorController;
+use App\Http\Controllers\NoiseController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -56,8 +58,6 @@ Route::group(['prefix' => 'result'], function () {
     Route::any('/', [ResultController::class, 'index'])->name('result.index')->middleware('auth');
     Route::get('/data', [ResultController::class, 'data'])->name('result.data');
     Route::delete('/delete', [ResultController::class, 'delete'])->name('result.delete');
-    Route::any('/noise/{id}', [ResultController::class, 'addNoise'])->name('result.noise.add');
-    Route::any('/noise_new/{id}', [ResultController::class, 'addNoiseNew'])->name('result.noise.add_new');
     Route::any('/workplace_air/{id}', [ResultController::class, 'addWorkplaceAir'])->name('result.workplace.add');
     Route::any('/odor/{id}', [ResultController::class, 'addOdor'])->name('result.odor.add');
     Route::any('/illumination/{id}', [ResultController::class, 'addIllumination'])->name('result.illumination.add');
@@ -68,6 +68,11 @@ Route::group(['prefix' => 'result'], function () {
     Route::any('/list_result/{id}', [ResultController::class, 'list_result'])->name('result.list_result');
     Route::get('/getDataResult/{id}', [ResultController::class, 'getDataResult'])->name('result.getDataResult');
 
+    // ---------------------------------------------------------------------------------------------------------------------------------------
+    Route::any('/noise_sample/{id}', [NoiseController::class, 'noise_sample'])->name('result.noise.noise_sample');
+    Route::any('/noise_sample_new/{id}', [NoiseController::class, 'noise_sample_new'])->name('result.noise.noise_sample_new');
+    Route::any('/noise/{id}', [NoiseController::class, 'addNoise'])->name('result.noise.add');
+    Route::any('/noise_new/{id}', [NoiseController::class, 'addNoiseNew'])->name('result.noise.add_new');
     // ---------------------------------------------------------------------------------------------------------------------------------------
 
     Route::any('/add_sample_1/{id}', [AmbientAirController::class, 'add_sample_1'])->name('result.add_sample_1');
