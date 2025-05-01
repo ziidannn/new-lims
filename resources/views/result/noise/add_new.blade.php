@@ -43,10 +43,10 @@
 @section('content')
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-        <li class="nav-item"><a class="nav-link active" href="{{ route('result.noise.add', $institute->id) }}">
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.noise.add', $institute->id) }}">
                 <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 1</i></b></a></li></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.noise.add_new', $institute->id) }}"><i
+        <li class="nav-item"><a class="nav-link active" href="{{ route('result.noise.add_new', $institute->id) }}"><i
                     class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 2</i></b></a></li>
     </ul>
@@ -69,7 +69,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('result.add_sample', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.noise.noise_sample_new', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
@@ -111,7 +111,7 @@
                                 <td><input type="text" class="form-control text-center me-1" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
-                                        style="width: 60px;" value="{{ old('no_sample', $sampling->first->no_sample ?? '') }}">
+                                        style="width: 60px;" value="{{ old('no_sample', $samplings->no_sample ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center fst-italic"
                                         name="sampling_location" value="{{ old('sampling_location') }} See Table"
@@ -126,7 +126,7 @@
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                     value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $samplings->first->sampling_time ?? '') }}"></td>
+                                        value="{{ old('sampling_time', $samplings->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
@@ -174,6 +174,7 @@
                             <th class="text-center"><b>Regulatory Standard</b></th>
                             <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
+                            <th class="text-center"><b>Action</b></th>
                         </tr>
                         @foreach($parameters as $key => $parameter)
                             @for($i = 0; $i < 5; $i++)
@@ -207,6 +208,10 @@
                                         <input type="text" class="form-control text-center"
                                         name="method[{{ $parameter->id }}]"
                                         value="{{ old('method.' . $parameter->id, $parameter->method ?? '') }}" readonly>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">Save</button>
+                                        <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
                                     </td>
                                 </tr>
                             @endfor

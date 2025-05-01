@@ -148,12 +148,6 @@
 <br>
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <!-- @if(session('msg'))
-        <div class="alert alert-success alert-dismissible" role="alert">
-            {{ session('msg') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif -->
     <form class="card" action="{{ route('result.workplace.add', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
@@ -167,12 +161,15 @@
                             <th class="text-center"><b>Regulatory Standard</b></th>
                             <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
+                            <th class="text-center"><b>Action</b></th>
                         </tr>
                         @php $parameterNumber = 1; @endphp
                         @foreach ($parameters->filter(function($parameter) {
                             return $parameter->subject_id == 2 || $parameter->code_subject == '02' || $parameter->subjects->name == 'Workplace Air';
                         }) as $parameter)
                         <tr>
+                        <form class="card" action="{{ route('result.workplace.add', $institute->id) }}" method="POST">
+                        @csrf
                             <td class="text-center">{{ $parameterNumber++ }}</td>
                             <td>
                                 <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
@@ -206,18 +203,28 @@
                                 <input type="text" class="form-control text-center" name="method[{{ $parameter->id }}]"
                                     value="{{ $parameter->method ?? '' }}" readonly>
                             </td>
+                            <td>
+                                <div class="button-group">
+                                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                        name="save">Save</button>
+                                    <button type="button"
+                                        class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
+                                        data-parameter-id="{{ $parameter->id }}">
+                                        Hide
+                                    </button>
+                                </div>
+                            </td>
+                        </form>
                         </tr>
                         @endforeach
                     </table>
                     <div class="card-footer text-end">
-                        <button class="btn btn-primary me-1" type="submit">Save</button>
+                        <button id="btn-undo" class="btn btn-warning me-1" style="display: none;">Undo</button>
+                        <!-- <button class="btn btn-primary me-1" type="submit">Save</button> -->
                         <a href="{{ route('result.list_result',$institute->id) }}">
                             <span class="btn btn-outline-secondary">Back</span>
                         </a>
                     </div>
-                    </td>
-                    </tr>
-                    </table>
                 </div>
             </div>
         </div>
@@ -250,6 +257,91 @@
                 format: 'DD-MM-YYYY'
             }
         });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let regulationId = document.body.getAttribute(
+            "data-regulation-id"); // Ambil regulation_id dari atribut di body
+        let storedHiddenParameters = JSON.parse(localStorage.getItem("hidden_parameters")) || {};
+        let hiddenParameters = storedHiddenParameters[regulationId] ||
+    []; // Ambil parameter tersembunyi hanya untuk regulation saat ini
+        let undoButton = document.getElementById("btn-undo");
+
+        // Tampilkan tombol Undo jika ada parameter yang disembunyikan
+        undoButton.style.display = hiddenParameters.length > 0 ? "inline-block" : "none";
+
+        // Sembunyikan parameter yang ada di localStorage untuk regulation saat ini
+        hiddenParameters.forEach(parameterId => {
+            document.querySelectorAll(`[data-parameter-id="${parameterId}"]`).forEach(element => {
+                element.closest("tr").style.display = "none";
+            });
+        });
+
+        // Event listener untuk tombol hide
+        document.querySelectorAll(".hide-parameter").forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                let parameterId = this.getAttribute("data-parameter-id");
+
+                // Simpan posisi scroll sebelum meng-hide
+                let scrollPosition = window.scrollY;
+                localStorage.setItem("scroll_position", scrollPosition);
+
+                // Pastikan hidden_parameters hanya untuk regulation saat ini
+                if (!hiddenParameters.includes(parameterId)) {
+                    hiddenParameters.push(parameterId);
+                    storedHiddenParameters[regulationId] = hiddenParameters;
+                    localStorage.setItem("hidden_parameters", JSON.stringify(
+                        storedHiddenParameters));
+                }
+
+                // Sembunyikan baris tanpa refresh
+                this.closest("tr").style.display = "none";
+
+                // Tampilkan tombol Undo
+                undoButton.style.display = "inline-block";
+
+                // Kembalikan posisi scroll agar tidak naik ke atas
+                window.scrollTo(0, scrollPosition);
+            });
+        });
+
+        // Event listener untuk tombol undo
+        undoButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (hiddenParameters.length > 0) {
+                let lastHiddenParameter = hiddenParameters
+                    .pop(); // Ambil parameter terakhir yang di-hide
+                storedHiddenParameters[regulationId] = hiddenParameters;
+                localStorage.setItem("hidden_parameters", JSON.stringify(storedHiddenParameters));
+
+                // Munculkan kembali baris yang terakhir di-hide
+                document.querySelectorAll(`[data-parameter-id="${lastHiddenParameter}"]`).forEach(
+                    element => {
+                        element.closest("tr").style.display = "";
+                    });
+
+                // Sembunyikan tombol Undo jika tidak ada parameter yang di-hide
+                if (hiddenParameters.length === 0) {
+                    undoButton.style.display = "none";
+                }
+
+                // Ambil posisi scroll terakhir dan atur kembali
+                let scrollPosition = localStorage.getItem("scroll_position");
+                if (scrollPosition) {
+                    window.scrollTo(0, scrollPosition);
+                }
+            }
+        });
+
+        // Reset hidden parameters jika regulation_id berubah
+        document.body.setAttribute("data-regulation-id", regulationId);
     });
 
 </script>

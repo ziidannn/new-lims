@@ -46,8 +46,8 @@
         <li class="nav-item"><a class="nav-link active" href="{{ route('result.noise.add', $institute->id) }}">
                 <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 1</i></b></a></li></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.noise.add_new', $institute->id) }}"><i
-                    class="bx bx-current-location me-1"></i>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.noise.add_new', $institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 2</i></b></a></li>
     </ul>
 </div>
@@ -69,7 +69,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('result.add_sample', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.noise.noise_sample', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
@@ -111,7 +111,8 @@
                                 <td><input type="text" class="form-control text-center me-1" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
-                                        style="width: 60px;" value="{{ old('no_sample', $samplings->first()->no_sample ?? '') }}">
+                                        style="width: 60px;"
+                                        value="{{ old('no_sample', $samplings->first()->no_sample ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center fst-italic"
                                         name="sampling_location" value="{{ old('sampling_location') }} See Table"
@@ -124,9 +125,10 @@
                                         value="{{ $instituteSubject->subject->name }}" readonly>
                                 </td>
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
-                                    value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
+                                        value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $samplings->first()->sampling_time ?? '') }}"></td>
+                                        value="{{ old('sampling_time', $samplings->first()->sampling_time ?? '') }}">
+                                </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
@@ -165,106 +167,75 @@
         <div class="col-xl-12">
             <div class="card-body">
                 <div class="row">
-                    <table class="table table-bordered">
-                        <tr>
-                            <th class="text-center"><b>No</b></th>
-                            <th class="text-center"><b>Sampling Location</b></th>
-                            <th class="text-center"><b>Noise</b></th>
-                            <th class="text-center"><b>Time</b></th>
-                            <th class="text-center"><b>Leq</b></th>
-                            <th class="text-center"><b>Ls</b></th>
-                            <th class="text-center"><b>Lm</b></th>
-                            <th class="text-center"><b>Lsm</b></th>
-                            <th class="text-center"><b>Regulatory Standard</b></th>
-                            <th class="text-center"><b>Unit</b></th>
-                            <th class="text-center"><b>Methods</b></th>
-                            <th class="text-center"><b>Action</b></th>
-                        </tr>
-                        @foreach($regulations as $key => $regulation)
-                            @if(in_array($regulation->id, [12, 14]) ||
-                                ($regulation->subject && ($regulation->subject->id == 3 || $regulation->subject->code == '03')))
+                    <table class="table table-bordered" id="locationTable">
+                        <thead>
+                            <tr>
+                                <th class="text-center"><b>No</b></th>
+                                <th class="text-center"><b>Sampling Location</b></th>
+                                <th class="text-center"><b>Noise</b></th>
+                                <th class="text-center"><b>Time</b></th>
+                                <th class="text-center"><b>Leq</b></th>
+                                <th class="text-center"><b>Ls</b></th>
+                                <th class="text-center"><b>Lm</b></th>
+                                <th class="text-center"><b>Lsm</b></th>
+                                <th class="text-center"><b>Regulatory Standard</b></th>
+                                <th class="text-center"><b>Unit</b></th>
+                                <th class="text-center"><b>Methods</b></th>
+                                <th class="text-center"><b>Action</b></th>
+                            </tr>
+                        </thead>
+                        <tbody id="locationBody">
+                            @foreach ($parameters as $index => $parameter)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
 
-                                @foreach(['Upwind', 'Downwind'] as $index => $location)
-                                <tr>
-                                    <form action="{{ route('result.noise.add', $institute->id) }}" method="POST">
-                                        @csrf
-                                        <td>{{ $key * 2 + $index + 1 }}</td>
-                                        <td>
-                                            <input type="text" class="form-control text-center"
-                                                name="location[{{ $key }}]" value="{{ $location }}" readonly>
-                                        </td>
-                                        <td>
-                                            @for($i = 1; $i <= 7; $i++)
-                                                <input type="text" class="form-control text-center"
-                                                    name="noise[{{ $key }}][{{ $i }}]" value="L{{ $i }}" readonly>
-                                            @endfor
-                                        </td>
-                                        <td>
-                                            @for($i = 1; $i <= 7; $i++)
-                                                <input type="text" class="form-control text-center"
-                                                    name="time[{{ $key }}][{{ $i }}]" value="T{{ $i }}" readonly>
-                                            @endfor
-                                        </td>
-                                        <td>
-                                            @for($i = 1; $i <= 7; $i++)
-                                                @php
-                                                    $noiseLabel = "L$i";
-                                                    $timeLabel = "T$i";
+                                <td><input type="text" class="form-control text-center" name="location[]"
+                                        value="{{ old('location.' . $index) }}"></td>
 
-                                                    $result = $results->where('regulation_id', $regulation->id)
-                                                                    ->where('location', $location)
-                                                                    ->where('noise', $noiseLabel)
-                                                                    ->where('time', $timeLabel)
-                                                                    ->first();
-                                                    $leqValue = $result ? $result->leq : '';
-                                                @endphp
-                                                <input type="text" class="form-control text-center"
-                                                    name="leq[{{ $key }}][{{ $i }}]" value="{{ old("leq.$key.$i", $leqValue) }}">
-                                            @endfor
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control text-center" name="ls"
-                                                value="{{ old('ls', optional($results->where('regulation_id', $regulation->id)->where('location', $location)->first())->ls) }}">
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control text-center" name="lm"
-                                                value="{{ old('lm', optional($results->where('regulation_id', $regulation->id)->where('location', $location)->first())->lm) }}">
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control text-center" name="lsm"
-                                                value="{{ old('lsm', optional($results->where('regulation_id', $regulation->id)->where('location', $location)->first())->lsm) }}">
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control text-center"
-                                                name="regulatory_standard[{{ $key }}]"
-                                                value="{{ old("regulatory_standard.$key", optional($results->where('regulation_id', $regulation->id)->where('location', $location)->first())->regulatory_standard) }}">
-                                        </td>
-                                        @php
-                                            $parameter = $parameters->where('subject_id', $subject->id)->first();
-                                        @endphp
-                                        <td>
-                                            <input type="text" class="form-control text-center"
-                                                name="unit[{{ $key }}]"
-                                                value="{{ old("unit.$key", $parameter->unit ?? '') }}" readonly>
-                                        </td>
-                                        <td>
-                                            <input type="text" class="form-control text-center"
-                                                name="method[{{ $key }}]"
-                                                value="{{ old("method.$key", $parameter->method ?? '') }}" readonly>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">
-                                                Save
-                                            </button>
-                                        </td>
-                                    </form>
-                                </tr>
-                                @endforeach
-                            @endif
-                        @endforeach
+                                <td>
+                                    @for ($j = 0; $j < 7; $j++) <input type="text" class="form-control text-center mb-1"
+                                        name="noise[{{ $index }}][{{ $j }}]"
+                                        value="{{ old('noise.' . $index . '.' . $j, 'L' . ($j + 1)) }}" readonly>
+                                        @endfor
+                                </td>
+
+                                <td>
+                                    @for ($j = 0; $j < 7; $j++) <input type="text" class="form-control text-center mb-1"
+                                        name="time[{{ $index }}][{{ $j }}]"
+                                        value="{{ old('time.' . $index . '.' . $j, 'T' . ($j + 1)) }}" readonly>
+                                        @endfor
+                                </td>
+
+                                <td>
+                                    @for ($j = 0; $j < 7; $j++) <input type="text" class="form-control text-center mb-1"
+                                        name="leq[{{ $index }}][{{ $j }}]"
+                                        value="{{ old('leq.' . $index . '.' . $j) }}">
+                                        @endfor
+                                </td>
+
+                                <td><input type="text" class="form-control text-center" name="ls[]"
+                                        value="{{ old('ls.' . $index) }}"></td>
+                                <td><input type="text" class="form-control text-center" name="lm[]"
+                                        value="{{ old('lm.' . $index) }}"></td>
+                                <td><input type="text" class="form-control text-center" name="lsm[]"
+                                        value="{{ old('lsm.' . $index) }}"></td>
+                                <td><input type="text" class="form-control text-center" name="regulatory_standard[]"
+                                        value="{{ old('regulatory_standard.' . $index) }}"></td>
+                                <td><input type="text" class="form-control text-center" name="unit[]"
+                                        value="{{ old('unit.' . $index, $parameter->unit) }}" readonly></td>
+                                <td><input type="text" class="form-control text-center" name="method[]"
+                                        value="{{ old('method.' . $index, $parameter->method) }}" readonly></td>
+                                <td>
+                                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">Save</button>
+                                    <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
                     </table>
                 </div>
                 <div class="card-footer text-end" style="margin-top: -10px;">
+                    <button type="button" class="btn btn-success" id="addLocation">Add Location</button>
                     <button class="btn btn-primary me-1" type="submit">Save</button>
                     <a href="{{ route('result.list_result', $institute->id) }}">
                         <span class="btn btn-outline-secondary">Back</span>
@@ -302,6 +273,62 @@
                 format: 'YYYY-MM-DD HH:mm'
             }
         });
+    });
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let locationBody = document.getElementById('locationBody');
+        let addLocationBtn = document.getElementById('addLocation');
+
+        addLocationBtn.addEventListener('click', function () {
+            let index = locationBody.querySelectorAll('tr').length;
+            let newRow = `<tr>
+                <td class="row-number">${index + 1}</td>
+
+                <td><input type="text" class="form-control text-center" name="location[]"></td>
+
+                <td>
+                    ${[...Array(7)].map((_, j) => `<input type="text" class="form-control text-center mb-1" name="noise[${index}][${j}]" value="L${j+1}" readonly>`).join('')}
+                </td>
+
+                <td>
+                    ${[...Array(7)].map((_, j) => `<input type="text" class="form-control text-center mb-1" name="time[${index}][${j}]" value="T${j+1}" readonly>`).join('')}
+                </td>
+
+                <td>
+                    ${[...Array(7)].map((_, j) => `<input type="text" class="form-control text-center mb-1" name="leq[${index}][${j}]">`).join('')}
+                </td>
+
+                <td><input type="text" class="form-control text-center" name="ls[]"></td>
+                <td><input type="text" class="form-control text-center" name="lm[]"></td>
+                <td><input type="text" class="form-control text-center" name="lsm[]"></td>
+                <td><input type="text" class="form-control text-center" name="regulatory_standard[]"></td>
+                <td><input type="text" class="form-control text-center" name="unit[]" value="{{ $parameter->unit }}" readonly></td>
+                <td><input type="text" class="form-control text-center" name="method[]" value="{{ $parameter->method }}" readonly></td>
+
+                <td>
+                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">Save</button>
+                    <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
+                </td>
+            </tr>`;
+            locationBody.insertAdjacentHTML('beforeend', newRow);
+            updateRowNumbers();
+        });
+
+        locationBody.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-row')) {
+                e.target.closest('tr').remove();
+                updateRowNumbers();
+            }
+        });
+
+        function updateRowNumbers() {
+            locationBody.querySelectorAll('tr').forEach((row, i) => {
+                row.querySelector('.row-number').textContent = i + 1;
+            });
+        }
     });
 
 </script>

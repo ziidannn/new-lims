@@ -106,7 +106,8 @@
                                         value="{{ old('no_sample', $sampling->no_sample ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
-                                        value="{{ old('sampling_location', $sampling->sampling_location ?? '') }} See Table"></td>
+                                        value="{{ old('sampling_location', $sampling->sampling_location ?? '') }} See Table">
+                                </td>
                                 <td>
                                     <input type="hidden" name="institute_id" value="{{ $institute->id }}">
                                     <input type="hidden" name="institute_subject_id"
@@ -117,7 +118,8 @@
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $sampling->sampling_time ?? '') }} See Table"></td>
+                                        value="{{ old('sampling_time', $sampling->sampling_time ?? '') }} See Table">
+                                </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
@@ -166,48 +168,61 @@
                             <th class="text-center"><b>Regulatory Standard</b></th>
                             <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
+                            <th class="text-center"><b>Action</b></th>
                         </tr>
-                            @php $key = 0; @endphp
-                            @for($i = 0; $i < 5; $i++)
-                                <tr>
-                                    <td>{{ $key * 5 + $i + 1 }}</td>
-                                    <td>
-                                        <input type="text" class="form-control text-center" name="location[]"
-                                        value="{{ old('location') }}">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control text-center" name="testing_result[]"
-                                        value="{{ old('testing_result') }}">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control text-center" name="time[]"
-                                        value="{{ old('time') }}">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control text-center" name="regulatory_standard[]"
-                                        value="{{ old('regulatory_standard') }}">
-                                    </td>
-                                    @endfor
-                                    <td>
-                                        <input type="text" class="form-control text-center"
-                                        name="unit"
-                                        value="{{ old('unit', 'Lux') }}" readonly>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control text-center"
-                                        name="method"
-                                        value="{{ old('method', 'SNI 7062:2019') }}" readonly>
-                                    </td>
-                                </tr>
+                        @foreach($parameters as $key => $parameter)
+                        @for($i = 0; $i < 5; $i++)
+                            @php $result=$results[$parameter->id] ?? ['location' => [],
+                            'testing_result' => [], 'time' => [], 'regulatory_standard' => []];
+                            @endphp
+                            <tr>
+                            <form class="card" action="{{ route('result.illumination.add', $institute->id) }}" method="POST">
+                            @csrf
+                                <td>{{ ($key * 5) + $i + 1 }}</td>
+                                <td>
+                                    <input type="text" class="form-control text-center" name="location[]"
+                                        value="{{ old('location.' . (($key * 5) + $i), $result['location'][$i] ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center" name="testing_result[]"
+                                        value="{{ old('testing_result.' . (($key * 5) + $i), $result['testing_result'][$i] ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center" name="time[]"
+                                        value="{{ old('time.' . (($key * 5) + $i), $result['time'][$i] ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center" name="regulatory_standard[]"
+                                        value="{{ old('regulatory_standard.' . (($key * 5) + $i), $result['regulatory_standard'][$i] ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center"
+                                        name="unit[{{ $parameter->id }}]"
+                                        value="{{ old('unit.' . $parameter->id, $parameter->unit ?? '') }}" readonly>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center"
+                                        name="method[{{ $parameter->id }}]"
+                                        value="{{ old('method.' . $parameter->id, $parameter->method ?? '') }}"
+                                        readonly>
+                                </td>
+                                <td>
+                                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                        name="save">Save</button>
+                                </td>
+                                </form>
+                            </tr>
+                        @endfor
+                        @endforeach
                     </table>
-                                <div class="card-footer text-end">
-                                    <button class="btn btn-primary me-1" type="submit">Save</button>
-                                    <a href="{{ route('result.list_result',$institute->id) }}">
-                                        <span class="btn btn-outline-secondary">Back</span>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-primary me-1" type="submit">Save</button>
+                        <a href="{{ route('result.list_result',$institute->id) }}">
+                            <span class="btn btn-outline-secondary">Back</span>
+                        </a>
+                    </div>
+                    </td>
+                    </tr>
                     </table>
                 </div>
             </div>
