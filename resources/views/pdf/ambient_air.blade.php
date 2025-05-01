@@ -115,7 +115,7 @@
 
 <div class="text-center certificate-container" style="margin-top: 45px;">
     <p class="certificate-title">CERTIFICATE OF ANALYSIS (COA)</p>
-    <div class="text-center" style="font-size: 12px; margin-left: 90px; margin-top: -10px;">Certificate No. {{ $institute->no_coa ?? 'N/A' }}</div>
+    <div class="text-center" style="font-size: 12px; margin-left: 50px; margin-top: -10px;">Certificate No. DIL-{{ $institute->no_coa ?? 'N/A' }}COA</div>
 </div>
 
 <div class="col-xs-110" style="margin-top: 30px; margin-left: 70px;">
@@ -197,13 +197,14 @@
     </div>
 </div>
 {{-- End Resume --}}
-{{-- Ambient Air --}}
+
+{{--============================================== AMBIEN AIR =====================================================--}}
 <div class="page_break"></div>
 @foreach($samplings->whereNotNull('sampling_location') as $sampling)
 <div>
     <div class="text-center certificate-container" style="margin-top: 20px;">
         <p class="certificate-title">CERTIFICATE OF ANALYSIS (COA)</p>
-        <div class="text-center" style="font-size: 12px; margin-left: 90px; margin-top: -10px;">Certificate No. {{ $institute->no_coa ?? 'N/A' }}</div>
+        <div class="text-center" style="font-size: 12px; margin-left: 50px; margin-top: -10px;">Certificate No. DIL-{{ $institute->no_coa ?? 'N/A' }}COA</div>
     </div>
     <div style="margin-top: 5px;"> <!-- Adjusted margin-top to add space between the title and the table -->
         <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center;">
@@ -235,6 +236,18 @@
 
         <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center; width: 100%;">
             <tr>
+            <td style="border: 1px solid; font-weight: bold;">NO</td>
+            <td style="border: 1px solid; font-weight: bold;">Parameters</td>
+            <td style="border: 1px solid; font-weight: bold;">Sampling Time</td>
+            <td style="border: 1px solid; font-weight: bold;">Testing Result</td>
+            <td style="border: 1px solid; font-weight: bold;">Regulatory <br> Standard**</td>
+            <td style="border: 1px solid; font-weight: bold;">Unit</td>
+            <td style="border: 1px solid; font-weight: bold;">Methods</td>
+            </tr>    
+
+            @php 
+            $counter = 1;
+=======
                 <td style="border: 1px solid; font-weight: bold;">NO</td>
                 <td style="border: 1px solid; font-weight: bold;">Parameters</td>
                 <td style="border: 1px solid; font-weight: bold;">Sampling Time</td>
@@ -246,15 +259,40 @@
 
             @php
                 $counter = 1; // Nomor tetap seperti sebelumnya
+>>>>>>> 4a11a7d381dd1a2be647a9306988a86b22236334
             @endphp
 
             @foreach(collect($samplingTimeRegulations)->pluck('parameter')->unique()->sortBy('id') as $parameter)
+            @php
+                $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
+                $rowspan = $samplingTimes->count();
+                $firstRow = true;
+            @endphp
+        
+            @foreach ($samplingTimes as $samplingTime)
                 @php
-                    $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
-                    $rowspan = $samplingTimes->count();
-                    $firstRow = true;
+                $resultKey = "{$parameter->id}-{$samplingTime->samplingTime->id}-{$sampling->id}";
+                $resultData = $results->get($resultKey) ?? collect();
+                $regulationStandard = $samplingTime->regulationStandards ?? null;
                 @endphp
 
+                @if ($resultData->isNotEmpty())
+                <tr>
+                    @if ($firstRow)
+                    <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $counter }}</td>
+                    <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->name }}</td>
+                    @endif
+                    <td style="border: 1px solid;">{{ $samplingTime->samplingTime->time }}</td>
+                    <td style="border: 1px solid;">{{ $resultData->pluck('testing_result')->implode(', ') }}</td>
+                    <td style="border: 1px solid;">{{ $regulationStandard ? $regulationStandard->title : '-' }}</td>
+                    @if ($firstRow)
+                    <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->unit ?? '-' }}</td>
+                    <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->method ?? '-' }}</td>
+                    @endif
+                </tr>
+                @php 
+                    $firstRow = false; 
+=======
                 @foreach ($samplingTimes as $samplingTime)
                     @php
                         $resultKey = "{$parameter->id}-{$samplingTime->samplingTime->id}";
@@ -433,7 +471,14 @@
 
                 @php
                     $counter++; // Tetap seperti sebelumnya
+>>>>>>> 4a11a7d381dd1a2be647a9306988a86b22236334
                 @endphp
+                @endif
+            @endforeach
+        
+            @php 
+                $counter++;
+            @endphp
             @endforeach
         </table>
     </div>
@@ -494,8 +539,12 @@
             @if ($regulations->isNotEmpty())
                 @foreach ($regulations as $regulation)
             <tr style="line-height: 1;">
+<<<<<<< HEAD
+                <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
+=======
                 <td style="width: 5%;">{{ $loop->iteration }}</td>
                 <td style="width: 5%;">{{ $loop->count > 2 ? '**' : '*' }}</td>
+
                 <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
             </tr>
             @endforeach
@@ -505,6 +554,10 @@
     {{-- End Notes and Regulation --}}
 </div>
 @endforeach
+{{--============================================== END AMBIEN AIR =====================================================--}}
 
+{{--============================================== WORKPLACE AIR =====================================================--}}
+
+{{--============================================== END WORKPLACE AIR =====================================================--}}
 </body>
 </html>
