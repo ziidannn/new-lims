@@ -106,7 +106,7 @@
                                         value="{{ old('no_sample', $sampling->no_sample ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
-                                        value="{{ old('sampling_location', $sampling->sampling_location ?? '') }} See Table"></td>
+                                        value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
                                 <td>
                                     <input type="hidden" name="institute_id" value="{{ $institute->id }}">
                                     <input type="hidden" name="institute_subject_id"
@@ -117,7 +117,7 @@
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $sampling->sampling_time ?? '') }} See Table"></td>
+                                        value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
@@ -165,41 +165,33 @@
                             <th class="text-center"><b>Regulatory Standard</b></th>
                             <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
+                            <th class="text-center"><b>Action</b></th>
                         </tr>
                         @php $parameterNumber = 1; @endphp
                         @foreach ($parameters->filter(function($parameter) {
-                            return $parameter->subject_id == 7 || $parameter->code_subject == '07' || $parameter->subjects->name == 'Stationary Stack';
+                            return $parameter->subject_id == 7 || $parameter->code_subject == '07' || $parameter->subjects->name == 'Stationary Stack Source Emission';
                         }) as $parameter)
                             <tr>
+                            <form class="card" action="{{ route('result.stationary_stack.add', $institute->id) }}" method="POST">
+                            @csrf
                                 <td>{{ $parameterNumber++ }}</td>
                                 <td>
                                     <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
                                     <input type="text" class="form-control text-center" value="{{ $parameter->name }}" readonly>
                                 </td>
                                 <td>
-                                    @php
-                                        $regulationStandard = $samplingTimeRegulations->where('parameter_id', $parameter->id)->first()->regulationStandards ?? null;
-                                        $resultKey = $parameter->id . '-' . ($regulationStandard->id ?? 'null');
-                                        $testingResult = $results[$resultKey]->testing_result ?? '';
-                                    @endphp
                                     <input type="text" class="form-control text-center testing-result"
-                                        name="testing_result[{{ $parameter->id }}]"
-                                        value="{{ old('testing_result.' . $parameter->id, $testingResult) }}" required>
+                                    name="testing_result[{{ $parameter->id }}]"
+                                    value="{{ old('testing_result.' . $parameter->id, $results[$parameter->id]->testing_result ?? '') }}" required>
+                                    @if ($errors->has('testing_result.' . $parameter->id))
+                                        <span class="text-danger">{{ $errors->first('testing_result.' . $parameter->id) }}</span>
+                                    @endif
                                 </td>
                                 <td>
-                                    @php
-                                        $regulationStandard = $samplingTimeRegulations->where('parameter_id', $parameter->id)->first()->regulationStandards ?? null;
-                                        $resultKey = $parameter->id . '-' . ($regulationStandard->id ?? 'null');
-                                        $time = $results[$resultKey]->time ?? '';
-                                    @endphp
-                                    <input type="text" class="form-control text-center"
-                                        name="time[{{ $parameter->id }}]"
-                                        value="{{ old('time.' . $parameter->id, $time) }}" required>
-                                </td>
-                                <td>
-                                    @if ($regulationStandard)
-                                        <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}]" value="{{ $regulationStandard->id }}">
-                                        <input type="text" class="form-control text-center" value="{{ $regulationStandard->title }}" readonly>
+                                    <input type="text" class="form-control text-center" name="regulatory_standard[{{ $parameter->id }}]"
+                                    value="{{ old('regulatory_standard.' . $parameter->id, $results[$parameter->id]->regulatory_standard ?? '') }}">
+                                    @if ($errors->has('regulatory_standard.' . $parameter->id))
+                                        <span class="text-danger">{{ $errors->first('regulatory_standard.' . $parameter->id) }}</span>
                                     @endif
                                 </td>
                                 <td>
@@ -210,6 +202,10 @@
                                     <input type="text" class="form-control text-center" name="method[{{ $parameter->id }}]"
                                         value="{{ $parameter->method ?? '' }}" readonly>
                                 </td>
+                                <td>
+                                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">Save</button>
+                                </td>
+                                </form>
                             </tr>
                         @endforeach
                     </table>

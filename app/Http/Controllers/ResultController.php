@@ -265,7 +265,6 @@ class ResultController extends Controller
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
 
-        // Ambil semua hasil berdasarkan sampling_id dan parameter_id
         // Ambil sampling terakhir untuk institute_subject_id terkait
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
         ->latest('id')
@@ -449,28 +448,20 @@ class ResultController extends Controller
                 ->first();
 
             foreach ($parameters as $parameterId) {
-                // Ambil regulation_standard_id berdasarkan parameter_id
-                $regulationStandardId = SamplingTimeRegulation::where('parameter_id', $parameterId)
-                    ->value('regulation_standard_id');
-
-                if ($regulationStandardId) {
-                    // Simpan atau update Result berdasarkan regulation_standard_id
                     $result = Result::updateOrCreate(
                         [
                             'sampling_id' => $samplings->id,
                             'parameter_id' => $parameterId,
-                            'regulation_standard_id' => $regulationStandardId
                         ],
                         [
                             'testing_result' => $request->input("testing_result.$parameterId"),
+                            'regulatory_standard' => $request->input("regulatory_standard.$parameterId"),
                             'unit' => $request->input("unit.$parameterId"),
                             'method' => $request->input("method.$parameterId"),
                         ]
                     );
-                }
             }
-            return redirect()->route('result.list_result', $institute->id)
-            ->with('msg', 'Results saved successfully');
+            return back()->with('msg', 'Results saved successfully');
         }
 
         // Ambil data untuk view
@@ -489,14 +480,17 @@ class ResultController extends Controller
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
 
-        // Ambil semua hasil berdasarkan sampling_id dan parameter_id
-        $results = Result::whereIn('parameter_id', $parametersIds)
-            ->get()
-            ->keyBy(function ($item) {
-                return $item->parameter_id . '-' . $item->regulation_standard_id;
-            });
+        // Ambil sampling terakhir untuk institute_subject_id terkait
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+        ->latest('id')
+        ->first();
 
-        $resultIds = $results->pluck('id'); // Ambil semua result_id
+        // Ambil semua hasil untuk sampling dan parameter terkait
+        $results = Result::where('sampling_id', $samplings->id ?? 0) // pakai sampling_id
+        ->whereIn('parameter_id', $parametersIds)
+        ->get()
+        ->keyBy('parameter_id');
+
 
         return view('result.stationary_stack.add', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',

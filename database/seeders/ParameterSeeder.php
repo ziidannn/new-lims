@@ -210,7 +210,7 @@ class ParameterSeeder extends Seeder
                 "unit" => "dBA",
                 "method" => "SNI 7231:2009"
             ],
-// Parameter for Regulation code 041
+            // Parameter 25
             [
                 "id" => "25",
                 "subject_id" => "4",
@@ -218,6 +218,7 @@ class ParameterSeeder extends Seeder
                 "unit" => "BDS",
                 "method" => "Gas Chromatography"
             ],
+            // Parameter 26
             [
                 "id" => "26",
                 "subject_id" => "4",
@@ -225,6 +226,7 @@ class ParameterSeeder extends Seeder
                 "unit" => "BDS",
                 "method" => "Gas Chromatography"
             ],
+            // Parameter 27
             [
                 "id" => "27",
                 "subject_id" => "4",
@@ -239,7 +241,6 @@ class ParameterSeeder extends Seeder
                 "unit" => "BDS",
                 "method" => "Gas Chromatography"
             ],
-            // Parameter for Regulation code 042
             [
                 "id" => "29",
                 "subject_id" => "4",
@@ -261,7 +262,6 @@ class ParameterSeeder extends Seeder
                 "unit" => "BDS",
                 "method" => "Gas Chromatography"
             ],
-            // Parameter for Regulation code 043
             [
                 "id" => "32",
                 "subject_id" => "4",
@@ -297,7 +297,6 @@ class ParameterSeeder extends Seeder
                 "unit" => "ppm",
                 "method" => "Gas Chromatography"
             ],
-            // Parameter for Regulation code 051
             [
                 "id" => "37",
                 "subject_id" => "5",
@@ -305,7 +304,6 @@ class ParameterSeeder extends Seeder
                 "unit" => "Lux",
                 "method" => "SNI 7062:2019"
             ],
-            // Parameter for Regulation code 052
             [
                 "id" => "38",
                 "subject_id" => "5",
@@ -313,13 +311,123 @@ class ParameterSeeder extends Seeder
                 "unit" => "Lux",
                 "method" => "SNI 7062:2019"
             ],
-            // Parameter for Regulation code 053
             [
                 "id" => "39",
                 "subject_id" => "5",
                 "name" => "",
                 "unit" => "Lux",
                 "method" => "SNI 7062:2019"
+            ],
+
+            // Parameter 40
+            [
+                "id" => "40",
+                "subject_id" => "7",
+                "name" => "Sulfur Dioxide (SO₂)*",
+                "unit" => "mg/m3",
+                "method" => "IK-6.4.19 (Direct Reading)"
+            ],
+            // Parameter 41
+            [
+                "id" => "41",
+                "subject_id" => "7",
+                "name" => "Particulate",
+                "unit" => "mg/m3",
+                "method" => "SNI 19-7117.12-2005"
+            ],
+            // Parameter 3
+            [
+                "id" => "42",
+                "subject_id" => "7",
+                "name" => "Nitrogen Dioxide (NO2)*",
+                "unit" => "mg/m3",
+                "method" => "IK-6.4.18 (Direct Reading)"
+            ],
+            // Parameter 4
+            [
+                "id" => "43",
+                "subject_id" => "7",
+                "name" => "Hydrogen Chloride (HCl)*",
+                "unit" => "mg/m3",
+                "method" => "SNI 19-7117.8-2005"
+            ],
+            // Parameter 5
+            [
+                "id" => "44",
+                "subject_id" => "7",
+                "name" => "Chlorine (Cl2)*",
+                "unit" => "mg/m3",
+                "method" => "IK.7.4.25 (Spectrophotometry)"
+            ],
+            [
+                "id" => "45",
+                "subject_id" => "7",
+                "name" => "Ammonia (NH3)*",
+                "unit" => "mg/m3",
+                "method" => "SNI 19-7117.6-2005"
+            ],
+            [
+                "id" => "46",
+                "subject_id" => "7",
+                "name" => "Hydrogen Fluoride (HF)",
+                "unit" => "mg/m3",
+                "method" => "SNI 19-7117.9-2005"
+            ],
+            [
+                "id" => "47",
+                "subject_id" => "7",
+                "name" => "Opacity",
+                "unit" => "mg/m3",
+                "method" => "SNI 19-7117.11-2005"
+            ],
+            [
+                "id" => "48",
+                "subject_id" => "7",
+                "name" => "Hydrogen Sulfide (H2S)",
+                "unit" => "mg/m3",
+                "method" => "SNI 06-7117.7-2005"
+            ],
+            [
+                "id" => "49",
+                "subject_id" => "7",
+                "name" => "Mercury (Hg)",
+                "unit" => "mg/m3",
+                "method" => "Atomic Fluorescence Spectrophotometry"
+            ],
+            [
+                "id" => "50",
+                "subject_id" => "7",
+                "name" => "Arsenic (As)",
+                "unit" => "mg/m3",
+                "method" => "Atomic Fluorescence Spectrophotometry"
+            ],
+            [
+                "id" => "51",
+                "subject_id" => "7",
+                "name" => "Antimony (Sb)",
+                "unit" => "mg/m3",
+                "method" => "Atomic Fluorescence Spectrophotometry"
+            ],
+            [
+                "id" => "52",
+                "subject_id" => "7",
+                "name" => "Cadmium (Cd)",
+                "unit" => "mg/m3",
+                "method" => "ICP-OES"
+            ],
+            [
+                "id" => "53",
+                "subject_id" => "7",
+                "name" => "Zinc (Zn)",
+                "unit" => "mg/m3",
+                "method" => "ICP-OES"
+            ],
+            [
+                "id" => "54",
+                "subject_id" => "7",
+                "name" => "Lead (Pb)",
+                "unit" => "mg/m3",
+                "method" => "ICP-OES"
             ],
 //             // Parameter for Regulation code 011
 //             [

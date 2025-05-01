@@ -180,7 +180,7 @@
                                     <input type="text" class="form-control text-center" value="{{ $parameter->name }}" readonly>
                                 </td>
                                 <td>
-                                <input type="text" class="form-control text-center testing-result"
+                                    <input type="text" class="form-control text-center testing-result"
                                     name="testing_result[{{ $parameter->id }}]"
                                     value="{{ old('testing_result.' . $parameter->id, $results[$parameter->id]->testing_result ?? '') }}" required>
                                     @if ($errors->has('testing_result.' . $parameter->id))
