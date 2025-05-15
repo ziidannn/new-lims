@@ -243,11 +243,11 @@
             <td style="border: 1px solid; font-weight: bold;">Regulatory <br> Standard**</td>
             <td style="border: 1px solid; font-weight: bold;">Unit</td>
             <td style="border: 1px solid; font-weight: bold;">Methods</td>
-            </tr>    
+            </tr>
 
-            @php 
+            @php
             $counter = 1;
-=======
+            @endphp
                 <td style="border: 1px solid; font-weight: bold;">NO</td>
                 <td style="border: 1px solid; font-weight: bold;">Parameters</td>
                 <td style="border: 1px solid; font-weight: bold;">Sampling Time</td>
@@ -259,7 +259,6 @@
 
             @php
                 $counter = 1; // Nomor tetap seperti sebelumnya
->>>>>>> 4a11a7d381dd1a2be647a9306988a86b22236334
             @endphp
 
             @foreach(collect($samplingTimeRegulations)->pluck('parameter')->unique()->sortBy('id') as $parameter)
@@ -268,7 +267,7 @@
                 $rowspan = $samplingTimes->count();
                 $firstRow = true;
             @endphp
-        
+
             @foreach ($samplingTimes as $samplingTime)
                 @php
                 $resultKey = "{$parameter->id}-{$samplingTime->samplingTime->id}-{$sampling->id}";
@@ -290,8 +289,8 @@
                     <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->method ?? '-' }}</td>
                     @endif
                 </tr>
-                @php 
-                    $firstRow = false; 
+                @php
+                    $firstRow = false;
 =======
                 @foreach ($samplingTimes as $samplingTime)
                     @php
@@ -475,8 +474,8 @@
                 @endphp
                 @endif
             @endforeach
-        
-            @php 
+
+            @php
                 $counter++;
             @endphp
             @endforeach

@@ -112,7 +112,7 @@
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
                                         style="width: 60px;"
-                                        value="{{ old('no_sample', $samplings->first()->no_sample ?? '') }}">
+                                        value="{{ old('no_sample', $samplings->no_sample ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center fst-italic"
                                         name="sampling_location" value="{{ old('sampling_location') }} See Table"
@@ -127,7 +127,7 @@
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $samplings->first()->sampling_time ?? '') }}">
+                                        value="{{ old('sampling_time', $samplings->sampling_time ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab" readonly></td>
@@ -155,12 +155,7 @@
 </div>
 
 <br>
-@if(session('msg'))
-<div class="alert alert-success alert-dismissible" role="alert">
-    {{ session('msg') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-@endif
+
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
     <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
         @csrf
@@ -185,7 +180,7 @@
                             </tr>
                         </thead>
                         <tbody id="locationBody">
-                            @foreach ($parameters as $index => $parameter)
+                            @foreach ($results as $index => $result)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
 
@@ -235,8 +230,7 @@
                     </table>
                 </div>
                 <div class="card-footer text-end" style="margin-top: -10px;">
-                    <button type="button" class="btn btn-success" id="addLocation">Add Location</button>
-                    <button class="btn btn-primary me-1" type="submit">Save</button>
+                    <button type="button" class="btn btn-primary" id="addLocation">Add Location</button>
                     <a href="{{ route('result.list_result', $institute->id) }}">
                         <span class="btn btn-outline-secondary">Back</span>
                     </a>

@@ -14,7 +14,7 @@ use App\Models\Sampling;
 use App\Models\Subject;
 use App\Models\SamplingTimeRegulation;
 
-class AmbientAirController extends Controller
+class WorkplaceController extends Controller
 {
     public function add_sample(Request $request, $id, $sampleNo) {
         if ($request->isMethod('POST')) {
@@ -129,7 +129,7 @@ class AmbientAirController extends Controller
         return $this->add_sample($request, $id, '010');
     }
 
-    public function addAmbientAir_1(Request $request, $id) {
+    public function addWorkplace_1(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -242,13 +242,13 @@ class AmbientAirController extends Controller
                 });
         }
 
-        return view('result.ambient_air.add_1', compact(
+        return view('result.workplace.add_1', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
-    public function addAmbientAir_2(Request $request, $id) {
+    public function addWorkplace_2(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -363,13 +363,13 @@ class AmbientAirController extends Controller
                 });
         }
 
-        return view('result.ambient_air.add_2', compact(
+        return view('result.workplace.add_2', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
-    public function addAmbientAir_3(Request $request, $id){
+    public function addWorkplace_3(Request $request, $id){
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -483,13 +483,13 @@ class AmbientAirController extends Controller
                 });
         }
 
-        return view('result.ambient_air.add_3', compact(
+        return view('result.workplace.add_3', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
-    public function addAmbientAir_4(Request $request, $id) {
+    public function addWorkplace_4(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -603,13 +603,13 @@ class AmbientAirController extends Controller
                 });
         }
 
-        return view('result.ambient_air.add_4', compact(
+        return view('result.workplace.add_4', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
-    public function addAmbientAir_5(Request $request, $id) {
+    public function addWorkplace_5(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -723,13 +723,13 @@ class AmbientAirController extends Controller
                 });
         }
 
-        return view('result.ambient_air.add_5', compact(
+        return view('result.workplace.add_5', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
-    public function addAmbientAir_6(Request $request, $id) {
+    public function addWorkplace_6(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -844,13 +844,13 @@ class AmbientAirController extends Controller
                 });
         }
 
-        return view('result.ambient_air.add_6', compact(
+        return view('result.workplace.add_6', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
-    public function addAmbientAir_7(Request $request, $id) {
+    public function addWorkplace_7(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -964,13 +964,13 @@ class AmbientAirController extends Controller
                 });
         }
 
-        return view('result.ambient_air.add_7', compact(
+        return view('result.workplace.add_7', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
-    public function addAmbientAir_8(Request $request, $id) {
+    public function addWorkplace_8(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -1084,13 +1084,13 @@ class AmbientAirController extends Controller
                 });
         }
 
-        return view('result.ambient_air.add_8', compact(
+        return view('result.workplace.add_8', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
-    public function addAmbientAir_9(Request $request, $id) {
+    public function addWorkplace_9(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -1204,13 +1204,13 @@ class AmbientAirController extends Controller
                 });
         }
 
-        return view('result.ambient_air.add_9', compact(
+        return view('result.workplace.add_9', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));
     }
 
-    public function addAmbientAir_10(Request $request, $id) {
+    public function addWorkplace_10(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
@@ -1324,7 +1324,7 @@ class AmbientAirController extends Controller
                 });
         }
 
-        return view('result.ambient_air.add_10', compact(
+        return view('result.workplace.add_10', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
         ));

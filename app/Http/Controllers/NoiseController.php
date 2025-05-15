@@ -73,8 +73,9 @@ class NoiseController extends Controller
         $parameters = Parameter::orderBy('name')->get();
         $instituteSubjects = InstituteSubject::where('institute_id', $id)->get();
         $samplings = Sampling::where('institute_id', $id)
-        ->where('institute_subject_id', $instituteSubjects->id) // Tambahkan ini
-        ->first(); // <-- Pakai first() kalau satu data, atau get() kalau banyak
+        ->where('institute_subject_id', $instituteSubjects->id)
+        ->orderBy('created_at', 'asc') // Ambil data paling awal dibuat
+        ->first();
 
         return view('result.noise.add', compact(
             'samplings', 'institute', 'subjects',
@@ -134,23 +135,19 @@ class NoiseController extends Controller
         }
 
         // Ini asumsinya $id adalah institute_subject_id
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
+        $institute = Institute::findOrFail($id);
+        $instituteSubjects = InstituteSubject::where('institute_id', $institute->id)->get();
 
         // Cari sampling TERAKHIR untuk institute_subject_id itu
-        $lastSampling = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->orderBy('id', 'desc')
-            ->first();
-
-        // Ambil no_sample dari lastSampling, kalau tidak ada sampling, kosongkan atau defaultkan null
-        $currentSampleNumber = $lastSampling ? $lastSampling->no_sample : null;
+        $samplings = Sampling::where('institute_id', $id)
+        ->where('institute_subject_id', $instituteSubjects->id) // Tambahkan ini
+        ->first(); // <-- Pakai first() kalau satu data, atau get() kalau banyak
 
         $subjects = Subject::orderBy('name')->get();
         $parameters = Parameter::orderBy('name')->get();
-        $instituteSubjects = InstituteSubject::where('institute_id', $institute->id)->get();
 
         return view('result.noise.add_new', compact(
-            'lastSampling', 'currentSampleNumber', 'institute', 'subjects', 'parameters', 'instituteSubjects'
+            'samplings', 'institute', 'subjects', 'parameters', 'instituteSubjects'
         ));
     }
 
@@ -199,7 +196,6 @@ class NoiseController extends Controller
                     }
 
                     $parameterId = $parameters[$locIndex]->id ?? null;
-
                     $timeValue = $request->time[$locIndex][$i] ?? null; // optional
 
                     $existingResult = Result::where([
@@ -212,7 +208,6 @@ class NoiseController extends Controller
 
                     if ($existingResult) {
                         $existingResult->update([
-                            'testing_result' => $request->testing_result[$locIndex][$i] ?? null,
                             'unit' => $request->unit[$locIndex] ?? null,
                             'method' => $request->method[$locIndex] ?? null,
                             'leq' => $request->leq[$locIndex][$i] ?? null,
@@ -225,7 +220,6 @@ class NoiseController extends Controller
                         Result::create([
                             'sampling_id' => $samplingNoise->id,
                             'parameter_id' => $parameterId,
-                            'testing_result' => $request->testing_result[$locIndex][$i] ?? null,
                             'unit' => $request->unit[$locIndex] ?? null,
                             'method' => $request->method[$locIndex] ?? null,
                             'time' => $timeValue,
@@ -247,7 +241,9 @@ class NoiseController extends Controller
         }
 
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+        ->latest('id')
+        ->first();
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
@@ -260,14 +256,14 @@ class NoiseController extends Controller
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
         $results = $samplingNoise
-            ? Result::where('sampling_id', $samplingNoise->id)
-                ->whereIn('parameter_id', $parametersIds)
-                ->get()
-            : collect();
+        ? Result::where('sampling_id', $samplingNoise->id)
+            ->whereIn('parameter_id', $parametersIds)
+            ->get()
+        : collect();
 
         return view('result.noise.add',compact(
             'institute', 'parameters', 'regulations', 'subjects', 'samplingTimeRegulations',
-            'results', 'subject', 'instituteSubject', 'samplingNoise', 'samplings'
+            'results', 'subject', 'instituteSubject', 'samplings'
         ));
     }
 

@@ -43,6 +43,40 @@
 @section('breadcrumb-title')
 @endsection
 @section('content')
+<div class="col-md-12">
+    <ul class="nav nav-pills flex-column flex-sm-row mb-4">
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_1', $institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 1</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ route('result.workplace.add_2', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 2</i></b></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_3',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 3</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_4', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 4</i></b></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_5',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 5</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_6', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 6</i></b></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_7',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 7</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_8', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 8</i></b></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_9',$institute->id) }}">
+                <i class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 9</i></b></a></li></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_10', $institute->id) }}"><i
+                    class="bx bx-current-location me-1"></i>
+                <b><i style="font-size: 1.13rem;">LOC - 10</i></b></a></li>
+    </ul>
+</div>
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
     @if(session('msg'))
     <div class="alert alert-success alert-dismissible" role="alert">
@@ -61,7 +95,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('result.add_sample', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.add_sample_2', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
@@ -99,39 +133,38 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($sampling as $sampleNames)
-                                <tr>
-                                    <td><input type="text" class="form-control text-center" name="no_sample"
-                                            value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
-                                        <input type="number" class="form-control text-center" name="no_sample"
-                                            value="{{ old('no_sample', $sampleNames->no_sample ?? '') }}">
-                                    </td>
-                                    <td><input type="text" class="form-control text-center" name="sampling_location"
-                                            value="{{ old('sampling_location', $sampleNames->sampling_location ?? '') }}"></td>
-                                    <td>
-                                        <input type="hidden" name="institute_id" value="{{ $institute->id }}">
-                                        <input type="hidden" name="institute_subject_id"
-                                            value="{{ $instituteSubject->id }}">
-                                        <input type="text" class="form-control text-center"
-                                            value="{{ $instituteSubject->subject->name }}" readonly>
-                                    </td>
-                                    <td><input type="date" class="form-control text-center" name="sampling_date"
-                                            value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
-                                    <td><input type="text" class="form-control text-center" name="sampling_time"
-                                            value="{{ old('sampling_time', $sampleNames->sampling_time ?? '') }}"></td>
-                                    <td><input type="text" class="form-control text-center" name="sampling_method"
-                                            value="Grab" readonly></td>
-                                    <td><input type="date" class="form-control text-center" name="date_received"
-                                            value="{{ old('date_received', $institute->sample_analysis_date ?? '') }}"></td>
-                                    <td>
-                                        <input type="date" class="form-control text-center" name="itd_start"
-                                            value="{{ old('itd_start', $institute->sample_analysis_date ?? '') }}">
-                                        <span class="mx-2">to</span>
-                                        <input type="date" class="form-control text-center" name="itd_end"
-                                            value="{{ old('itd_end', $institute->report_date ?? '') }}">
-                                    </td>
-                                </tr>
-                            @endforeach
+                            <tr>
+                                <td><input type="text" class="form-control text-center" name="no_sample"
+                                        value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
+                                    <input type="number" class="form-control text-center" name="no_sample"
+                                        value="{{ old('no_sample', $sampleNames->no_sample ?? '') }}">
+                                </td>
+                                <td><input type="text" class="form-control text-center" name="sampling_location"
+                                        value="{{ old('sampling_location', $sampleNames->sampling_location ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="hidden" name="institute_id" value="{{ $institute->id }}">
+                                    <input type="hidden" name="institute_subject_id"
+                                        value="{{ $instituteSubject->id }}">
+                                    <input type="text" class="form-control text-center"
+                                        value="{{ $instituteSubject->subject->name }}" readonly>
+                                </td>
+                                <td><input type="date" class="form-control text-center" name="sampling_date"
+                                        value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
+                                <td><input type="text" class="form-control text-center" name="sampling_time"
+                                        value="{{ old('sampling_time', $sampleNames->sampling_time ?? '') }}"></td>
+                                <td><input type="text" class="form-control text-center" name="sampling_method"
+                                        value="Grab" readonly></td>
+                                <td><input type="date" class="form-control text-center" name="date_received"
+                                        value="{{ old('date_received', $institute->sample_analysis_date ?? '') }}"></td>
+                                <td>
+                                    <input type="date" class="form-control text-center" name="itd_start"
+                                        value="{{ old('itd_start', $institute->sample_analysis_date ?? '') }}">
+                                    <span class="mx-2">to</span>
+                                    <input type="date" class="form-control text-center" name="itd_end"
+                                        value="{{ old('itd_end', $institute->report_date ?? '') }}">
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -148,7 +181,7 @@
 <br>
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('result.workplace.add', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.workplace.add_2', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
@@ -165,56 +198,59 @@
                         </tr>
                         @php $parameterNumber = 1; @endphp
                         @foreach ($parameters->filter(function($parameter) {
-                            return $parameter->subject_id == 2 || $parameter->code_subject == '02' || $parameter->subjects->name == 'Workplace Air';
+                        return $parameter->subject_id == 2 || $parameter->code_subject == '02' ||
+                        $parameter->subjects->name == 'Workplace Air';
                         }) as $parameter)
                         <tr>
-                        <form class="card" action="{{ route('result.workplace.add', $institute->id) }}" method="POST">
-                        @csrf
-                            <td class="text-center">{{ $parameterNumber++ }}</td>
-                            <td>
-                                <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
-                                <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
-                                    readonly>
-                            </td>
-                            <td>
-                                @php
-                                $regulationStandard = $samplingTimeRegulations->where('parameter_id',
-                                $parameter->id)->first()->regulationStandards ?? null;
-                                $resultKey = $parameter->id . '-' . ($regulationStandard->id ?? 'null');
-                                $testingResult = $results[$resultKey]->testing_result ?? '';
-                                @endphp
-                                <input type="text" class="form-control text-center testing-result"
-                                    name="testing_result[{{ $parameter->id }}]"
-                                    value="{{ old('testing_result.' . $parameter->id, $testingResult) }}" required>
-                            </td>
-                            <td>
-                                @if ($regulationStandard)
-                                <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}]"
-                                    value="{{ $regulationStandard->id }}">
-                                <input type="text" class="form-control text-center"
-                                    value="{{ $regulationStandard->title }}" readonly>
-                                @endif
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="unit[{{ $parameter->id }}]"
-                                    value="{{ $parameter->unit ?? '' }}" readonly>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control text-center" name="method[{{ $parameter->id }}]"
-                                    value="{{ $parameter->method ?? '' }}" readonly>
-                            </td>
-                            <td>
-                                <div class="button-group">
-                                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
-                                        name="save">Save</button>
-                                    <button type="button"
-                                        class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
-                                        data-parameter-id="{{ $parameter->id }}">
-                                        Hide
-                                    </button>
-                                </div>
-                            </td>
-                        </form>
+                            <form class="card" action="{{ route('result.workplace.add_2', $institute->id) }}"
+                                method="POST">
+                                @csrf
+                                <td class="text-center">{{ $parameterNumber++ }}</td>
+                                <td>
+                                    <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
+                                    <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
+                                        readonly>
+                                </td>
+                                <td>
+                                    @php
+                                    $regulationStandard = $samplingTimeRegulations->where('parameter_id',
+                                    $parameter->id)->first()->regulationStandards ?? null;
+                                    $resultKey = $parameter->id . '-' . ($regulationStandard->id ?? 'null');
+                                    $testingResult = $results[$resultKey]->testing_result ?? '';
+                                    @endphp
+                                    <input type="text" class="form-control text-center testing-result"
+                                        name="testing_result[{{ $parameter->id }}]"
+                                        value="{{ old('testing_result.' . $parameter->id, $testingResult) }}" required>
+                                </td>
+                                <td>
+                                    @if ($regulationStandard)
+                                    <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}]"
+                                        value="{{ $regulationStandard->id }}">
+                                    <input type="text" class="form-control text-center"
+                                        value="{{ $regulationStandard->title }}" readonly>
+                                    @endif
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center"
+                                        name="unit[{{ $parameter->id }}]" value="{{ $parameter->unit ?? '' }}" readonly>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center"
+                                        name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}"
+                                        readonly>
+                                </td>
+                                <td>
+                                    <div class="button-group">
+                                        <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                            name="save">Save</button>
+                                        <button type="button"
+                                            class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
+                                            data-parameter-id="{{ $parameter->id }}">
+                                            Hide
+                                        </button>
+                                    </div>
+                                </td>
+                            </form>
                         </tr>
                         @endforeach
                     </table>
@@ -258,6 +294,7 @@
             }
         });
     });
+
 </script>
 
 <script>

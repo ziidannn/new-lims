@@ -160,7 +160,7 @@
                                 html = `<a class="badge bg-warning badge-icon" title="Add Ambient Air" href="/result/ambient_air/${instituteSubjectId}">
                                         <i class="bx bx-pencil icon-white"></i></a>`;
                             } else if (row.institute_subject.subject.id == 2) {
-                                html = `<a class="badge bg-warning badge-icon" title="Add Workplace Air" href="/result/workplace_air/${instituteSubjectId}">
+                                html = `<a class="badge bg-warning badge-icon" title="Add Workplace Air" href="/result/workplace/${instituteSubjectId}">
                                         <i class="bx bx-pencil icon-white"></i></a>`;
                             } else if (row.institute_subject.subject.id == 3) {
                                 html = `<a class="badge bg-warning badge-icon" title="Add Noise" href="/result/noise/${instituteSubjectId}">

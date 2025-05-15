@@ -30,14 +30,23 @@
     <div class="card-datatable table-responsive">
         <div class="card-header">
             <div class="row">
-                <div class="col-md d-flex justify-content-center justify-content-md-end">
-                    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#newrecord"
-                        aria-controls="offcanvasEnd" tabindex="0" aria-controls="DataTables_Table_0"
-                        title="Add Standard Criteria" type="button"><span><i class="bx bx-plus me-sm-2"></i>
-                            <span>Add</span></span>
-                    </button>
-                </div>
+                <div class="row mb-3">
+                    <!-- Tombol Export Excel di sebelah kiri -->
+                    <div class="col-md d-flex justify-content-start">
+                       <a href="{{ route('customer.export') }}" class="btn" style="background-color: #217346; color: white; border-color: #1e623b;">
+                            <i class="bx bx-export me-sm-2"></i> Export Excel
+                        </a>
+                    </div>
 
+                    <!-- Tombol Add di sebelah kanan -->
+                    <div class="col-md d-flex justify-content-end">
+                        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#newrecord"
+                            aria-controls="offcanvasEnd" title="Add Standard Criteria">
+                            <i class="bx bx-plus me-sm-2"></i>
+                            <span>Add</span>
+                        </button>
+                    </div>
+                </div>
                 <div class="offcanvas offcanvas-end @if($errors->all()) show @endif" tabindex="-1" id="newrecord"
                     aria-labelledby="offcanvasEndLabel">
                     <div class="offcanvas-header">
