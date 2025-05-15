@@ -344,14 +344,14 @@
                 <td style="width: 0%;"> * </td>
                 <td style="width: 95%;">Accredited Parameters </td>
             </tr>
-            @if ($regulations->isNotEmpty())
-                @foreach ($regulations as $regulation)
-            <tr style="line-height: 1;">
-                <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
-                <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
-            </tr>
-            @endforeach
+            @foreach ($regulations as $regulation)
+            @if ($regulation->subject_id == 3)
+                <tr style="line-height: 1;">
+                    <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
+                    <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
+                </tr>
             @endif
+            @endforeach
         </table>
     </div>
     {{-- End Notes and Regulation --}}
@@ -493,14 +493,14 @@
                 <td style="width: 0%;"> * </td>
                 <td style="width: 95%;">Accredited Parameters </td>
             </tr>
-            @if ($regulations->isNotEmpty())
-                @foreach ($regulations as $regulation)
-            <tr style="line-height: 1;">
-                <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
-                <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
-            </tr>
-            @endforeach
+            @foreach ($regulations as $regulation)
+            @if ($regulation->subject_id == 3)
+                <tr style="line-height: 1;">
+                    <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
+                    <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
+                </tr>
             @endif
+            @endforeach
         </table>
     </div>
     {{-- End Notes and Regulation --}}
