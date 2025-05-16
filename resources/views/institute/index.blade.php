@@ -185,7 +185,7 @@
                         var html = '';
                         {
                             html = `
-                                    <a class="badge bg-dark badge-icon" title="View Resume" href="/ambient_air/${row.id}">
+                                    <a class="badge bg-dark badge-icon" title="View Resume" href="/preview_pdf/${row.id}">
                                     <i class="bx bx-printer"></i></a>
                                     <a class="badge bg-warning badge-icon" title="Edit" href="/institute/edit/${row.id}">
                                     <i class="bx bx-pencil"></i></a>

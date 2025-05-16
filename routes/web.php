@@ -164,8 +164,7 @@ Route::middleware('auth')->group(function () {
 });
 
 //PDF
-Route::get('/resume_coa/{customerId}', [PDFController::class, 'previewPdf'])->name('preview.pdf');
-Route::get('/ambient_air/{customerId}', [PDFController::class, 'ambientAirPdf'])->name('ambient.air.pdf');
+Route::get('/preview_pdf/{customerId}', [PDFController::class, 'previewPdf'])->name('preview.pdf');
 
 // Director
 Route::get('/directors', [DirectorController::class, 'index'])->name('director.index');

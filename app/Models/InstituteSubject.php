@@ -27,7 +27,7 @@ class InstituteSubject extends Model
     }
     public function Subject()
     {
-        return $this->belongsTo(Subject::class, 'subject_id','id');
+        return $this->belongsTo(Subject::class, 'subject_id','id', 'name');
     }
     public function instituteRegulations()
     {
