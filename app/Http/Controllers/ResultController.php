@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HeatStress;
 use App\Models\Institute;
 use App\Models\InstituteRegulation;
 use App\Models\InstituteSubject;
@@ -106,9 +107,12 @@ class ResultController extends Controller
         $subjects = Subject::orderBy('name')->get();
         $parameters = Parameter::orderBy('name')->get();
         $instituteSubjects = InstituteSubject::where('institute_id', $id)->get();
+        $instituteSubjectIds = $instituteSubjects->pluck('id'); // Ambil semua ID-nya
+
         $samplings = Sampling::where('institute_id', $id)
-        ->where('institute_subject_id', $instituteSubjects->id) // Tambahkan ini
-        ->first(); // <-- Pakai first() kalau satu data, atau get() kalau banyak
+            ->whereIn('institute_subject_id', $instituteSubjectIds)
+            ->first(); // get() karena mungkin ada lebih dari satu sampling
+
 
         return view('result.add_result', compact(
             'samplings', 'institute', 'subjects',
@@ -381,32 +385,29 @@ class ResultController extends Controller
                 ->latest('id')
                 ->first();
 
-            foreach ($parameters as $parameterId) {
-                // Ambil regulation_standard_id berdasarkan parameter_id
-                $regulationStandardId = SamplingTimeRegulation::where('parameter_id', $parameterId)
-                    ->value('regulation_standard_id');
+            HeatStress::updateOrCreate(
+                [
+                    'sampling_id' => $samplings->id,
+                ],
+                [
+                    'sampling_location' => $request->input('sampling_location'),
+                    'time' => $request->input('time'),
+                    'humidity' => $request->input('humidity'),
+                    'wet' => $request->input('wet'),
+                    'dew' => $request->input('dew'),
+                    'globe' => $request->input('globe'),
+                    'wbgt_index' => $request->input('wbgt_index'),
+                    'methods' => $request->input('methods'),
+                ]
+            );
 
-                if ($regulationStandardId) {
-                    // Simpan atau update Result berdasarkan regulation_standard_id
-                    $result = Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $request->input("testing_result.$parameterId"),
-                            'unit' => $request->input("unit.$parameterId"),
-                            'method' => $request->input("method.$parameterId"),
-                        ]
-                    );
-                }
-            }
-            return redirect()->route('result.list_result', $institute->id)
-            ->with('msg', 'Results saved successfully');
+            return redirect()->back()->with('msg', 'Results saved successfully');
         }
 
         // Ambil data untuk view
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->latest('id')
+            ->first();
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
@@ -416,6 +417,7 @@ class ResultController extends Controller
         $subjects = Subject::whereIn('id', $subjectsIds)->get();
         $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
+
         // Ambil standar regulasi terkait dengan parameter
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
@@ -431,13 +433,12 @@ class ResultController extends Controller
         $resultIds = $results->pluck('id'); // Ambil semua result_id
 
         return view('result.heat_stress.add', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject'
+            'samplings', 'institute', 'parameters',
+            'samplingTimeRegulations', 'results', 'regulations', 'subject', 'instituteSubject'
         ));
     }
 
-    public function addStationaryStack(Request $request, $id)
-    {
+    public function addStationaryStack(Request $request, $id){
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
 
@@ -491,10 +492,9 @@ class ResultController extends Controller
         ->get()
         ->keyBy('parameter_id');
 
-
         return view('result.stationary_stack.add', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject'
+            'regulations', 'subject', 'instituteSubject', 'samplings'
         ));
     }
 

@@ -6,6 +6,8 @@ use App\Models\Customer;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use Illuminate\Http\Request;
+use App\Exports\CustomersExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class CustomerController extends Controller
@@ -102,6 +104,14 @@ class CustomerController extends Controller
         }
 
         return DataTables::of($data)->make(true);
+    }
+
+    public function export()
+    {
+        $date = now()->format('Y-m-d'); // atau pakai format 'd-m-Y' jika mau format lokal
+        $fileName = 'customers_' . $date . '.xlsx';
+
+        return Excel::download(new CustomersExport, $fileName);
     }
 
     /**

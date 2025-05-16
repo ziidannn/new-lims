@@ -273,7 +273,7 @@
                                 <td>
                                     <div class="button-group">
                                         <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
-                                            name="save">Save</button>
+                                            name="action" value="save_parameter">Save</button>
                                         <button type="button"
                                             class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
                                             data-parameter-id="{{ $parameter->id }}">
@@ -290,91 +290,100 @@
                             <button id="btn-undo" class="btn btn-warning me-1" style="display: none;">Undo</button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
+    <form class="card" id="mainForm" action="{{ route('result.ambient_air.add_7', $institute->id) }}" method="POST">
+        @csrf
+        <div class="col-xl-12">
+            <div class="card-body">
+                <div class="row">
+                    @php
+                    $fieldCondition = \App\Models\FieldCondition::where('institute_subject_id',
+                    $instituteSubject->id)->first();
+                    @endphp
+                    <h4 class="mb-3">Ambient Environmental Condition</h4>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 field-condition" id="coordinate">
+                            <label class="form-label">Coordinate</label>
+                            <input type="text" class="form-control" name="coordinate" placeholder="Input Coordinate"
+                                value="{{ old('coordinate', $fieldCondition->coordinate ?? '') }}">
+                        </div>
+                        <div class="col-lg-6 col-md-6 field-condition" id="temperature">
+                            <label class="form-label">Temperature</label>
+                            <input type="text" class="form-control" name="temperature" placeholder="Input Temperature"
+                                value="{{ old('temperature', $fieldCondition->temperature ?? '') }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 field-condition" id="pressure">
+                            <label class="form-label">Pressure</label>
+                            <input type="text" class="form-control" name="pressure" placeholder="Input Pressure"
+                                value="{{ old('pressure', $fieldCondition->pressure ?? '') }}">
+                        </div>
+                        <div class="col-lg-6 col-md-6 field-condition" id="humidity">
+                            <label class="form-label">Humidity</label>
+                            <input type="text" class="form-control" name="humidity" placeholder="Input Humidity"
+                                value="{{ old('humidity', $fieldCondition->humidity ?? '') }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 field-condition" id="wind_speed">
+                            <label class="form-label">Wind Speed</label>
+                            <input type="text" class="form-control" name="wind_speed" placeholder="Input Wind Speed"
+                                value="{{ old('wind_speed', $fieldCondition->wind_speed ?? '') }}">
+                        </div>
+                        <div class="col-lg-6 col-md-6 field-condition" id="wind_direction">
+                            <label class="form-label">Wind Direction</label>
+                            <input type="text" class="form-control" name="wind_direction"
+                                placeholder="Input Wind Direction"
+                                value="{{ old('wind_direction', $fieldCondition->wind_direction ?? '') }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 field-condition" id="weather">
+                            <label class="form-label">Weather</label>
+                            <input type="text" class="form-control" name="weather" placeholder="Input Weather"
+                                value="{{ old('weather', $fieldCondition->weather ?? '') }}">
+                        </div>
+                        <div class="col-lg-6 col-md-6 field-condition" id="velocity">
+                            <label class="form-label">Velocity</label>
+                            <input type="text" class="form-control" name="velocity" placeholder="Input Velocity"
+                                value="{{ old('velocity', $fieldCondition->velocity ?? '') }}">
+                        </div>
+                    </div>
+
                     <hr style="display: block; color: #000;height: 1px;width: 100%;margin: 1rem 0;">
-                    <div>
-                        @php
-                        $fieldCondition = \App\Models\FieldCondition::where('institute_subject_id',
-                        $instituteSubject->id)->first();
-                        @endphp
-                        <h4 class="mb-3">Ambient Environmental Condition</h4>
-                        <div class="row">
-                            <div class="col-lg-6 col-md-6 field-condition" id="coordinate">
-                                <label class="form-label">Coordinate</label>
-                                <input type="text" class="form-control" name="coordinate" placeholder="Input Coordinate"
-                                    value="{{ old('coordinate', $fieldCondition->coordinate ?? '') }}"> </div>
-                            <div class="col-lg-6 col-md-6 field-condition" id="temperature">
-                                <label class="form-label">Temperature</label>
-                                <input type="text" class="form-control" name="temperature"
-                                    placeholder="Input Temperature"
-                                    value="{{ old('temperature', $fieldCondition->temperature ?? '') }}">
-                            </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-lg-6 col-md-6 field-condition" id="pressure">
-                                <label class="form-label">Pressure</label>
-                                <input type="text" class="form-control" name="pressure" placeholder="Input Pressure"
-                                    value="{{ old('pressure', $fieldCondition->pressure ?? '') }}">
-                            </div>
-                            <div class="col-lg-6 col-md-6 field-condition" id="humidity">
-                                <label class="form-label">Humidity</label>
-                                <input type="text" class="form-control" name="humidity" placeholder="Input Humidity"
-                                    value="{{ old('humidity', $fieldCondition->humidity ?? '') }}">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6 col-md-6 field-condition" id="wind_speed">
-                                <label class="form-label">Wind Speed</label>
-                                <input type="text" class="form-control" name="wind_speed" placeholder="Input Wind Speed"
-                                    value="{{ old('wind_speed', $fieldCondition->wind_speed ?? '') }}">
-                            </div>
-                            <div class="col-lg-6 col-md-6 field-condition" id="wind_direction">
-                                <label class="form-label">Wind Direction</label>
-                                <input type="text" class="form-control" name="wind_direction"
-                                    placeholder="Input Wind Direction"
-                                    value="{{ old('wind_direction', $fieldCondition->wind_direction ?? '') }}">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-lg-6 col-md-6 field-condition" id="weather">
-                                <label class="form-label">Weather</label>
-                                <input type="text" class="form-control" name="weather" placeholder="Input Weather"
-                                    value="{{ old('weather', $fieldCondition->weather ?? '') }}">
-                            </div>
-                            <div class="col-lg-6 col-md-6 field-condition" id="velocity">
-                                <label class="form-label">Velocity</label>
-                                <input type="text" class="form-control" name="velocity" placeholder="Input Velocity"
-                                    value="{{ old('velocity', $fieldCondition->velocity ?? '') }}">
-                            </div>
-                        </div>
-
-                        <hr style="display: block; color: #000;height: 1px;width: 100%;margin: 1rem 0;">
-
-                        <label class="form-label d-block"><i>Do you want to give this sample a logo?</i></label>
-                        @php
-                        $samplingData = $sampling ? $sampling->where('no_sample', '07')->where('institute_id',
-                        $institute->id)->first() : null;
-                        @endphp
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="showLogoYes" name="show_logo" value="1"
-                                {{ old('show_logo', $samplingData->show_logo ?? false) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="showLogoYes"><b>Yes</b></label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="showLogoNo" name="show_logo" value="0"
-                                {{ old('show_logo', $samplingData->show_logo ?? false) ? '' : 'checked' }}>
-                            <label class="form-check-label" for="showLogoNo"><b>No</b></label>
-                        </div>
-                        <hr style="display: block; color: #000;height: 1px;width: 100%;margin: 1rem 0;">
-                        <div class="card-footer text-end">
-                            <button class="btn btn-primary me-2" type="submit" onclick="confirmSubmit(event)">Save
-                                All</button>
-                            <input type="hidden" name="save_all" id="save_all" value="1">
-                            <a href="{{ route('result.list_result', $institute->id) }}"
-                                class="btn btn-outline-secondary">Back</a>
-                        </div>
+                    <label class="form-label d-block"><i>Do you want to give this sample a logo?</i></label>
+                    @php
+                    $samplingData = $sampling ? $sampling->where('no_sample', '07')->where('institute_id',
+                    $institute->id)->first() : null;
+                    @endphp
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" id="showLogoYes" name="show_logo" value="1"
+                            {{ old('show_logo', $samplingData->show_logo ?? false) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="showLogoYes"><b>Yes</b></label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" id="showLogoNo" name="show_logo" value="0"
+                            {{ old('show_logo', $samplingData->show_logo ?? false) ? '' : 'checked' }}>
+                        <label class="form-check-label" for="showLogoNo"><b>No</b></label>
+                    </div>
+                    <hr style="display: block; color: #000;height: 1px;width: 100%;margin: 10urem 0;">
+                    <div class="card-footer text-end">
+                        <button class="btn btn-primary me-2" type="submit" name="action" value="save_all" onclick="confirmSubmit(event)">Save
+                            All</button>
+                        <input type="hidden" name="action" id="save_all" value="save_all">
+                        <a href="{{ route('result.list_result', $institute->id) }}"
+                            class="btn btn-outline-secondary">Back</a>
                     </div>
                 </div>
             </div>
@@ -382,8 +391,6 @@
     </form>
 </div>
 
-
-</div>
 </div>
 @endsection
 

@@ -243,9 +243,9 @@
                 <td style="border: 1px solid; font-weight: bold;">Regulatory <br> Standard**</td>
                 <td style="border: 1px solid; font-weight: bold;">Unit</td>
                 <td style="border: 1px solid; font-weight: bold;">Methods</td>
-            </tr>    
-        
-            @php 
+            </tr>
+
+            @php
             $counter = 0;
             @endphp
 
@@ -347,7 +347,7 @@
             @foreach ($regulations as $regulation)
             @if ($regulation->subject_id == 3)
                 <tr style="line-height: 1;">
-                    <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
+                    <td style="width: 5%;">{{ $loop->count > 2 ? '' : '*' }}</td>
                     <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
                 </tr>
             @endif
@@ -438,6 +438,10 @@
                    <td style="border: 1px solid;">{{ $row[0] }}</td>
                    <td style="border: 1px solid;">{{ $row[1] }}</td>
    
+
+                   <td style="border: 1px solid;">{{ $row[0] }}</td>
+                   <td style="border: 1px solid;">{{ $row[1] }}</td>
+
                    @if($index == 0)
                        <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">-</td>
                        <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">-</td>
@@ -467,7 +471,7 @@
             @foreach ($regulations as $regulation)
             @if ($regulation->subject_id == 3)
                 <tr style="line-height: 1;">
-                    <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
+                    <td style="width: 5%;">{{ $loop->count > 2 ? '' : '*' }}</td>
                     <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
                 </tr>
             @endif
@@ -522,7 +526,7 @@
                 <th style="border: 1px solid;">Unit</th>
                 <th style="border: 1px solid;">Methods</th>
             </tr>
-           
+
             <tr>
                 <td style="border: 1px solid;">1</td>
                 <td style="border: 1px solid;">Upwind</td>
@@ -549,7 +553,7 @@
             {{-- @if ($regulations->isNotEmpty())
                 @foreach ($regulations as $regulation) --}}
             <tr style="line-height: 1;">
-                {{-- <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td> --}}
+                {{-- <td style="width: 5%;">{{ $loop->count > 2 ? '' : '*' }}</td> --}}
                 {{-- <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td> --}}
             </tr>
             {{-- @endforeach
@@ -607,7 +611,7 @@
                 <td style="border: 1px solid; font-weight: bold;">Unit</td>
                 <td style="border: 1px solid; font-weight: bold;">Methods</td>
             </tr>
-        
+
             @php
             $counter = 0;
             @endphp
@@ -710,7 +714,7 @@
             @if ($regulations->isNotEmpty())
                 @foreach ($regulations as $regulation)
             <tr style="line-height: 1;">
-                <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
+                <td style="width: 5%;">{{ $loop->count > 2 ? '' : '*' }}</td>
                 <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
             </tr>
             @endforeach

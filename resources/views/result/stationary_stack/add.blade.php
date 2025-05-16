@@ -103,10 +103,10 @@
                                 <td><input type="text" class="form-control text-center" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $sampling->no_sample ?? '') }}">
+                                        value="{{ old('no_sample', $samplings->no_sample ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
-                                        value="{{ old('sampling_location', $sampling->sampling_location ?? '') }}"></td>
+                                        value="{{ old('sampling_location', $samplings->sampling_location ?? '') }}"></td>
                                 <td>
                                     <input type="hidden" name="institute_id" value="{{ $institute->id }}">
                                     <input type="hidden" name="institute_subject_id"
@@ -117,7 +117,7 @@
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $sampling->sampling_time ?? '') }}"></td>
+                                        value="{{ old('sampling_time', $samplings->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"

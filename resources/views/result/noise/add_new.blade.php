@@ -153,19 +153,13 @@
 </div>
 
 <br>
-@if(session('msg'))
-<div class="alert alert-success alert-dismissible" role="alert">
-    {{ session('msg') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-@endif
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
     <form class="card" action="{{ route('result.noise.add_new', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
                 <div class="row">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered" id="locationTable">
                         <tr>
                             <th class="text-center"><b>No</b></th>
                             <th class="text-center"><b>Sampling Location</b></th>
@@ -219,7 +213,7 @@
                     </table>
                 </div>
                 <div class="card-footer text-end" style="margin-top: -10px;">
-                    <button class="btn btn-primary me-1" type="submit">Save</button>
+                    <button type="button" class="btn btn-success" id="addLocation">Add Location</button>
                     <a href="{{ route('result.list_result', $institute->id) }}">
                         <span class="btn btn-outline-secondary">Back</span>
                     </a>
@@ -258,6 +252,49 @@
             }
         });
     });
+</script>
+<script>
+    $(document).ready(function () {
+    function getLastRowNumber() {
+        let lastNumber = 0;
+        $('#locationTable tbody tr').each(function () {
+            const num = parseInt($(this).find('td:first').text());
+            if (!isNaN(num) && num > lastNumber) {
+                lastNumber = num;
+            }
+        });
+        return lastNumber;
+    }
 
+    $('#addLocation').click(function () {
+        let newRowNumber = getLastRowNumber() + 1;
+
+        var newRow = `
+            <tr>
+                <td>${newRowNumber}</td>
+                <td><input type="text" class="form-control text-center" name="location[]"></td>
+                <td><input type="text" class="form-control text-center" name="testing_result[]"></td>
+                <td><input type="text" class="form-control text-center" name="time[]"></td>
+                <td><input type="text" class="form-control text-center" name="regulatory_standard[]"></td>
+                <td><input type="text" class="form-control text-center" name="unit[]" value="{{ $parameter->unit }}" readonly></td>
+                <td><input type="text" class="form-control text-center" name="method[]" value="{{ $parameter->method }}" readonly></td>
+                <td>
+                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">Save</button>
+                    <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
+                </td>
+            </tr>`;
+        $('#locationTable tbody').append(newRow);
+    });
+
+    $(document).on('click', '.remove-row', function () {
+        $(this).closest('tr').remove();
+
+        // Re-number semua baris ulang di locationTable
+        let rowNumber = 1;
+        $('#locationTable tbody tr').each(function () {
+            $(this).find('td:first').text(rowNumber++);
+        });
+    });
+});
 </script>
 @endsection

@@ -67,7 +67,6 @@ class PDFController extends Controller
                 // Untuk data biasa
                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->sampling_id}";
             });
-            
 
         // Mengambil ID regulation yang terkait dengan InstituteSubject
         $regulationsIds = InstituteRegulation::whereIn('institute_subject_id', $instituteSubjects->pluck('id'))
