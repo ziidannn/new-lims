@@ -435,15 +435,6 @@
                         // DATA DUMMY UNTUK NOISE ROW
                         $noises = [['L1', 'T1'],['L2', 'T2'],['L3', 'T3'],['L4', 'T4'],['L5', 'T5'],['L6', 'T6'],['L7', 'T7']];
                     @endphp
-
-                      {{-- DEBUG UNTUK MELIHAT APAKAH DATA NOISE TERSEDIA --}}
-                    @if ($isNoise)
-                        <tr>
-                            <td colspan="11" style="color: red;">
-                                Noise Key: {{ $resultKey }} | Tersedia: {{ $results->has($resultKey) ? 'YA' : 'TIDAK' }}
-                            </td>
-                        </tr>
-                    @endif
         
                     @foreach ($noises as $index => $row)
                         @if ($index === 0)
