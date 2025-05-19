@@ -447,5 +447,154 @@ Protection and Management Appendix VII</td>
     {{-- End Parameters --}}
 </div>
 {{-- End Noise* --}}
+
+
+{{-------------------------------------------- Template Noise 1 ---------------------------------------------------}}
+<div class="page_break"></div>
+@foreach($samplings->whereNotNull('sampling_location') as $sampling)
+@if($sampling->instituteSubject && $sampling->instituteSubject->subject && $sampling->instituteSubject->subject->name === 'Noise*')
+<div>
+    <div class="text-center certificate-container" style="margin-top: 20px;">
+        <p class="certificate-title">CERTIFICATE OF ANALYSIS (COA)</p>
+        <div class="text-center" style="font-size: 12px; margin-left: 50px; margin-top: -10px;">Certificate No. DIL-{{ $institute->no_coa ?? 'N/A' }}COA</div>
+    </div>
+    <div style="margin-top: 5px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+        <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center;">
+            <tr>
+                <td style="border: 1px solid; font-weight: bold;">SAMPEL NO</td>
+                <td style="border: 1px solid; font-weight: bold;">SAMPLING LOCATION</td>
+                <td style="border: 1px solid; font-weight: bold;">SAMPLING DESCRIPTION</td>
+                <td style="border: 1px solid; font-weight: bold;">SAMPLING DATE</td>
+                <td style="border: 1px solid; font-weight: bold;">SAMPLING TIME</td>
+                <td style="border: 1px solid; font-weight: bold;">SAMPLING METHODS</td>
+                <td style="border: 1px solid; font-weight: bold;">DATE RECEIVED</td>
+                <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
+                                            <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
+            </tr>
+        </table>
+    </div>
+    {{-- Start Parameters --}}
+    <div style="margin-top: 20px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+        <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center; width: 100%;">
+            <tr>
+                <th style="border: 1px solid;">No</th>
+                <th style="border: 1px solid;">Sampling<br>Location</th>
+                <th style="border: 1px solid;">Noise</th>
+                <th style="border: 1px solid;">Time</th>
+                <th style="border: 1px solid;">Leq</th>
+                <th style="border: 1px solid;">Ls</th>
+                <th style="border: 1px solid;">Lm</th>
+                <th style="border: 1px solid;">Lsm</th>
+                <th style="border: 1px solid;">Regulatory<br>Standard**</th>
+                <th style="border: 1px solid;">Unit</th>
+                <th style="border: 1px solid;">Methods</th>
+            </tr>
+        
+            @foreach(collect($samplingTimeRegulations)->pluck('parameter')->unique()->sortBy('id') as $parameter)
+                @php
+                    $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
+                    $rowspan = $samplingTimes->count();
+                @endphp
+        
+                @foreach ($samplingTimes as $samplingTime)
+                    @php
+                        // DETEKSI NOISE
+                        $isNoise = is_null($parameter->id) || is_null($samplingTime->samplingTime->id);
+        
+                        // BUAT KEY SESUAI JENIS DATA
+                        $resultKey = $isNoise
+                            ? "Noise*-{$sampling->id}"
+                            : "{$parameter->id}-{$samplingTime->samplingTime->id}-{$sampling->id}";
+        
+                        $resultData = $results->get($resultKey) ?? collect();
+                        $regulationStandard = $samplingTime->regulationStandards ?? null;
+        
+                        // DATA DUMMY UNTUK NOISE ROW
+                        $noises = [['L1', 'T1'],['L2', 'T2'],['L3', 'T3'],['L4', 'T4'],['L5', 'T5'],['L6', 'T6'],['L7', 'T7']];
+                    @endphp
+        
+                    @foreach ($noises as $index => $row)
+                        @if ($index === 0)
+                        <tr>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">{{ $loop->parent->iteration }}</td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $isNoise ? ($resultData->pluck('location')->first() ?? 'N/A') : ($sampling->sampling_location ?? 'N/A') }}
+                            </td>
+                            <td style="border: 1px solid;">{{ $row[0] }}</td>
+                            <td style="border: 1px solid;">{{ $row[1] }}</td>
+        
+                            <!-- Contoh hasil pengisian dari resultData -->
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('leq')->first() ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('ls')->first() ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('lm')->first() ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('lsm')->first() ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $regulationStandard->standard_value ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('unit')->first() ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('method')->first() ?? '-' }}
+                            </td>
+                        </tr>
+                        @else
+                        <tr>
+                            <td style="border: 1px solid;">{{ $row[0] }}</td>
+                            <td style="border: 1px solid;">{{ $row[1] }}</td>
+                        </tr>
+                        @endif
+                    @endforeach
+                @endforeach
+            @endforeach
+        </table>
+        
+    </div>
+    {{-- End Parameters --}}
+    {{-- Start Notes and Regulation --}}
+    <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+        <table style="font-size: 10px; margin: 0 auto;  border-collapse: collapse; text-align: left; width: 100%;">
+            <tr style="line-height: 1;">
+                <td style="width: 10%; font-weight: bold;">Notes:</td>
+                {{-- <td style="width: 90%;">: Xxxxxx</td> --}}
+            </tr>
+            <tr style="line-height: 1;">
+                <td style="width: 0%;"> * </td>
+                <td style="width: 95%;">Accredited Parameters </td>
+            </tr>
+            @foreach ($regulations as $regulation)
+            @if ($regulation->subject_id == 3)
+                <tr style="line-height: 1;">
+                    <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
+                    <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
+                </tr>
+            @endif
+            @endforeach
+        </table>
+    </div>
+    {{-- End Notes and Regulation --}}
+</div>
+@endif
+@endforeach
+{{-------------------------------------------- End Template Noise 1 ---------------------------------------------------}}
+
 </body>
 </html>

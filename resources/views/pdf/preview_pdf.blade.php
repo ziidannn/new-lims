@@ -434,6 +434,10 @@
                        <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">{{ $data['no'] }}</td>
                        <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">{{ $data['location'] }}</td>
                    @endif
+   
+                   <td style="border: 1px solid;">{{ $row[0] }}</td>
+                   <td style="border: 1px solid;">{{ $row[1] }}</td>
+   
 
                    <td style="border: 1px solid;">{{ $row[0] }}</td>
                    <td style="border: 1px solid;">{{ $row[1] }}</td>
