@@ -180,7 +180,7 @@
                             </tr>
                         </thead>
                         <tbody id="locationBody">
-                            @foreach ($results as $index => $result)
+                            @foreach ($parameters as $index => $parameter)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
 
