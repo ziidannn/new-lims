@@ -412,48 +412,72 @@
                 <th style="border: 1px solid;">Unit</th>
                 <th style="border: 1px solid;">Methods</th>
             </tr>
-            @php
-            $noises = [
-                ['L1', 'T1'],
-                ['L2', 'T2'],
-                ['L3', 'T3'],
-                ['L4', 'T4'],
-                ['L5', 'T5'],
-                ['L6', 'T6'],
-                ['L7', 'T7'],
-            ];
-            $datas = [
-                ['no' => 1, 'location' => 'See Table', 'noises' => $noises],
-                ['no' => 2, 'location' => 'See Table', 'noises' => $noises],
-            ];
-            @endphp
-           @foreach($datas as $data)
-           @foreach($data['noises'] as $index => $row)
-               <tr>
-                   @if($index == 0)
-                       <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">{{ $data['no'] }}</td>
-                       <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">{{ $data['location'] }}</td>
-                   @endif
-   
-                   <td style="border: 1px solid;">{{ $row[0] }}</td>
-                   <td style="border: 1px solid;">{{ $row[1] }}</td>
-   
-
-                   <td style="border: 1px solid;">{{ $row[0] }}</td>
-                   <td style="border: 1px solid;">{{ $row[1] }}</td>
-
-                   @if($index == 0)
-                       <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">-</td>
-                       <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">-</td>
-                       <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">-</td>
-                       <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">-</td>
-                       <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">-</td>
-                       <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">-</td>
-                       <td style="border: 1px solid;" rowspan="{{ count($data['noises']) }}">-</td>
-                   @endif
-               </tr>
-           @endforeach
-       @endforeach
+        
+            @foreach(collect($samplingTimeRegulations)->pluck('parameter')->unique()->sortBy('id') as $parameter)
+                @php
+                    $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
+                    $rowspan = $samplingTimes->count();
+                @endphp
+        
+                @foreach ($samplingTimes as $samplingTime)
+                    @php
+                        // DETEKSI NOISE
+                        $isNoise = is_null($parameter->id) && is_null($samplingTime->samplingTime->id);
+        
+                        // BUAT KEY SESUAI JENIS DATA
+                        $resultKey = $isNoise
+                            ? "Noise*-{$sampling->id}"
+                            : "{$parameter->id}-{$samplingTime->samplingTime->id}-{$sampling->id}";
+        
+                        $resultData = $results->get($resultKey) ?? collect();
+                        $regulationStandard = $samplingTime->regulationStandards ?? null;
+        
+                        // DATA DUMMY UNTUK NOISE ROW
+                        $noises = [['L1', 'T1'],['L2', 'T2'],['L3', 'T3'],['L4', 'T4'],['L5', 'T5'],['L6', 'T6'],['L7', 'T7']];
+                    @endphp
+        
+                    @foreach ($noises as $index => $row)
+                        @if ($index === 0)
+                        <tr>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">{{ $loop->parent->iteration }}</td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $isNoise ? ($resultData->pluck('location')->first() ?? 'N/A') : ($sampling->sampling_location ?? 'N/A') }}
+                            </td>
+                            <td style="border: 1px solid;">{{ $row[0] }}</td>
+                            <td style="border: 1px solid;">{{ $row[1] }}</td>
+        
+                            <!-- Contoh hasil pengisian dari resultData -->
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('leq')->first() ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('ls')->first() ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('lm')->first() ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('lsm')->first() ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $regulationStandard->standard_value ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('unit')->first() ?? '-' }}
+                            </td>
+                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
+                                {{ $resultData->pluck('method')->first() ?? '-' }}
+                            </td>
+                        </tr>
+                        @else
+                        <tr>
+                            <td style="border: 1px solid;">{{ $row[0] }}</td>
+                            <td style="border: 1px solid;">{{ $row[1] }}</td>
+                        </tr>
+                        @endif
+                    @endforeach
+                @endforeach
+            @endforeach
         </table>
     </div>
     {{-- End Parameters --}}
@@ -471,7 +495,7 @@
             @foreach ($regulations as $regulation)
             @if ($regulation->subject_id == 3)
                 <tr style="line-height: 1;">
-                    <td style="width: 5%;">{{ $loop->count > 2 ? '' : '*' }}</td>
+                    <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
                     <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
                 </tr>
             @endif
