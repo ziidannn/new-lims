@@ -304,7 +304,7 @@ class ResultController extends Controller
                 'location.*' => 'nullable|string'
             ]);
 
-            $messages = [];
+            $messages = []; 
 
             foreach ($request->input('testing_result', []) as $index => $testingResult) {
                 $location = $request->input('location')[$index] ?? null;

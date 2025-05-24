@@ -52,39 +52,28 @@
     </ul>
 </div>
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    @if(session('msg'))
-    <div class="alert alert-success alert-dismissible" role="alert">
-        {{ session('msg') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-
-    @if($errors->any())
-    <div class="alert alert-danger alert-dismissible" role="alert">
-        <ul>
-            @foreach($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
     <form class="card" action="{{ route('result.noise.noise_sample', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
                 <h4 class="card-title mb-0">@yield('title')
                     @if ($subject)
-                    <i class="fw-bold">{{ $subject->name }}</i>
+                        <i class="fw-bold">{{ $subject->name }}</i>
                     @else
-                    <i class="fw-bold">No Name Available</i>
+                        <i class="fw-bold">No Subject Name Available</i>
                     @endif
                 </h4>
-                @if ($regulations->isNotEmpty())
-                @foreach ($regulations as $regulation)
-                <i class="fw-bold"
-                    style="font-size: 1.1rem; color: darkred;">{{ $regulation->title ?? 'No Name Available' }}</i>
-                @endforeach
+
+                @if ($regulations && $regulations->isNotEmpty())
+                    @foreach ($regulations as $regulation)
+                        <div>
+                            <i class="fw-bold" style="font-size: 1.1rem; color: darkred;">
+                                {{ $regulation->title ?? 'No Regulation Title Available' }}
+                            </i>
+                        </div>
+                    @endforeach
+                @else
+                    <i class="text-muted">No Regulations Found</i>
                 @endif
             </div>
             <div class="card-body">
@@ -180,48 +169,64 @@
                             </tr>
                         </thead>
                         <tbody id="locationBody">
-                            @foreach ($parameters as $index => $parameter)
+                            @foreach ($results as $index => $result)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
 
-                                <td><input type="text" class="form-control text-center" name="location[]"
-                                        value="{{ old('location.' . $index) }}"></td>
+                                {{-- Sampling Location --}}
+                                <td>
+                                    <input type="text" class="form-control text-center" name="location[]"
+                                        value="{{ $result->location }}">
+                                </td>
 
+                                {{-- Noise (L1–L7) --}}
                                 <td>
                                     @for ($j = 0; $j < 7; $j++) <input type="text" class="form-control text-center mb-1"
-                                        name="noise[{{ $index }}][{{ $j }}]"
-                                        value="{{ old('noise.' . $index . '.' . $j, 'L' . ($j + 1)) }}" readonly>
+                                        name="noise[{{ $index }}][{{ $j }}]" value="L{{ $j + 1 }}" readonly>
                                         @endfor
                                 </td>
 
+                                {{-- Time (T1–T7) --}}
                                 <td>
                                     @for ($j = 0; $j < 7; $j++) <input type="text" class="form-control text-center mb-1"
-                                        name="time[{{ $index }}][{{ $j }}]"
-                                        value="{{ old('time.' . $index . '.' . $j, 'T' . ($j + 1)) }}" readonly>
+                                        name="time[{{ $index }}][{{ $j }}]" value="T{{ $j + 1 }}" readonly>
                                         @endfor
                                 </td>
 
+                                {{-- LEQ --}}
                                 <td>
+                                    @php
+                                        $leqs = explode(',', $result->leq_values); // hasil dari GROUP_CONCAT
+                                    @endphp
                                     @for ($j = 0; $j < 7; $j++) <input type="text" class="form-control text-center mb-1"
-                                        name="leq[{{ $index }}][{{ $j }}]"
-                                        value="{{ old('leq.' . $index . '.' . $j) }}">
+                                        name="leq[{{ $index }}][{{ $j }}]" value="{{ $leqs[$j] ?? '' }}">
                                         @endfor
                                 </td>
 
+                                {{-- LS, LM, LSM --}}
                                 <td><input type="text" class="form-control text-center" name="ls[]"
-                                        value="{{ old('ls.' . $index) }}"></td>
+                                        value="{{ $result->ls }}"></td>
                                 <td><input type="text" class="form-control text-center" name="lm[]"
-                                        value="{{ old('lm.' . $index) }}"></td>
+                                        value="{{ $result->lm }}"></td>
                                 <td><input type="text" class="form-control text-center" name="lsm[]"
-                                        value="{{ old('lsm.' . $index) }}"></td>
+                                        value="{{ $result->lsm }}"></td>
+
+                                {{-- Regulatory Standard --}}
                                 <td><input type="text" class="form-control text-center" name="regulatory_standard[]"
-                                        value="{{ old('regulatory_standard.' . $index) }}"></td>
+                                        value="{{ $result->regulatory_standard }}"></td>
+
+                                {{-- Unit --}}
                                 <td><input type="text" class="form-control text-center" name="unit[]"
-                                        value="{{ old('unit.' . $index, $parameter->unit) }}" readonly></td>
+                                        value="{{ $parameters[0]->unit ?? '' }}" readonly></td>
+
+                                {{-- Method --}}
                                 <td><input type="text" class="form-control text-center" name="method[]"
-                                        value="{{ old('method.' . $index, $parameter->method) }}" readonly></td>
+                                        value="{{ $parameters[0]->method ?? '' }}" readonly></td>
+
+                                {{-- Action --}}
                                 <td>
-                                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">Save</button>
+                                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                        name="save">Save</button>
                                     <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
                                 </td>
                             </tr>
@@ -299,8 +304,8 @@
                 <td><input type="text" class="form-control text-center" name="lm[]"></td>
                 <td><input type="text" class="form-control text-center" name="lsm[]"></td>
                 <td><input type="text" class="form-control text-center" name="regulatory_standard[]"></td>
-                <td><input type="text" class="form-control text-center" name="unit[]" value="{{ $parameter->unit }}" readonly></td>
-                <td><input type="text" class="form-control text-center" name="method[]" value="{{ $parameter->method }}" readonly></td>
+                <td><input type="text" class="form-control text-center" name="unit[]" value="{{ $parameters[0]->unit }}" readonly></td>
+                <td><input type="text" class="form-control text-center" name="method[]" value="{{ $parameters[0]->method }}" readonly></td>
 
                 <td>
                     <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">Save</button>

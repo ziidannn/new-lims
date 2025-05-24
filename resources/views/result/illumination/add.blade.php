@@ -170,40 +170,33 @@
                             <th class="text-center"><b>Methods</b></th>
                             <th class="text-center"><b>Action</b></th>
                         </tr>
-                        @foreach($parameters as $key => $parameter)
-                        @for($i = 0; $i < 5; $i++)
-                            @php $result=$results[$parameter->id] ?? ['location' => [],
-                            'testing_result' => [], 'time' => [], 'regulatory_standard' => []];
-                            @endphp
-                            <tr>
                             <form class="card" action="{{ route('result.illumination.add', $institute->id) }}" method="POST">
                             @csrf
-                                <td>{{ ($key * 5) + $i + 1 }}</td>
+                            <tr>
+                                <td>1</td>
                                 <td>
                                     <input type="text" class="form-control text-center" name="location[]"
-                                        value="{{ old('location.' . (($key * 5) + $i), $result['location'][$i] ?? '') }}">
+                                        value="{{ old('location') }}">
                                 </td>
                                 <td>
                                     <input type="text" class="form-control text-center" name="testing_result[]"
-                                        value="{{ old('testing_result.' . (($key * 5) + $i), $result['testing_result'][$i] ?? '') }}">
+                                        value="{{ old('testing_result') }}">
                                 </td>
                                 <td>
                                     <input type="text" class="form-control text-center" name="time[]"
-                                        value="{{ old('time.' . (($key * 5) + $i), $result['time'][$i] ?? '') }}">
+                                        value="{{ old('time') }}">
                                 </td>
                                 <td>
                                     <input type="text" class="form-control text-center" name="regulatory_standard[]"
-                                        value="{{ old('regulatory_standard.' . (($key * 5) + $i), $result['regulatory_standard'][$i] ?? '') }}">
+                                        value="{{ old('regulatory_standard') }}">
                                 </td>
                                 <td>
                                     <input type="text" class="form-control text-center"
-                                        name="unit[{{ $parameter->id }}]"
-                                        value="{{ old('unit.' . $parameter->id, $parameter->unit ?? '') }}" readonly>
+                                        name="unit[]" value="{{ old('unit')}}" readonly>
                                 </td>
                                 <td>
                                     <input type="text" class="form-control text-center"
-                                        name="method[{{ $parameter->id }}]"
-                                        value="{{ old('method.' . $parameter->id, $parameter->method ?? '') }}"
+                                        name="method[]" value="{{ old('method')}}"
                                         readonly>
                                 </td>
                                 <td>
@@ -212,8 +205,6 @@
                                 </td>
                                 </form>
                             </tr>
-                        @endfor
-                        @endforeach
                     </table>
                     <div class="card-footer text-end">
                         <button class="btn btn-primary me-1" type="submit">Save</button>

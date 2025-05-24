@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\Sampling;
 use App\Models\Subject;
 use App\Models\SamplingTimeRegulation;
+use Illuminate\Support\Facades\DB;
 
 class NoiseController extends Controller
 {
@@ -255,11 +256,10 @@ class NoiseController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = $samplingNoise
-        ? Result::where('sampling_id', $samplingNoise->id)
-            ->whereIn('parameter_id', $parametersIds)
-            ->get()
-        : collect();
+        $results = DB::table('results')
+            ->select('location', DB::raw('GROUP_CONCAT(leq ORDER BY id) as leq_values'), 'ls', 'lm', 'lsm', 'regulatory_standard')
+            ->groupBy('location', 'ls', 'lm', 'lsm', 'regulatory_standard')
+            ->get();
 
         return view('result.noise.add',compact(
             'institute', 'parameters', 'regulations', 'subjects', 'samplingTimeRegulations',
