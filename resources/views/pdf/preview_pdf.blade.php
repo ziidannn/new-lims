@@ -413,72 +413,54 @@
                 <th style="border: 1px solid;">Methods</th>
             </tr>
         
-            @foreach(collect($samplingTimeRegulations)->pluck('parameter')->unique()->sortBy('id') as $parameter)
-                @php
-                    $samplingTimes = $samplingTimeRegulations->where('parameter_id', $parameter->id);
-                    $rowspan = $samplingTimes->count();
-                @endphp
+            @php
+                $noises = [
+                    ['L1', 'T1', 'q1'],
+                    ['L2', 'T2', 'q1'],
+                    ['L3', 'T3', 'q1'],
+                    ['L4', 'T4', 'q1'],
+                    ['L5', 'T5', 'q1'],
+                    ['L6', 'T6', 'q1'],
+                    ['L7', 'T7', 'q1'],
+                ];
+                $rowNumber = 1;
+            @endphp
         
-                @foreach ($samplingTimes as $samplingTime)
+            @foreach ($noiseResults as $samplingId => $locations)
+                @foreach ($locations as $locationData)
                     @php
-                        // DETEKSI NOISE
-                        $isNoise = is_null($parameter->id) && is_null($samplingTime->samplingTime->id);
-        
-                        // BUAT KEY SESUAI JENIS DATA
-                        $resultKey = $isNoise
-                            ? "Noise*-{$sampling->id}"
-                            : "{$parameter->id}-{$samplingTime->samplingTime->id}-{$sampling->id}";
-        
-                        $resultData = $results->get($resultKey) ?? collect();
-                        $regulationStandard = $samplingTime->regulationStandards ?? null;
-        
-                        // DATA DUMMY UNTUK NOISE ROW
-                        $noises = [['L1', 'T1'],['L2', 'T2'],['L3', 'T3'],['L4', 'T4'],['L5', 'T5'],['L6', 'T6'],['L7', 'T7']];
+                        $leqArray = explode(',', $locationData->leq_values);
                     @endphp
         
-                    @foreach ($noises as $index => $row)
-                        @if ($index === 0)
+                    @foreach ($noises as $i => $noise)
                         <tr>
-                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">{{ $loop->parent->iteration }}</td>
-                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
-                                {{ $isNoise ? ($resultData->pluck('location')->first() ?? 'N/A') : ($sampling->sampling_location ?? 'N/A') }}
-                            </td>
-                            <td style="border: 1px solid;">{{ $row[0] }}</td>
-                            <td style="border: 1px solid;">{{ $row[1] }}</td>
+                            {{-- No & Location hanya muncul sekali per lokasi, rowspan 7 --}}
+                            @if ($i === 0)
+                                <td style="border: 1px solid;" rowspan="7">{{ $rowNumber++ }}</td>
+                                <td style="border: 1px solid;" rowspan="7">{{ $locationData->location }}</td>
+                            @endif
         
-                            <!-- Contoh hasil pengisian dari resultData -->
-                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
-                                {{ $resultData->pluck('leq')->first() ?? '-' }}
+                            <td style="border: 1px solid;">{{ $noise[0] }}</td>
+                            <td style="border: 1px solid;">{{ $noise[1] }}</td>
+                            <td style="border: 1px solid;">
+                                {{ isset($leqArray[$i]) && trim($leqArray[$i]) !== '' ? $leqArray[$i] : '-' }}
                             </td>
-                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
-                                {{ $resultData->pluck('ls')->first() ?? '-' }}
-                            </td>
-                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
-                                {{ $resultData->pluck('lm')->first() ?? '-' }}
-                            </td>
-                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
-                                {{ $resultData->pluck('lsm')->first() ?? '-' }}
-                            </td>
-                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
-                                {{ $regulationStandard->standard_value ?? '-' }}
-                            </td>
-                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
-                                {{ $resultData->pluck('unit')->first() ?? '-' }}
-                            </td>
-                            <td style="border: 1px solid;" rowspan="{{ count($noises) }}">
-                                {{ $resultData->pluck('method')->first() ?? '-' }}
-                            </td>
+        
+                            {{-- Data tambahan hanya muncul sekali per lokasi --}}
+                            @if ($i === 0)
+                                <td style="border: 1px solid;" rowspan="7">{{ $locationData->ls ?? '-' }}</td>
+                                <td style="border: 1px solid;" rowspan="7">{{ $locationData->lm ?? '-' }}</td>
+                                <td style="border: 1px solid;" rowspan="7">{{ $locationData->lsm ?? '-' }}</td>
+                                <td style="border: 1px solid;" rowspan="7">{{ $locationData->regulatory_standard ?? '-' }}</td>
+                                <td style="border: 1px solid;" rowspan="7">{{ $locationData->unit ?? '-' }}</td>
+                                <td style="border: 1px solid;" rowspan="7">{{ $locationData->method ?? '-' }}</td>
+                            @endif
                         </tr>
-                        @else
-                        <tr>
-                            <td style="border: 1px solid;">{{ $row[0] }}</td>
-                            <td style="border: 1px solid;">{{ $row[1] }}</td>
-                        </tr>
-                        @endif
                     @endforeach
                 @endforeach
             @endforeach
         </table>
+        
     </div>
     {{-- End Parameters --}}
     {{-- Start Notes and Regulation --}}
@@ -508,6 +490,8 @@
 @endforeach
 {{-------------------------------------------- End Template Noise 1 ---------------------------------------------------}}
 <div class="page_break"></div>
+@foreach($samplings->whereNotNull('sampling_location') as $sampling)
+@if($sampling->instituteSubject && $sampling->instituteSubject->subject && $sampling->instituteSubject->subject->name === 'Noise*')
 <div>
     <div class="text-center certificate-container" style="margin-top: 20px;">
         <p class="certificate-title">CERTIFICATE OF ANALYSIS (COA)</p>
@@ -525,17 +509,17 @@
                 <td style="border: 1px solid; font-weight: bold;">DATE RECEIVED</td>
                 <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
             </tr>
-                <tr>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"></td>
-                    <td style="border: 1px solid;"><br> to
-                                                <br></td>
-                </tr>
+            <tr>
+                <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
+                <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
+                                            <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
+            </tr>
         </table>
     </div>
     {{-- Start Parameters --}}
@@ -543,16 +527,18 @@
         <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center; width: 100%;">
             <tr>
                 <th style="border: 1px solid;">No</th>
-                <th style="border: 1px solid;">Sampling<br>Location</th>
+                <th style="border: 1px solid;">SamplingLocation</th>
                 <th style="border: 1px solid;">Testing Result</th>
                 <th style="border: 1px solid;">Time</th>
                 <th style="border: 1px solid;">Regulatory<br>Standard**</th>
                 <th style="border: 1px solid;">Unit</th>
                 <th style="border: 1px solid;">Methods</th>
             </tr>
-
+            @php
+                $rowNumber = 1;
+            @endphp
             <tr>
-                <td style="border: 1px solid;">1</td>
+                <td style="border: 1px solid;">{{ $rowNumber++ }}</td>
                 <td style="border: 1px solid;">Upwind</td>
                 <td style="border: 1px solid;"></td>
                 <td style="border: 1px solid;"></td>
@@ -586,13 +572,15 @@
     </div>
     {{-- End Notes and Regulation --}}
 </div>
+@endif
+@endforeach
 {{-------------------------------------------- Template Noise 2 ---------------------------------------------------}}
 {{-------------------------------------------- End Template Noise 2 ---------------------------------------------------}}
 {{--============================================== END NOISE* =====================================================--}}
 
 {{--============================================== WORKPLACE AIR =====================================================--}}
 @foreach($samplings->whereNotNull('sampling_location') as $sampling)
-@if($sampling->instituteSubject && $sampling->instituteSubject->subject && $sampling->instituteSubject->subject->name === 'Ambient Air')
+@if($sampling->instituteSubject && $sampling->instituteSubject->subject && $sampling->instituteSubject->subject->name === 'Workplace Air')
 <div>
     <div class="text-center certificate-container" style="margin-top: 20px;">
         <p class="certificate-title">CERTIFICATE OF ANALYSIS (COA)</p>
