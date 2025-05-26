@@ -18,7 +18,7 @@ use App\Models\InstituteRegulation;
 use App\Models\Customer;
 use Dompdf\Options;
 use Dompdf\FontMetrics; // Pastikan ini diimpor
-
+use Illuminate\Support\Facades\DB;
 
 class PDFController extends Controller
 {
@@ -52,22 +52,27 @@ class PDFController extends Controller
             ->get()
             ->sortBy('parameter.name'); // Mengurutkan berdasarkan nama parameter
 
-        // Mengambil data hasil (Result) berdasarkan parameter_id dan sampling_time_id serta sampling_id
-        // $results = Result::whereIn('parameter_id', $parameters->pluck('id'))
-        //     ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-        //     ->whereIn('sampling_id', $samplings->pluck('id'))
-        //     ->get()
-        //     ->groupBy(fn($item) => "{$item->parameter_id}-{$item->sampling_time_id}-{$item->sampling_id}");
-
-            $results = Result::all()->groupBy(function ($item) {
-                if (is_null($item->parameter_id) && is_null($item->sampling_time_id)) {
-                    // Ini untuk data noise
-                    return "Noise*-{$item->sampling_id}";
-                }
-                // Untuk data biasa
+            // ✅ Ambil semua result BIASA
+            $results = Result::whereNotNull('parameter_id')
+            ->whereNotNull('sampling_time_id')
+            ->get()
+            ->groupBy(function ($item) {
                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->sampling_id}";
             });
-            
+            // ✅ Ambil khusus NOISE pakai query yang kamu mau
+            $noiseResults = DB::table('results')
+            ->select(
+                'sampling_id',
+                'location',
+                DB::raw('GROUP_CONCAT(leq ORDER BY id) as leq_values'),
+                'ls', 'lm', 'lsm', 'unit', 'method', 'regulatory_standard'
+            )
+            ->whereNull('parameter_id')
+            ->whereNull('sampling_time_id')
+            ->groupBy('sampling_id', 'location', 'ls', 'lm', 'lsm', 'unit', 'method', 'regulatory_standard')
+            ->get()
+            ->groupBy('sampling_id');
+            // dd($noiseResults->toArray());
 
         // Mengambil ID regulation yang terkait dengan InstituteSubject
         $regulationsIds = InstituteRegulation::whereIn('institute_subject_id', $instituteSubjects->pluck('id'))
@@ -84,7 +89,7 @@ class PDFController extends Controller
         $fieldCondition = optional($results->flatten()->first())->fieldCondition;
 
         $pdf = Pdf::loadView('pdf.preview_pdf', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
+            'institute', 'parameters', 'samplingTimeRegulations', 'results','noiseResults',
             'instituteSubjects', 'sampling', 'fieldCondition', 'samplings', 'regulations','isNoise'
         ));
 
@@ -93,3 +98,11 @@ class PDFController extends Controller
         return $pdf->stream("Preview_Pdf_Report{$id}.pdf");
     }
 }
+
+
+// Mengambil data hasil (Result) berdasarkan parameter_id dan sampling_time_id serta sampling_id
+        // $results = Result::whereIn('parameter_id', $parameters->pluck('id'))
+        //     ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+        //     ->whereIn('sampling_id', $samplings->pluck('id'))
+        //     ->get()
+        //     ->groupBy(fn($item) => "{$item->parameter_id}-{$item->sampling_time_id}-{$item->sampling_id}");
