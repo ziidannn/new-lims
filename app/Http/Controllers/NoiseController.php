@@ -16,141 +16,145 @@ use Illuminate\Support\Facades\DB;
 
 class NoiseController extends Controller
 {
-    public function noise_sample(Request $request, $id) {
+    public function noise_sample(Request $request, $id)
+    {
         if ($request->isMethod('POST')) {
+            // Ambil data InstituteSubject berdasarkan ID yang dikirim
             $instituteSubject = InstituteSubject::findOrFail($id);
             $institute = Institute::findOrFail($instituteSubject->institute_id);
 
-            // Validasi data
+            // Validasi input
             $validatedData = $request->validate([
                 'no_sample' => ['required'],
                 'sampling_location' => ['required'],
-                'institute_subject_id' => ['required', 'integer'],
                 'sampling_date' => ['required', 'date'],
                 'sampling_time' => ['required'],
                 'sampling_method' => ['required'],
                 'date_received' => ['required', 'date'],
-                'itd_start' => ['required'],
-                'itd_end' => ['required'],
+                'itd_start' => ['required', 'date'],
+                'itd_end' => ['required', 'date'],
             ]);
 
-            // Periksa apakah institute_subject_id valid atau tidak
-            if ($request->filled('institute_subject_id')) {
-                $instituteSubjectExists = InstituteSubject::where('id', $request->institute_subject_id)
-                    ->where('institute_id', $id)
-                    ->exists();
+            // Masukkan institute_id dan institute_subject_id yang valid
+            $validatedData['institute_id'] = $institute->id;
+            $validatedData['institute_subject_id'] = $instituteSubject->id;
 
-                if ($instituteSubjectExists) {
-                    $validatedData['institute_subject_id'] = $request->institute_subject_id;
-                }
-            }
-
-            // Tambahkan institute_id dari URL
-            $validatedData['institute_id'] = $id;
-
-            // **Cek apakah data sudah ada di tabel samplings untuk institute ini**
-            $existingSample = Sampling::where('institute_id', $id)
+            // Cek apakah sudah ada data sampling dengan no_sample yang sama
+            $existingSample = Sampling::where('institute_id', $institute->id)
+                ->where('institute_subject_id', $instituteSubject->id)
                 ->where('no_sample', $request->no_sample)
                 ->first();
 
             if ($existingSample) {
-                // Jika data sudah ada → UPDATE
                 $existingSample->update($validatedData);
-                $message = "Data Coa ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
-                $alertType = 'warning'; // Notifikasi warna kuning untuk update
+                $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
+                $alertType = 'warning';
             } else {
-                // Jika belum ada → CREATE baru
                 Sampling::create($validatedData);
-                $message = "Data Coa ({$institute->no_coa}.{$request->no_sample}) saved successfully!";
-                $alertType = 'success'; // Notifikasi warna hijau untuk create baru
+                $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) saved successfully!";
+                $alertType = 'success';
             }
 
             return back()->with(['msg' => $message, 'alertType' => $alertType]);
         }
 
-        // **Bagian GET request** (tidak membutuhkan `$instituteSubject`)
-        $institute = Institute::findOrFail($id);
+        // GET REQUEST → panggil data
+        $instituteSubject = InstituteSubject::findOrFail($id);
+        $institute = Institute::findOrFail($instituteSubject->institute_id);
+
         $subjects = Subject::orderBy('name')->get();
         $parameters = Parameter::orderBy('name')->get();
-        $instituteSubjects = InstituteSubject::where('institute_id', $id)->get();
-        $samplings = Sampling::where('institute_id', $id)
-        ->where('institute_subject_id', $instituteSubjects->id)
-        ->orderBy('created_at', 'asc') // Ambil data paling awal dibuat
-        ->first();
-
-        return view('result.noise.add', compact(
-            'samplings', 'institute', 'subjects',
-            'parameters', 'instituteSubjects'));
-    }
-
-    public function noise_sample_new(Request $request, $id) {
-        if ($request->isMethod('POST')) {
-            $instituteSubject = InstituteSubject::findOrFail($id);
-            $institute = Institute::findOrFail($instituteSubject->institute_id);
-
-            // Validasi data
-            $validatedData = $request->validate([
-                'no_sample' => ['required'],
-                'sampling_location' => ['required'],
-                'institute_subject_id' => ['required', 'integer'],
-                'sampling_date' => ['required', 'date'],
-                'sampling_time' => ['required'],
-                'sampling_method' => ['required'],
-                'date_received' => ['required', 'date'],
-                'itd_start' => ['required'],
-                'itd_end' => ['required'],
-            ]);
-
-            // Periksa apakah institute_subject_id valid atau tidak
-            if ($request->filled('institute_subject_id')) {
-                $instituteSubjectExists = InstituteSubject::where('id', $request->institute_subject_id)
-                    ->where('institute_id', $id)
-                    ->exists();
-
-                if ($instituteSubjectExists) {
-                    $validatedData['institute_subject_id'] = $request->institute_subject_id;
-                }
-            }
-
-            // Tambahkan institute_id dari URL
-            $validatedData['institute_id'] = $id;
-
-            // **Cek apakah data sudah ada di tabel samplings untuk institute ini**
-            $existingSample = Sampling::where('institute_id', $id)
-                ->where('no_sample', $request->no_sample)
-                ->first();
-
-            if ($existingSample) {
-                // Jika data sudah ada → UPDATE
-                $existingSample->update($validatedData);
-                $message = "Data Coa ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
-                $alertType = 'warning'; // Notifikasi warna kuning untuk update
-            } else {
-                // Jika belum ada → CREATE baru
-                Sampling::create($validatedData);
-                $message = "Data Coa ({$institute->no_coa}.{$request->no_sample}) saved successfully!";
-                $alertType = 'success'; // Notifikasi warna hijau untuk create baru
-            }
-
-            return back()->with(['msg' => $message, 'alertType' => $alertType]);
-        }
-
-        // Ini asumsinya $id adalah institute_subject_id
-        $institute = Institute::findOrFail($id);
         $instituteSubjects = InstituteSubject::where('institute_id', $institute->id)->get();
 
-        // Cari sampling TERAKHIR untuk institute_subject_id itu
-        $samplings = Sampling::where('institute_id', $id)
-        ->where('institute_subject_id', $instituteSubjects->id) // Tambahkan ini
-        ->first(); // <-- Pakai first() kalau satu data, atau get() kalau banyak
+        // Ambil dua sampling: paling awal dan paling akhir
+        $firstSampling = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->orderBy('created_at', 'asc')
+            ->first();
 
-        $subjects = Subject::orderBy('name')->get();
-        $parameters = Parameter::orderBy('name')->get();
+        $latestSampling = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
 
-        return view('result.noise.add_new', compact(
-            'samplings', 'institute', 'subjects', 'parameters', 'instituteSubjects'
+        return view('result.noise.add', compact(
+            'firstSampling',      // untuk noise (LOC 1)
+            'latestSampling',     // untuk noise_new (LOC 2)
+            'institute',
+            'subjects',
+            'parameters',
+            'instituteSubjects',
+            'instituteSubject'
         ));
     }
+
+
+    // public function noise_sample_new(Request $request, $id) {
+    //     if ($request->isMethod('POST')) {
+    //         $instituteSubject = InstituteSubject::findOrFail($id);
+    //         $institute = Institute::findOrFail($instituteSubject->institute_id);
+
+    //         // Validasi data
+    //         $validatedData = $request->validate([
+    //             'no_sample' => ['required'],
+    //             'sampling_location' => ['required'],
+    //             'institute_subject_id' => ['required', 'integer'],
+    //             'sampling_date' => ['required', 'date'],
+    //             'sampling_time' => ['required'],
+    //             'sampling_method' => ['required'],
+    //             'date_received' => ['required', 'date'],
+    //             'itd_start' => ['required'],
+    //             'itd_end' => ['required'],
+    //         ]);
+
+    //         // Periksa apakah institute_subject_id valid atau tidak
+    //         if ($request->filled('institute_subject_id')) {
+    //             $instituteSubjectExists = InstituteSubject::where('id', $request->institute_subject_id)
+    //                 ->where('institute_id', $id)
+    //                 ->exists();
+
+    //             if ($instituteSubjectExists) {
+    //                 $validatedData['institute_subject_id'] = $request->institute_subject_id;
+    //             }
+    //         }
+
+    //         // Tambahkan institute_id dari URL
+    //         $validatedData['institute_id'] = $id;
+
+    //         // **Cek apakah data sudah ada di tabel samplings untuk institute ini**
+    //         $existingSample = Sampling::where('institute_id', $id)
+    //             ->where('no_sample', $request->no_sample)
+    //             ->first();
+
+    //         if ($existingSample) {
+    //             // Jika data sudah ada → UPDATE
+    //             $existingSample->update($validatedData);
+    //             $message = "Data Coa ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
+    //             $alertType = 'warning'; // Notifikasi warna kuning untuk update
+    //         } else {
+    //             // Jika belum ada → CREATE baru
+    //             Sampling::create($validatedData);
+    //             $message = "Data Coa ({$institute->no_coa}.{$request->no_sample}) saved successfully!";
+    //             $alertType = 'success'; // Notifikasi warna hijau untuk create baru
+    //         }
+
+    //         return back()->with(['msg' => $message, 'alertType' => $alertType]);
+    //     }
+
+    //     // Ini asumsinya $id adalah institute_subject_id
+    //     $institute = Institute::findOrFail($id);
+    //     $instituteSubjects = InstituteSubject::where('institute_id', $institute->id)->get();
+
+    //     // Cari sampling TERAKHIR untuk institute_subject_id itu
+    //     $samplings = Sampling::where('institute_id', $id)
+    //     ->where('institute_subject_id', $instituteSubjects->id) // Tambahkan ini
+    //     ->first(); // <-- Pakai first() kalau satu data, atau get() kalau banyak
+
+    //     $subjects = Subject::orderBy('name')->get();
+    //     $parameters = Parameter::orderBy('name')->get();
+
+    //     return view('result.noise.add_new', compact(
+    //         'samplings', 'institute', 'subjects', 'parameters', 'instituteSubjects'
+    //     ));
+    // }
 
     public function addNoise(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
@@ -337,8 +341,10 @@ class NoiseController extends Controller
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
-        $results = Result::where('sampling_id', $samplings->id)->get();
 
+        $results = Result::where('sampling_id', $samplings->id)
+            ->with('parameter') // tambahkan ini
+            ->get();
         return view('result.noise.add_new',compact(
             'institute', 'parameters', 'regulations', 'subjects',
             'samplingTimeRegulations', 'results', 'subject', 'instituteSubject'

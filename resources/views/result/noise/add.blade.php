@@ -43,16 +43,33 @@
 @section('content')
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-        <li class="nav-item"><a class="nav-link active" href="{{ route('result.noise.add', $institute->id) }}">
+        <li class="nav-item"><a class="nav-link active" href="{{ route('result.noise.add', $instituteSubject->id) }}">
                 <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 1</i></b></a></li></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.noise.add_new', $institute->id) }}">
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.noise.add_new', $instituteSubject->id) }}">
                 <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 2</i></b></a></li>
     </ul>
 </div>
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('result.noise.noise_sample', $institute->id) }}" method="POST">
+    @if(session('msg'))
+    <div class="alert alert-success alert-dismissible" role="alert">
+        {{ session('msg') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
+    @if($errors->any())
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <ul>
+            @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+    <form class="card" action="{{ route('result.noise.noise_sample', $instituteSubject->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
@@ -101,7 +118,7 @@
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
                                         style="width: 60px;"
-                                        value="{{ old('no_sample', $samplings->no_sample ?? '') }}">
+                                        value="{{ old('no_sample', $firstSampling->no_sample ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center fst-italic"
                                         name="sampling_location" value="{{ old('sampling_location') }} See Table"
@@ -116,7 +133,7 @@
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $samplings->sampling_time ?? '') }}">
+                                        value="{{ old('sampling_time', $firstSampling->sampling_time ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab" readonly></td>
@@ -136,7 +153,7 @@
             </div>
             <div class="card-footer text-end" style="margin-top: -30px;">
                 <button class="btn btn-primary me-1" type="submit">Save</button>
-                <a href="{{ url()->previous() }}">
+                <a href="{{ route('result.list_result', $institute->id) }}">
                     <span class="btn btn-outline-secondary">Back</span>
                 </a>
             </div>

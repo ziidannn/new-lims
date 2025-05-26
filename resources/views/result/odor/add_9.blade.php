@@ -103,10 +103,10 @@
                                 <td><input type="text" class="form-control text-center" name="no_sample"
                                         value="{{ old('no_sample', $institute->no_coa ?? '') }}" readonly>
                                     <input type="number" class="form-control text-center" name="no_sample"
-                                        value="{{ old('no_sample', $samplings->no_sample ?? '') }}">
+                                        value="{{ old('no_sample', $sampleNames->no_sample ?? '') }}">
                                 </td>
                                 <td><input type="text" class="form-control text-center" name="sampling_location"
-                                        value="{{ old('sampling_location', $samplings->sampling_location ?? '') }} See Table">
+                                        value="{{ old('sampling_location', $sampleNames->sampling_location ?? '') }}">
                                 </td>
                                 <td>
                                     <input type="hidden" name="institute_id" value="{{ $institute->id }}">
@@ -118,8 +118,7 @@
                                 <td><input type="date" class="form-control text-center" name="sampling_date"
                                         value="{{ old('sampling_date', $institute->sample_receive_date ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_time"
-                                        value="{{ old('sampling_time', $samplings->sampling_time ?? '') }} See Table">
-                                </td>
+                                        value="{{ old('sampling_time', $sampleNames->sampling_time ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="sampling_method"
                                         value="Grab" readonly></td>
                                 <td><input type="date" class="form-control text-center" name="date_received"
@@ -148,76 +147,86 @@
 <br>
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    @if(session('msg'))
-    <div class="alert alert-success alert-dismissible" role="alert">
-        {{ session('msg') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-    <form class="card" action="{{ route('result.illumination.add', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.workplace.add', $institute->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
                 <div class="row">
-                    <table class="table table-bordered" id="locationTable">
+                    <table class="table table-bordered" id="parameterTable">
                         <tr>
                             <th class="text-center"><b>No</b></th>
-                            <th class="text-center"><b>Sampling Location</b></th>
+                            <th class="text-center"><b>Parameters</b></th>
                             <th class="text-center"><b>Testing Result</b></th>
-                            <th class="text-center"><b>Time</b></th>
                             <th class="text-center"><b>Regulatory Standard</b></th>
                             <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
                             <th class="text-center"><b>Action</b></th>
                         </tr>
-                        @foreach($results as $index => $result)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-
+                        @php $parameterNumber = 1; @endphp
+                        @foreach ($parameters->filter(function($parameter) {
+                        return $parameter->subject_id == 2 || $parameter->code_subject == '02' ||
+                        $parameter->subjects->name == 'Workplace Air';
+                        }) as $parameter)
+                        <tr>
+                            <form class="card" action="{{ route('result.workplace.add', $institute->id) }}"
+                                method="POST">
+                                @csrf
+                                <td class="text-center">{{ $parameterNumber++ }}</td>
                                 <td>
-                                    <input type="text" class="form-control text-center" name="location[]"
-                                        value="{{ old('location.' . $index, $result->location ?? '') }}">
+                                    <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
+                                    <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
+                                        readonly>
                                 </td>
-
                                 <td>
-                                    <input type="text" class="form-control text-center" name="testing_result[]"
-                                        value="{{ old('testing_result.' . $index, $result->testing_result ?? '') }}">
+                                    @php
+                                    $regulationStandard = $samplingTimeRegulations->where('parameter_id',
+                                    $parameter->id)->first()->regulationStandards ?? null;
+                                    $resultKey = $parameter->id . '-' . ($regulationStandard->id ?? 'null');
+                                    $testingResult = $results[$resultKey]->testing_result ?? '';
+                                    @endphp
+                                    <input type="text" class="form-control text-center testing-result"
+                                        name="testing_result[{{ $parameter->id }}]"
+                                        value="{{ old('testing_result.' . $parameter->id, $testingResult) }}" required>
                                 </td>
-
                                 <td>
-                                    <input type="text" class="form-control text-center" name="time[]"
-                                        value="{{ old('time.' . $index, $result->time ?? '') }}">
+                                    @if ($regulationStandard)
+                                    <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}]"
+                                        value="{{ $regulationStandard->id }}">
+                                    <input type="text" class="form-control text-center"
+                                        value="{{ $regulationStandard->title }}" readonly>
+                                    @endif
                                 </td>
-
                                 <td>
-                                    <input type="text" class="form-control text-center" name="regulatory_standard[]"
-                                        value="{{ old('regulatory_standard.' . $index, $result->regulatory_standard ?? '') }}">
+                                    <input type="text" class="form-control text-center"
+                                        name="unit[{{ $parameter->id }}]" value="{{ $parameter->unit ?? '' }}" readonly>
                                 </td>
-
-                                {{-- Unit --}}
-                                <td><input type="text" class="form-control text-center" name="unit[]"
-                                        value="{{ $parameters[0]->unit ?? '' }}" readonly></td>
-
-                                {{-- Method --}}
-                                <td><input type="text" class="form-control text-center" name="method[]"
-                                        value="{{ $parameters[0]->method ?? '' }}" readonly></td>
-
                                 <td>
-                                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">Save</button>
-                                    <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
+                                    <input type="text" class="form-control text-center"
+                                        name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}"
+                                        readonly>
                                 </td>
-                            </tr>
+                                <td>
+                                    <div class="button-group">
+                                        <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                            name="save">Save</button>
+                                        <button type="button"
+                                            class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
+                                            data-parameter-id="{{ $parameter->id }}">
+                                            Hide
+                                        </button>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
                         @endforeach
                     </table>
                     <div class="card-footer text-end">
-                        <button type="button" class="btn btn-primary" id="addLocation">Add Location</button>
+                        <button id="btn-undo" class="btn btn-warning me-1" style="display: none;">Undo</button>
+                        <!-- <button class="btn btn-primary me-1" type="submit">Save</button> -->
                         <a href="{{ route('result.list_result',$institute->id) }}">
                             <span class="btn btn-outline-secondary">Back</span>
                         </a>
                     </div>
-                    </td>
-                    </tr>
-                    </table>
                 </div>
             </div>
         </div>
@@ -247,53 +256,96 @@
         $('#date_range').daterangepicker({
             timePicker: true,
             locale: {
-                format: 'YYYY-MM-DD HH:mm'
+                format: 'DD-MM-YYYY'
             }
         });
     });
+
 </script>
+
 <script>
-    $(document).ready(function () {
-    function getLastRowNumber() {
-        let lastNumber = 0;
-        $('#locationTable tbody tr').each(function () {
-            const num = parseInt($(this).find('td:first').text());
-            if (!isNaN(num) && num > lastNumber) {
-                lastNumber = num;
+    document.addEventListener("DOMContentLoaded", function () {
+        let regulationId = document.body.getAttribute(
+            "data-regulation-id"); // Ambil regulation_id dari atribut di body
+        let storedHiddenParameters = JSON.parse(localStorage.getItem("hidden_parameters")) || {};
+        let hiddenParameters = storedHiddenParameters[regulationId] ||
+    []; // Ambil parameter tersembunyi hanya untuk regulation saat ini
+        let undoButton = document.getElementById("btn-undo");
+
+        // Tampilkan tombol Undo jika ada parameter yang disembunyikan
+        undoButton.style.display = hiddenParameters.length > 0 ? "inline-block" : "none";
+
+        // Sembunyikan parameter yang ada di localStorage untuk regulation saat ini
+        hiddenParameters.forEach(parameterId => {
+            document.querySelectorAll(`[data-parameter-id="${parameterId}"]`).forEach(element => {
+                element.closest("tr").style.display = "none";
+            });
+        });
+
+        // Event listener untuk tombol hide
+        document.querySelectorAll(".hide-parameter").forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                let parameterId = this.getAttribute("data-parameter-id");
+
+                // Simpan posisi scroll sebelum meng-hide
+                let scrollPosition = window.scrollY;
+                localStorage.setItem("scroll_position", scrollPosition);
+
+                // Pastikan hidden_parameters hanya untuk regulation saat ini
+                if (!hiddenParameters.includes(parameterId)) {
+                    hiddenParameters.push(parameterId);
+                    storedHiddenParameters[regulationId] = hiddenParameters;
+                    localStorage.setItem("hidden_parameters", JSON.stringify(
+                        storedHiddenParameters));
+                }
+
+                // Sembunyikan baris tanpa refresh
+                this.closest("tr").style.display = "none";
+
+                // Tampilkan tombol Undo
+                undoButton.style.display = "inline-block";
+
+                // Kembalikan posisi scroll agar tidak naik ke atas
+                window.scrollTo(0, scrollPosition);
+            });
+        });
+
+        // Event listener untuk tombol undo
+        undoButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (hiddenParameters.length > 0) {
+                let lastHiddenParameter = hiddenParameters
+                    .pop(); // Ambil parameter terakhir yang di-hide
+                storedHiddenParameters[regulationId] = hiddenParameters;
+                localStorage.setItem("hidden_parameters", JSON.stringify(storedHiddenParameters));
+
+                // Munculkan kembali baris yang terakhir di-hide
+                document.querySelectorAll(`[data-parameter-id="${lastHiddenParameter}"]`).forEach(
+                    element => {
+                        element.closest("tr").style.display = "";
+                    });
+
+                // Sembunyikan tombol Undo jika tidak ada parameter yang di-hide
+                if (hiddenParameters.length === 0) {
+                    undoButton.style.display = "none";
+                }
+
+                // Ambil posisi scroll terakhir dan atur kembali
+                let scrollPosition = localStorage.getItem("scroll_position");
+                if (scrollPosition) {
+                    window.scrollTo(0, scrollPosition);
+                }
             }
         });
-        return lastNumber;
-    }
 
-    $('#addLocation').click(function () {
-        let newRowNumber = getLastRowNumber() + 1;
-
-        var newRow = `
-            <tr>
-                <td>${newRowNumber}</td>
-                <td><input type="text" class="form-control text-center" name="location[]"></td>
-                <td><input type="text" class="form-control text-center" name="testing_result[]"></td>
-                <td><input type="text" class="form-control text-center" name="time[]"></td>
-                <td><input type="text" class="form-control text-center" name="regulatory_standard[]"></td>
-                <td><input type="text" class="form-control text-center" name="unit[]" value="{{ $parameters[0]->unit }}" readonly></td>
-                <td><input type="text" class="form-control text-center" name="method[]" value="{{ $parameters[0]->method }}" readonly></td>
-                <td>
-                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">Save</button>
-                    <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
-                </td>
-            </tr>`;
-        $('#locationTable tbody').append(newRow);
+        // Reset hidden parameters jika regulation_id berubah
+        document.body.setAttribute("data-regulation-id", regulationId);
     });
 
-    $(document).on('click', '.remove-row', function () {
-        $(this).closest('tr').remove();
-
-        // Re-number semua baris ulang di locationTable
-        let rowNumber = 1;
-        $('#locationTable tbody tr').each(function () {
-            $(this).find('td:first').text(rowNumber++);
-        });
-    });
-});
 </script>
 @endsection
