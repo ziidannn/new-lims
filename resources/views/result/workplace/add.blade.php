@@ -61,7 +61,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    <form class="card" action="{{ route('result.stationary_stack.add', $instituteSubject->id) }}" method="POST">
+    <form class="card" action="{{ route('result.workplace.add', $instituteSubject->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-header">
@@ -148,7 +148,7 @@
 </div>
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('result.stationary_stack.add', $instituteSubject->id) }}" method="POST">
+    <form class="card" action="{{ route('result.workplace.add', $instituteSubject->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
@@ -165,11 +165,11 @@
                         </tr>
                         @php $parameterNumber = 1; @endphp
                         @foreach ($parameters->filter(function($parameter) {
-                        return $parameter->subject_id == 7 || $parameter->code_subject == '07' ||
-                        $parameter->subjects->name == 'Stationary Stack Source Emission';
+                        return $parameter->subject_id == 2 || $parameter->code_subject == '02' ||
+                        $parameter->subjects->name == 'Workplace Air';
                         }) as $parameter)
                         <tr>
-                            <form class="card" action="{{ route('result.stationary_stack.add', $instituteSubject->id) }}"
+                            <form class="card" action="{{ route('result.workplace.add', $instituteSubject->id) }}"
                                 method="POST">
                                 @csrf
                                 <td class="text-center">{{ $parameterNumber++ }}</td>
@@ -235,7 +235,7 @@
 </div>
 
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" id="mainForm" action="{{ route('result.stationary_stack.add', $instituteSubject->id) }}" method="POST">
+    <form class="card" id="mainForm" action="{{ route('result.workplace.add', $instituteSubject->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">

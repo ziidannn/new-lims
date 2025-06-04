@@ -206,58 +206,58 @@
                         </thead>
                         <tbody>
                             @php
-    $count = count($existingHeatStress);
-@endphp
+                                $count = count($existingHeatStress);
+                            @endphp
 
-@for ($i = 0; $i < ($count > 0 ? $count : 1); $i++)
-<tr>
-    <td class="text-center">{{ $i + 1 }}</td>
-    <td>
-        <input type="text" class="form-control text-center" name="sampling_location[]"
-            value="{{ old('sampling_location.' . $i, $existingHeatStress[$i]->sampling_location ?? '') }}">
-    </td>
-    <td>
-        <input type="text" class="form-control text-center" name="time[]"
-            value="{{ old('time.' . $i, $existingHeatStress[$i]->time ?? '') }}">
-    </td>
-    <td>
-        <input type="text" class="form-control text-center" name="humidity[]"
-            value="{{ old('humidity.' . $i, $existingHeatStress[$i]->humidity ?? '') }}">
-    </td>
-    <td>
-        <input type="text" class="form-control text-center" name="wet[]"
-            value="{{ old('wet.' . $i, $existingHeatStress[$i]->wet ?? '') }}">
-    </td>
-    <td>
-        <input type="text" class="form-control text-center" name="dew[]"
-            value="{{ old('dew.' . $i, $existingHeatStress[$i]->dew ?? '') }}">
-    </td>
-    <td>
-        <input type="text" class="form-control text-center" name="globe[]"
-            value="{{ old('globe.' . $i, $existingHeatStress[$i]->globe ?? '') }}">
-    </td>
-    <td>
-        <input type="text" class="form-control text-center" name="wbgt_index[]"
-            value="{{ old('wbgt_index.' . $i, $existingHeatStress[$i]->wbgt_index ?? '') }}">
-    </td>
-    <td>
-        <input type="text" class="form-control text-center" name="methods[]"
-            value="{{ old('methods.' . $i, $existingHeatStress[$i]->methods ?? '') }}">
-    </td>
-    <td>
-        <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
-            name="save">Save</button>
-        <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
-    </td>
-</tr>
-@endfor
-
+                            @for ($i = 0; $i < ($count > 0 ? $count : 1); $i++)
+                            <tr>
+                                <td class="text-center">{{ $i + 1 }}</td>
+                                <td>
+                                    <input type="hidden" name="heat_stress_id[]" value="{{ isset($existingHeatStress[$i]) ? $existingHeatStress[$i]->id : '' }}">
+                                    <input type="text" class="form-control text-center" name="sampling_location[]"
+                                        value="{{ old('sampling_location.' . $i, $existingHeatStress[$i]->sampling_location ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center" name="time[]"
+                                        value="{{ old('time.' . $i, $existingHeatStress[$i]->time ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center" name="humidity[]"
+                                        value="{{ old('humidity.' . $i, $existingHeatStress[$i]->humidity ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center" name="wet[]"
+                                        value="{{ old('wet.' . $i, $existingHeatStress[$i]->wet ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center" name="dew[]"
+                                        value="{{ old('dew.' . $i, $existingHeatStress[$i]->dew ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center" name="globe[]"
+                                        value="{{ old('globe.' . $i, $existingHeatStress[$i]->globe ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center" name="wbgt_index[]"
+                                        value="{{ old('wbgt_index.' . $i, $existingHeatStress[$i]->wbgt_index ?? '') }}">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center" name="methods[]"
+                                        value="{{ old('methods.' . $i, $existingHeatStress[$i]->methods ?? '') }}">
+                                </td>
+                                <td>
+                                    <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                        name="save">Save</button>
+                                    <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
+                                </td>
+                            </tr>
+                            @endfor
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="card-footer text-end" style="margin-top: -30px;">
-                <button type="button" class="btn btn-success" id="addLocation">Add Location</button>
+                <button type="button" class="btn btn-primary" id="addLocation">Add Location</button>
                 <a href="{{ route('result.list_result',$institute->id) }}">
                     <span class="btn btn-outline-secondary">Back</span>
                 </a>

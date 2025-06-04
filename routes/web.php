@@ -98,26 +98,28 @@ Route::group(['prefix' => 'result'], function () {
     Route::any('/add_sample_10/{id}', [AmbientAirController::class, 'add_sample_10'])->name('result.add_sample_10');
     Route::any('/ambient_air_10/{id}', [AmbientAirController::class, 'addAmbientAir_10'])->name('result.ambient_air.add_10');
 
-    Route::any('/add_sample_1/{id}', [WorkplaceController::class, 'add_sample_1'])->name('result.add_sample_1');
-    Route::any('/workplace/{id}', [WorkplaceController::class, 'addWorkplace_1'])->name('result.workplace.add_1');
-    Route::any('/add_sample_2/{id}', [WorkplaceController::class, 'add_sample_2'])->name('result.add_sample_2');
-    Route::any('/workplace_2/{id}', [WorkplaceController::class, 'addWorkplace_2'])->name('result.workplace.add_2');
-    Route::any('/add_sample_3/{id}', [WorkplaceController::class, 'add_sample_3'])->name('result.add_sample_3');
-    Route::any('/workplace_3/{id}', [WorkplaceController::class, 'addWorkplace_3'])->name('result.workplace.add_3');
-    Route::any('/add_sample_4/{id}', [WorkplaceController::class, 'add_sample_4'])->name('result.add_sample_4');
-    Route::any('/workplace_4/{id}', [WorkplaceController::class, 'addWorkplace_4'])->name('result.workplace.add_4');
-    Route::any('/add_sample_5/{id}', [WorkplaceController::class, 'add_sample_5'])->name('result.add_sample_5');
-    Route::any('/workplace_5/{id}', [WorkplaceController::class, 'addWorkplace_5'])->name('result.workplace.add_5');
-    Route::any('/add_sample_6/{id}', [WorkplaceController::class, 'add_sample_6'])->name('result.add_sample_6');
-    Route::any('/workplace_6/{id}', [WorkplaceController::class, 'addWorkplace_6'])->name('result.workplace.add_6');
-    Route::any('/add_sample_7/{id}', [WorkplaceController::class, 'add_sample_7'])->name('result.add_sample_7');
-    Route::any('/workplace_7/{id}', [WorkplaceController::class, 'addWorkplace_7'])->name('result.workplace.add_7');
-    Route::any('/add_sample_8/{id}', [WorkplaceController::class, 'add_sample_8'])->name('result.add_sample_8');
-    Route::any('/workplace_8/{id}', [WorkplaceController::class, 'addWorkplace_8'])->name('result.workplace.add_8');
-    Route::any('/add_sample_9/{id}', [WorkplaceController::class, 'add_sample_9'])->name('result.add_sample_9');
-    Route::any('/workplace_9/{id}', [WorkplaceController::class, 'addWorkplace_9'])->name('result.workplace.add_9');
-    Route::any('/add_sample_10/{id}', [WorkplaceController::class, 'add_sample_10'])->name('result.add_sample_10');
-    Route::any('/workplace_10/{id}', [WorkplaceController::class, 'addWorkplace_10'])->name('result.workplace.add_10');
+    // ---------------------------------------------------------------------------------------------------------------------------------------
+    Route::any('/workplace/{id}', [WorkplaceController::class, 'addWorkplace'])->name('result.workplace.add');
+    // Route::any('/add_sample_1/{id}', [WorkplaceController::class, 'add_sample_1'])->name('result.add_sample_1');
+    // Route::any('/workplace/{id}', [WorkplaceController::class, 'addWorkplace_1'])->name('result.workplace.add_1');
+    // Route::any('/add_sample_2/{id}', [WorkplaceController::class, 'add_sample_2'])->name('result.add_sample_2');
+    // Route::any('/workplace_2/{id}', [WorkplaceController::class, 'addWorkplace_2'])->name('result.workplace.add_2');
+    // Route::any('/add_sample_3/{id}', [WorkplaceController::class, 'add_sample_3'])->name('result.add_sample_3');
+    // Route::any('/workplace_3/{id}', [WorkplaceController::class, 'addWorkplace_3'])->name('result.workplace.add_3');
+    // Route::any('/add_sample_4/{id}', [WorkplaceController::class, 'add_sample_4'])->name('result.add_sample_4');
+    // Route::any('/workplace_4/{id}', [WorkplaceController::class, 'addWorkplace_4'])->name('result.workplace.add_4');
+    // Route::any('/add_sample_5/{id}', [WorkplaceController::class, 'add_sample_5'])->name('result.add_sample_5');
+    // Route::any('/workplace_5/{id}', [WorkplaceController::class, 'addWorkplace_5'])->name('result.workplace.add_5');
+    // Route::any('/add_sample_6/{id}', [WorkplaceController::class, 'add_sample_6'])->name('result.add_sample_6');
+    // Route::any('/workplace_6/{id}', [WorkplaceController::class, 'addWorkplace_6'])->name('result.workplace.add_6');
+    // Route::any('/add_sample_7/{id}', [WorkplaceController::class, 'add_sample_7'])->name('result.add_sample_7');
+    // Route::any('/workplace_7/{id}', [WorkplaceController::class, 'addWorkplace_7'])->name('result.workplace.add_7');
+    // Route::any('/add_sample_8/{id}', [WorkplaceController::class, 'add_sample_8'])->name('result.add_sample_8');
+    // Route::any('/workplace_8/{id}', [WorkplaceController::class, 'addWorkplace_8'])->name('result.workplace.add_8');
+    // Route::any('/add_sample_9/{id}', [WorkplaceController::class, 'add_sample_9'])->name('result.add_sample_9');
+    // Route::any('/workplace_9/{id}', [WorkplaceController::class, 'addWorkplace_9'])->name('result.workplace.add_9');
+    // Route::any('/add_sample_10/{id}', [WorkplaceController::class, 'add_sample_10'])->name('result.add_sample_10');
+    // Route::any('/workplace_10/{id}', [WorkplaceController::class, 'addWorkplace_10'])->name('result.workplace.add_10');
 });
 
 Route::group(['prefix' => 'manage_coa'], function () {

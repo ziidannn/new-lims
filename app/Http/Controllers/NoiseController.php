@@ -86,7 +86,6 @@ class NoiseController extends Controller
         ));
     }
 
-
     // public function noise_sample_new(Request $request, $id) {
     //     if ($request->isMethod('POST')) {
     //         $instituteSubject = InstituteSubject::findOrFail($id);

@@ -97,56 +97,30 @@ class InstituteController extends Controller
         $description = Subject::orderBy('name')->get();
         $customer = Customer::all();
 
-        if ($request->isMethod('POST')) {
-            $this->validate($request, [
-                'no_coa' => ['required'],
-                'customer_id' => ['required'],
-                'subject_id' => ['required', 'array'], // Pastikan ini array
-                'sample_receive_date' => ['required'],
-                'sample_analysis_date' => ['required'],
-                'report_date' => ['required']
-            ]);
+        if ($request->has('subject_id')) {
+            // Ambil data subject lama dari DB
+            $existingSubjects = InstituteSubject::where('institute_id', $data->id)->get()->keyBy('subject_id');
 
-            // Update data di tabel institute
-            $data->update([
-                'no_coa' => $request->no_coa,
-                'customer_id' => $request->customer_id,
-                'sample_receive_date' => $request->sample_receive_date,
-                'sample_analysis_date' => $request->sample_analysis_date,
-                'report_date' => $request->report_date,
-            ]);
-
-            InstituteRegulation::whereIn(
-                'institute_subject_id',
-                InstituteSubject::where('institute_id', $data->id)->pluck('id')
-            )->delete();
-
-            $instituteSubjectIds = InstituteSubject::where('institute_id', $data->id)->pluck('id');
-
-            FieldCondition::whereIn('institute_subject_id', $instituteSubjectIds)->delete();
-
-            InstituteRegulation::whereIn('institute_subject_id', $instituteSubjectIds)->delete();
-
-            InstituteSubject::whereIn('id', $instituteSubjectIds)->delete();
-
-            if ($request->has('subject_id')) {
-                foreach ($request->subject_id as $subjectId) {
-                    // Simpan subject_id ke tabel institute_subjects
+            // Loop berdasarkan urutan subject dari form
+            foreach ($request->subject_id as $index => $subjectId) {
+                if ($existingSubjects->has($subjectId)) {
+                    $instituteSubject = $existingSubjects[$subjectId];
+                    InstituteRegulation::where('institute_subject_id', $instituteSubject->id)->delete();
+                } else {
                     $instituteSubject = InstituteSubject::create([
                         'institute_id' => $data->id,
                         'subject_id' => $subjectId,
                     ]);
+                }
 
-                    // Ambil regulation_id berdasarkan subject_id
-                    $regulationIds = $request->input('regulation_id') ?? [];
+                // Ambil regulation_id berdasarkan index
+                $regulationIds = $request->input("regulations")[$index] ?? [];
 
-                    // Simpan regulation_id ke tabel institute_regulations
-                    foreach ($regulationIds as $regulationId) {
-                        InstituteRegulation::create([
-                            'institute_subject_id' => $instituteSubject->id,
-                            'regulation_id' => $regulationId,
-                        ]);
-                    }
+                foreach ($regulationIds as $regulationId) {
+                    InstituteRegulation::create([
+                        'institute_subject_id' => $instituteSubject->id,
+                        'regulation_id' => $regulationId,
+                    ]);
                 }
             }
 
