@@ -534,19 +534,20 @@
                 <th style="border: 1px solid;">Unit</th>
                 <th style="border: 1px solid;">Methods</th>
             </tr>
-            @php
-                $rowNumber = 1;
-            @endphp
+           
             <tr>
-                <td style="border: 1px solid;">{{ $rowNumber++ }}</td>
-                <td style="border: 1px solid;">Upwind</td>
-                <td style="border: 1px solid;"></td>
-                <td style="border: 1px solid;"></td>
-                <td style="border: 1px solid;">70</td>
-                <td style="border: 1px solid;">dBA</td>
-                <td style="border: 1px solid;">SNI 8427:2017</td>
+                
+                <td style="border: 1px solid;" rowspan="1"></td>
+                <td style="border: 1px solid;" rowspan="1"></td>
+                <td style="border: 1px solid;" rowspan="1"></td>
+                <td style="border: 1px solid;" rowspan="1"></td>
+                <td style="border: 1px solid;" rowspan="1"></td>
+                <td style="border: 1px solid;" rowspan="1"></td>
+                <td style="border: 1px solid;" rowspan="1"></td>
+                
             </tr>
         </table>
+            
     </div>
     {{-- End Parameters --}}
     {{-- Start Notes and Regulation --}}
