@@ -490,6 +490,15 @@
 @endforeach
 {{-------------------------------------------- End Template Noise 1 ---------------------------------------------------}}
 <div class="page_break"></div>
+@php
+    // Cek apakah ada testing_result yang valid (tidak null atau kosong)
+    $hasNoiseData = collect($noiseResults)
+        ->flatten(1)
+        ->filter(function ($item) {
+            return !empty($item->testing_result);
+        })->isNotEmpty();
+@endphp
+@if($hasNoiseData)
 @foreach($samplings->whereNotNull('sampling_location') as $sampling)
 @if($sampling->instituteSubject && $sampling->instituteSubject->subject && $sampling->instituteSubject->subject->name === 'Noise*')
 <div>
@@ -527,7 +536,7 @@
         <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center; width: 100%;">
             <tr>
                 <th style="border: 1px solid;">No</th>
-                <th style="border: 1px solid;">SamplingLocation</th>
+                <th style="border: 1px solid;">Sampling<br>Location</th>
                 <th style="border: 1px solid;">Testing Result</th>
                 <th style="border: 1px solid;">Time</th>
                 <th style="border: 1px solid;">Regulatory<br>Standard**</th>
@@ -535,17 +544,23 @@
                 <th style="border: 1px solid;">Methods</th>
             </tr>
            
+            @php
+        $rowNumber = 1;
+    @endphp
+
+    @foreach ($noiseResults as $samplingId => $locations)
+        @foreach ($locations as $locationData)
             <tr>
-                
-                <td style="border: 1px solid;" rowspan="1"></td>
-                <td style="border: 1px solid;" rowspan="1"></td>
-                <td style="border: 1px solid;" rowspan="1"></td>
-                <td style="border: 1px solid;" rowspan="1"></td>
-                <td style="border: 1px solid;" rowspan="1"></td>
-                <td style="border: 1px solid;" rowspan="1"></td>
-                <td style="border: 1px solid;" rowspan="1"></td>
-                
+                <td style="border: 1px solid;">{{ $rowNumber++ }}</td>
+                <td style="border: 1px solid;">{{ $locationData->location }}</td> {{-- Parameters --}}
+                <td style="border: 1px solid;">{{ $locationData->sampling_time ?? '-' }}</td> {{-- Sampling Time --}}
+                <td style="border: 1px solid;">{{ $locationData->testing_result ?? '-' }}</td> {{-- Testing Result --}}
+                <td style="border: 1px solid;">{{ $locationData->regulatory_standard ?? '-' }}</td>
+                <td style="border: 1px solid;">{{ $locationData->unit ?? '-' }}</td>
+                <td style="border: 1px solid;">{{ $locationData->method ?? '-' }}</td>
             </tr>
+        @endforeach
+    @endforeach
         </table>
             
     </div>
@@ -561,20 +576,21 @@
                 <td style="width: 0%;"> * </td>
                 <td style="width: 95%;">Accredited Parameters </td>
             </tr>
-            {{-- @if ($regulations->isNotEmpty())
-                @foreach ($regulations as $regulation) --}}
-            <tr style="line-height: 1;">
-                {{-- <td style="width: 5%;">{{ $loop->count > 2 ? '' : '*' }}</td> --}}
-                {{-- <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td> --}}
-            </tr>
-            {{-- @endforeach
-            @endif --}}
+            @foreach ($regulations as $regulation)
+            @if ($regulation->subject_id == 3)
+                <tr style="line-height: 1;">
+                    <td style="width: 5%;">{{ $loop->count > 2 ? '***' : '**' }}</td>
+                    <td style="width: 95%;">{{ $regulation->title ?? 'No Name Available' }}</td>
+                </tr>
+            @endif
+            @endforeach
         </table>
     </div>
     {{-- End Notes and Regulation --}}
 </div>
 @endif
 @endforeach
+@endif
 {{-------------------------------------------- Template Noise 2 ---------------------------------------------------}}
 {{-------------------------------------------- End Template Noise 2 ---------------------------------------------------}}
 {{--============================================== END NOISE* =====================================================--}}
