@@ -12,6 +12,23 @@
         border: 1px solid #333;
     }
 
+    .form-select {
+    width: 100%;
+    min-width: 300px;
+    }
+
+    .select2-selection {
+        white-space: normal !important; /* biar teks bisa wrap */
+        height: auto !important;        /* tinggi mengikuti isi */
+        min-height: 38px;
+    }
+
+    .select2-selection__rendered {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        line-height: 1.2 !important;
+    }
+
 </style>
 @endsection
 
@@ -116,36 +133,33 @@
                         <div class="col-lg-12">
                             <label class="col-form-label">Sample Description & Regulation</label>
                             <div id="subject_id_container">
-                                @foreach ($data->subjects as $subject)
-                                <div class="row mb-2">
-                                    <div class="col-md-5">
-                                        <select name="subject_id[]"
-                                            class="form-select input-sm select2-modal subject_id" required>
-                                            <option value="">Select Sample Description</option>
-                                            @foreach ($description as $desc)
-                                            <option value="{{ $desc->id }}"
-                                                {{ $subject->id == $desc->id ? 'selected' : '' }}>
+                                @foreach ($data->subjects as $index => $subject)
+                                <div class="mb-4 p-3 border rounded bg-light">
+                                    <!-- Subject -->
+                                    <label>Subject</label>
+                                    <select name="subject_id[]" class="form-select select2-modal subject_id" required>
+                                        <option value="">Select Subject</option>
+                                        @foreach ($description as $desc)
+                                            <option value="{{ $desc->id }}" {{ $subject->id == $desc->id ? 'selected' : '' }}>
                                                 {{ $desc->subject_code }} - {{ $desc->name }}
                                             </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                        @endforeach
+                                    </select>
 
-                                    <div class="col-md-5">
-                                        <select name="regulation_id[]" class="form-select input-sm select2-modal"
-                                            required>
-                                            <option value="">Select Regulation</option>
-                                            @foreach ($regulation as $rg)
+                                    <!-- Regulation -->
+                                    <label class="mt-3">Regulation</label>
+                                    <select name="regulations[{{ $index }}][]" class="form-select select2-modal" multiple required>
+                                        @foreach ($regulation->where('subject_id', $subject->id) as $rg)
                                             <option value="{{ $rg->id }}"
-                                                {{ in_array($rg->id, $subject->instituteRegulations->pluck('regulation_id')->toArray() ?? []) ? 'selected' : '' }}>
+                                                {{ in_array($rg->id, $subject->instituteRegulations->pluck('regulation_id')->toArray()) ? 'selected' : '' }}>
                                                 {{ $rg->regulation_code }} - {{ $rg->title }}
                                             </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                        @endforeach
+                                    </select>
 
-                                    <div class="col-md-2">
-                                        <button type="button" class="btn btn-danger remove-row">X</button>
+                                    <!-- Remove -->
+                                    <div class="text-end mt-2">
+                                        <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
                                     </div>
                                 </div>
                                 @endforeach
@@ -167,134 +181,80 @@
 @endsection
 
 @section('script')
-<script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
+<script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
 <script>
     $(document).ready(function () {
+        // Init awal
         $('.select2-modal').select2({
             placeholder: "Select an option",
             allowClear: true
         });
-    });
 
-</script>
-<script>
-    $(document).ready(function () {
-        const selectElement = document.querySelector('#is_required');
-        selectElement.addEventListener('change', (event) => {
-            selectElement.value = selectElement.checked ? 1 : 0;
-            // alert(selectElement.value);
-            $('#subject_id_container').on('click', '#add_more', function () {
-                let container = document.getElementById('subject_id_container');
-                let div = document.createElement('div');
-                div.classList.add('row', 'mb-2');
+        // Tambah row baru
+        $('#add_more').on('click', function () {
+            let index = $('.row').length; // hitung index dinamis
+            let container = $('#subject_id_container');
+            let div = $(`
+                <div class="row mb-2">
+                    <div class="col-md-5">
+                        <select name="subject_id[]" class="form-select select2-modal subject-select" required>
+                            <option value="">Select Sample Description</option>
+                            @foreach ($description as $desc)
+                                <option value="{{ $desc->id }}">{{ $desc->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                div.innerHTML = `
-                <div class="col-md-5">
-                    <select name="subject_id[]" class="form-select input-sm select2-modal" required>
-                        <option value="">Select Sample Description</option>
-                        @foreach ($description as $desc)
-                            <option value="{{ $desc->id }}">{{ $desc->name }}</option>
-                        @endforeach
-                    </select>
+                    <div class="col-md-5">
+                        <select name="regulations[${index}][]" class="form-select select2-modal regulation-select" multiple required>
+                            <option value="">Select Regulation</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger remove-row">X</button>
+                    </div>
                 </div>
+            `);
 
-                <div class="col-md-5">
-                    <select name="regulation_id[]" class="form-select input-sm select2-modal" required>
-                        <option value="">Select Regulation </option>
-                        @foreach ($regulation as $rg)
-                            <option value="{{ $rg->id }}">{{ $rg->title }}</option>
-                        @endforeach
-                    </select>
-                </div>
+            container.append(div);
 
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-danger remove-row">X</button>
-                </div>
-            `;
-
-                container.appendChild(div);
-                $('.select2').select2({
-                    placeholder: "Select an option",
-                    allowClear: true
-                });
-            });
-
-            $(document).on('click', '.remove-row', function () {
-                $(this).closest('.row').remove();
+            // Reinit select2
+            div.find('.select2-modal').select2({
+                placeholder: "Select an option",
+                allowClear: true
             });
         });
+
+        // Remove row
+        $(document).on('click', '.remove-row', function () {
+            $(this).closest('.row').remove();
+        });
+
+        // Load regulation berdasarkan subject_id
+        $(document).on('change', '.subject-select', function () {
+            let subjectId = $(this).val();
+            let regulationSelect = $(this).closest('.row').find('.regulation-select');
+
+            if (subjectId) {
+                $.ajax({
+                    url: "{{ route('DOC.get_regulation_id_by_id') }}",
+                    type: "GET",
+                    data: { ids: [subjectId] },
+                    dataType: 'json',
+                    success: function (results) {
+                        let options = '';
+                        $.each(results, function (key, value) {
+                            options += `<option value="${value.id}">(${value.regulation_code}) - ${value.title}</option>`;
+                        });
+                        regulationSelect.html(options).trigger('change');
+                    }
+                });
+            } else {
+                regulationSelect.html('<option value="">Select Regulation</option>');
+            }
+        });
     });
-
-</script>
-<script>
-    document.getElementById('add_more').addEventListener('click', function () {
-        let container = document.getElementById('subject_id_container');
-        let div = document.createElement('div');
-        div.classList.add('row', 'mb-2');
-
-        div.innerHTML = `
-        <div class="col-md-5">
-            <select name="subject_id[]" class="form-control" required>
-                <option value="">Select Sample Description</option>
-                @foreach ($description as $desc)
-                    <option value="{{ $desc->id }}">{{ $desc->name }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="col-md-5">
-            <select name="regulation_id[]" class="form-control" required>
-                <option value="">Select Regulation </option>
-                @foreach ($regulation as $rg)
-                    <option value="{{ $rg->id }}">{{ $rg->title }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="col-md-2">
-            <button type="button" class="btn btn-danger remove-row">X</button>
-        </div>
-    `;
-
-        container.appendChild(div);
-    });
-
-    document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('remove-row')) {
-            e.target.closest('.row').remove();
-        }
-    });
-
-</script>
-<script>
-    $(document).on('change', 'select[name="subject_id[]"]', function () {
-        let selectedSubject = $(this).val(); // Ambil subject_id yang dipilih
-        let regulationSelect = $(this).closest('.row').find(
-            'select[name="regulation_id[]"]'); // Cari dropdown regulation terkait
-
-        if (selectedSubject) {
-            $.ajax({
-                url: "{{ route('DOC.get_regulation_id_by_id') }}",
-                type: "GET",
-                data: {
-                    ids: [selectedSubject]
-                }, // Kirim array subject_id
-                dataType: 'json',
-                success: function (results) {
-                    let regulationOptions = '<option value="">Select Regulation</option>';
-                    $.each(results, function (key, value) {
-                        regulationOptions += '<option value="' + value.id + '">' + value
-                            .title + '</option>';
-                    });
-
-                    regulationSelect.html(regulationOptions);
-                }
-            });
-        } else {
-            regulationSelect.html(
-                '<option value="">Select Regulation</option>'); // Kosongkan jika tidak ada yang dipilih
-        }
-    });
-
 </script>
 @endsection
+

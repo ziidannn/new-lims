@@ -412,7 +412,7 @@
                 <th style="border: 1px solid;">Unit</th>
                 <th style="border: 1px solid;">Methods</th>
             </tr>
-        
+
             @php
                 $noises = [
                     ['L1', 'T1', 'q1'],
@@ -425,13 +425,13 @@
                 ];
                 $rowNumber = 1;
             @endphp
-        
+
             @foreach ($noiseResults as $samplingId => $locations)
                 @foreach ($locations as $locationData)
                     @php
                         $leqArray = explode(',', $locationData->leq_values);
                     @endphp
-        
+
                     @foreach ($noises as $i => $noise)
                         <tr>
                             {{-- No & Location hanya muncul sekali per lokasi, rowspan 7 --}}
@@ -439,13 +439,13 @@
                                 <td style="border: 1px solid;" rowspan="7">{{ $rowNumber++ }}</td>
                                 <td style="border: 1px solid;" rowspan="7">{{ $locationData->location }}</td>
                             @endif
-        
+
                             <td style="border: 1px solid;">{{ $noise[0] }}</td>
                             <td style="border: 1px solid;">{{ $noise[1] }}</td>
                             <td style="border: 1px solid;">
                                 {{ isset($leqArray[$i]) && trim($leqArray[$i]) !== '' ? $leqArray[$i] : '-' }}
                             </td>
-        
+
                             {{-- Data tambahan hanya muncul sekali per lokasi --}}
                             @if ($i === 0)
                                 <td style="border: 1px solid;" rowspan="7">{{ $locationData->ls ?? '-' }}</td>
@@ -460,7 +460,7 @@
                 @endforeach
             @endforeach
         </table>
-        
+
     </div>
     {{-- End Parameters --}}
     {{-- Start Notes and Regulation --}}

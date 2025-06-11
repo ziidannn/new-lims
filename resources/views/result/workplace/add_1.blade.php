@@ -45,34 +45,34 @@
 @section('content')
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-        <li class="nav-item"><a class="nav-link active" href="{{ route('result.workplace.add_1', $institute->id) }}">
+        <li class="nav-item"><a class="nav-link active" href="{{ route('result.workplace.add_1', $instituteSubject->id) }}">
                 <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 1</i></b></a></li></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_2', $institute->id) }}"><i
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_2', $instituteSubject->id) }}"><i
                     class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 2</i></b></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_3',$institute->id) }}">
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_3',$instituteSubject->id) }}">
                 <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 3</i></b></a></li></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_4', $institute->id) }}"><i
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_4', $instituteSubject->id) }}"><i
                     class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 4</i></b></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_5',$institute->id) }}">
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_5',$instituteSubject->id) }}">
                 <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 5</i></b></a></li></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_6', $institute->id) }}"><i
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_6', $instituteSubject->id) }}"><i
                     class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 6</i></b></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_7',$institute->id) }}">
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_7',$instituteSubject->id) }}">
                 <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 7</i></b></a></li></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_8', $institute->id) }}"><i
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_8', $instituteSubject->id) }}"><i
                     class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 8</i></b></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_9',$institute->id) }}">
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_9',$instituteSubject->id) }}">
                 <i class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 9</i></b></a></li></a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_10', $institute->id) }}"><i
+        <li class="nav-item"><a class="nav-link" href="{{ route('result.workplace.add_10', $instituteSubject->id) }}"><i
                     class="bx bx-current-location me-1"></i>
                 <b><i style="font-size: 1.13rem;">LOC - 10</i></b></a></li>
     </ul>
