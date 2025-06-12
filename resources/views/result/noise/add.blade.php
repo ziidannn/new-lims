@@ -210,9 +210,10 @@
                                 <td><input type="text" class="form-control text-center" name="unit[]" value="{{ $parameters[0]->unit ?? '' }}" readonly></td>
                                 <td><input type="text" class="form-control text-center" name="method[]" value="{{ $parameters[0]->method ?? '' }}" readonly></td>
                                 <td>
-                                    <button class="btn btn-info btn-sm mt-1 custom-blue" type="submit">Save</button>
-                                    <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
-                                </td>
+                                <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                    name="action" value="save_location">Save</button>
+                                <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
+                            </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -260,9 +261,10 @@
                                 <td><input type="text" class="form-control text-center" name="unit[]" value="{{ $parameters[0]->unit ?? '' }}" readonly></td>
                                 <td><input type="text" class="form-control text-center" name="method[]" value="{{ $parameters[0]->method ?? '' }}" readonly></td>
                                 <td>
-                                    <button class="btn btn-info btn-sm mt-1 custom-blue" type="submit">Save</button>
-                                    <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
-                                </td>
+                                <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                    name="action" value="save_location">Save</button>
+                                <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
+                            </td>
                             </tr>
                             @endforeach
                         </tbody>

@@ -198,7 +198,7 @@
 
                             <td>
                                 <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
-                                    name="save">Save</button>
+                                    name="action" value="save_location">Save</button>
                                 <button type="button" class="btn btn-danger btn-sm mt-1 remove-row">Remove</button>
                             </td>
                         </tr>
@@ -210,12 +210,43 @@
                             <span class="btn btn-outline-secondary">Back</span>
                         </a>
                     </div>
-                    </table>
                 </div>
             </div>
         </div>
     </form>
 </div>
+
+<div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
+    <form class="card" id="mainForm" action="{{ route('result.illumination.add', $instituteSubject->id) }}" method="POST">
+        @csrf
+        <div class="col-xl-12">
+            <div class="card-body">
+                <div class="row">
+                    <label class="form-label d-block"><i>Do you want to give this sample a logo?</i></label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" id="showLogoYes" name="show_logo" value="1"
+                            {{ old('show_logo', $samplingData->show_logo ?? false) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="showLogoYes"><b>Yes</b></label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" id="showLogoNo" name="show_logo" value="0"
+                            {{ old('show_logo', $samplingData->show_logo ?? false) ? '' : 'checked' }}>
+                        <label class="form-check-label" for="showLogoNo"><b>No</b></label>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-primary me-2" type="submit" name="action" value="save_all"
+                            onclick="confirmSubmit(event)">Save
+                            All</button>
+                        <input type="hidden" name="action" id="save_all" value="save_all">
+                        <a href="{{ route('result.list_result', $institute->id) }}"
+                            class="btn btn-outline-secondary">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
 </div>
 </div>
 @endsection

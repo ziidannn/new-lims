@@ -169,6 +169,20 @@ class NoiseController extends Controller
             ->first();
 
         if ($request->isMethod('POST')) {
+            $action = $request->input('action');
+
+            // ✅ Jika hanya ingin simpan logo (save_all), langsung simpan tanpa proses looping data
+            if ($action === 'save_all') {
+                Sampling::updateOrCreate(
+                    ['institute_subject_id' => $instituteSubject->id],
+                    ['show_logo' => $request->input('show_logo', false)]
+                );
+
+                return redirect()->route('result.list_result', $institute->id)
+                    ->with('msg', 'Logo saved successfully!');
+            }
+
+            // ✅ Validasi dan proses data result baru dilakukan jika bukan save_all
             $request->validate([
                 'unit.*' => 'nullable|string',
                 'method.*' => 'nullable|string',
@@ -185,22 +199,15 @@ class NoiseController extends Controller
             $messages = [];
 
             foreach ($request->location as $locIndex => $location) {
-                if (empty($location)) {
-                    continue; // Skip lokasi kosong
-                }
+                if (empty($location)) continue;
 
-                // CEK apakah noise tersedia untuk lokasi ini
-                if (!isset($request->noise[$locIndex]) || !is_array($request->noise[$locIndex])) {
-                    continue; // Skip kalau noise untuk location ini tidak ada
-                }
+                if (!isset($request->noise[$locIndex]) || !is_array($request->noise[$locIndex])) continue;
 
                 foreach ($request->noise[$locIndex] as $i => $noiseValue) {
-                    if (empty($noiseValue)) {
-                        continue; // Skip noise kosong
-                    }
+                    if (empty($noiseValue)) continue;
 
                     $parameterId = $parameters[$locIndex]->id ?? null;
-                    $timeValue = $request->time[$locIndex][$i] ?? null; // optional
+                    $timeValue = $request->time[$locIndex][$i] ?? null;
 
                     $existingResult = Result::where([
                         'sampling_id' => $samplingNoise->id,
@@ -274,6 +281,7 @@ class NoiseController extends Controller
             ->get();
         $results = DB::table('results')
             ->select('location', DB::raw('GROUP_CONCAT(leq ORDER BY id) as leq_values'), 'ls', 'lm', 'lsm', 'regulatory_standard')
+            ->where('sampling_id', $samplingNoise->id) // ✅ filter hanya data milik Noise
             ->groupBy('location', 'ls', 'lm', 'lsm', 'regulatory_standard')
             ->get();
         $latestResults = $samplings
