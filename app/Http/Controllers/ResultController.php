@@ -378,12 +378,8 @@ class ResultController extends Controller
         $results = collect();
         if ($samplings) {
             $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->flatten()->filter())
                 ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
+                ->groupBy('parameter_id'); // ✅ hanya berdasarkan parameter_id
         }
 
         return view('result.odor.add', compact(
@@ -747,12 +743,8 @@ class ResultController extends Controller
         $results = collect();
         if ($samplings) {
             $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->flatten()->filter())
                 ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
+                ->groupBy('parameter_id'); // ✅ hanya berdasarkan parameter_id
         }
 
         return view('result.stationary_stack.add', compact(

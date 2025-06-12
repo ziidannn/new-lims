@@ -256,7 +256,7 @@ class WorkplaceController extends Controller
             }
         }
 
-        // Bagian GET
+        // ✅ STEP 4: Prepare Data for View
         $subject = Subject::where('id', $instituteSubject->subject_id)->first();
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
@@ -276,12 +276,8 @@ class WorkplaceController extends Controller
         $results = collect();
         if ($samplings) {
             $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->flatten()->filter())
                 ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
+                ->groupBy('parameter_id'); // ✅ hanya berdasarkan parameter_id
         }
 
         return view('result.workplace.add', compact(

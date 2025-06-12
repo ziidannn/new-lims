@@ -34,6 +34,11 @@
     }
 </style>
 @endsection
+@if(session('error'))
+    <div class="alert alert-warning text-center">
+        {{ session('error') }}
+    </div>
+@endif
 <div class="card">
     <div class="card-datatable table-responsive">
         <div class="card-header">
