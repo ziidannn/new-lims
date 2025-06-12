@@ -340,50 +340,50 @@ class RegulationSeeder extends Seeder
             ],
             // Surface Water
             [
-                "id" => "41",
+                "id" => "50",
                 "regulation_code" => "121",
                 "subject_id" => 10,
                 "title" => "Government of Republic of Indonesia Regulation No. 22 of 2021, Regarding the Implementation of Environmental Protection and Management Annex VI"
             ],
             [
-                "id" => "42",
+                "id" => "51",
                 "regulation_code" => "122",
                 "subject_id" => 10,
                 "title" => "Government of Republic of Indonesia Regulation No. 22 of 2021, Regarding the Implementation of Environmental Protection and Management Annex VI Regarding the Implementation of Protection and Environmental Management Quality Standards for river and similar water."
             ],
             [
-                "id" => "43",
+                "id" => "52",
                 "regulation_code" => "123",
                 "subject_id" => 10,
                 "title" => "Government of Republic of Indonesia Regulation No. 22 of 2021, Regarding the Implementation of Environmental Protection and Management Annex VI Regarding the Implementation of Protection and Environmental Management Quality Standards for lake and similar water. "
             ],
             [
-                "id" => "44",
+                "id" => "53",
                 "regulation_code" => "124",
                 "subject_id" => 10,
                 "title" => "Governor of the Head of the Special Capital Region of Jakarta Number 582 Year 1995 Regarding Designation of Designations and Quality Standards for River Water / Water Bodies and Liquid Waste Quality Standards in the Capital Region of Jakarta Development Area Middle Appendix III Group D"
             ],
             // Vibration
             [
-                "id" => "43",
+                "id" => "54",
                 "regulation_code" => "131",
                 "subject_id" => 11,
                 "title" => "Minister of Manpower Regulation No. 05 Year 2018"
             ],
             [
-                "id" => "44",
+                "id" => "55",
                 "regulation_code" => "132",
                 "subject_id" => 11,
                 "title" => "Minister of Environmental Decree of Republic Indonesia No. 49/MENLH/11/1996, Regarding the Vibration Level Standard"
             ],
             [
-                "id" => "45",
+                "id" => "56",
                 "regulation_code" => "133",
                 "subject_id" => 11,
                 "title" => "Minister of Environmental Decree of Republic Indonesia No. 49/MENLH/11/1996 Class III, Regarding the Vibration Level Standard"
             ],
             [
-                "id" => "46",
+                "id" => "57",
                 "regulation_code" => "134",
                 "subject_id" => 11,
                 "title" => "Minister of Environmental Decree of Republic Indonesia No. 49/MENLH/11/1996 Class II, Regarding the Vibration Level Standard
