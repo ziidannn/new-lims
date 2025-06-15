@@ -11,8 +11,8 @@
     <meta name="keywords" content="">
     <!-- Canonical SEO -->
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{asset('assets/img/favicon.ico')}}" />
-    <link rel="shortcut icon" href="{{asset('assets/img/favicon.ico')}}" type="image/x-icon">
+    <link rel="icon" type="image/x-icon" href="{{asset('assets/img/DIL.png')}}" />
+    <link rel="shortcut icon" href="{{asset('assets/img/DIL.png')}}" type="image/x-icon">
     @include('layouts.css')
     @yield('style')
 </head>

@@ -50,26 +50,26 @@ class SubjectSeeder extends Seeder
                 "subject_code" => "07",
                 "name" => "Stationary Stack Source Emission"
             ],
-            [
-                "id" => "8",
-                "subject_code" => "08",
-                "name" => "Wastewater"
-            ],
-            [
-                "id" => "9",
-                "subject_code" => "09",
-                "name" => "Clean Water"
-            ],
-            [
-                "id" => "10",
-                "subject_code" => "10",
-                "name" => "Surface Water"
-            ],
-            [
-                "id" => "11",
-                "subject_code" => "11",
-                "name" => "Vibration"
-            ]
+            // [
+            //     "id" => "8",
+            //     "subject_code" => "08",
+            //     "name" => "Wastewater"
+            // ],
+            // [
+            //     "id" => "9",
+            //     "subject_code" => "09",
+            //     "name" => "Clean Water"
+            // ],
+            // [
+            //     "id" => "10",
+            //     "subject_code" => "10",
+            //     "name" => "Surface Water"
+            // ],
+            // [
+            //     "id" => "11",
+            //     "subject_code" => "11",
+            //     "name" => "Vibration"
+            // ]
         ];
 
         foreach ($data as $x) {
