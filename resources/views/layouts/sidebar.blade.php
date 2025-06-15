@@ -2,8 +2,8 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme no-print">
     <div class="app-brand demo ">
         <a href="{{ route('index') }}" class="app-brand-link">
-            <span class="app-brand-logo demo" style="margin-left: -10px">
-                <img src="{{asset('assets/img/DIL.png')}}" height="44" >
+            <span class="app-brand-logo demo" >
+                <img src="{{asset('assets/img/DIL.png')}}" height="67" >
             </span>
         </a>
 

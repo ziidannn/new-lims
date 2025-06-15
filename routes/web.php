@@ -65,6 +65,10 @@ Route::group(['prefix' => 'result'], function () {
     Route::any('/illumination/{id}', [ResultController::class, 'addIllumination'])->name('result.illumination.add');
     Route::any('/heat_stress/{id}', [ResultController::class, 'addHeatStress'])->name('result.heat_stress.add');
     Route::any('/stationary_stack/{id}', [ResultController::class, 'addStationaryStack'])->name('result.stationary_stack.add');
+    Route::any('/waste_water/{id}', [ResultController::class, 'addWastewater'])->name('result.waste_water.add');
+    Route::any('/clean_water/{id}', [ResultController::class, 'addCleanWater'])->name('result.clean_water.add');
+    Route::any('/surface_water/{id}', [ResultController::class, 'addSurfaceWater'])->name('result.surface_water.add');
+    Route::any('/vibration/{id}', [ResultController::class, 'addVibration'])->name('result.vibration.add');
     Route::any('/add_sample/{id}', [ResultController::class, 'add_sample'])->name('result.add_sample');
     Route::any('/add_sample_new/{id}', [ResultController::class, 'add_sample_new'])->name('result.add_sample_new');
     Route::any('/list_result/{id}', [ResultController::class, 'list_result'])->name('result.list_result');

@@ -151,16 +151,15 @@
                         </div> -->
                         <div class="col-lg-12">
                             <div id="subject_id_container">
-                                <label class="col-form-label">Subject Description And Regulatiom<i
+                                <label class="col-form-label">Subject Description And Regulation<i
                                         class="text-danger">*</i></label>
                                 <div class="row mb-2">
                                     <div class="col-md-5">
                                         <select id="subject_select" name="subject_id[]"
                                             class="form-select input-sm select2-modal" required>
                                             <option value="">Select Sample Description</option>
-                                            @foreach ($description as $desc)
-                                            <option value="{{ $desc->id }}">({{ $desc->subject_code }}) -
-                                                {{ $desc->name }}</option>
+                                            @foreach ($description->sortBy('subject_code') as $desc)
+                                                <option value="{{ $desc->id }}">({{ $desc->subject_code }}) - {{ $desc->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -168,7 +167,7 @@
                                         <select name="regulation_id[]" class="form-select input-sm select2-modal"
                                             required>
                                             <option value="">Select Regulation</option>
-                                            @foreach ($regulation as $rg)
+                                            @foreach ($regulation->sortBy('regulation_code') as $rg)
                                             <option value="{{ $rg->id }}">({{ $rg->regulation_code }}) -
                                                 {{ $rg->title }}</option>
                                             @endforeach
@@ -297,6 +296,7 @@
     });
 
 </script>
+
 <script>
     $(document).ready(function () {
         const selectElement = document.querySelector('#is_required');
@@ -351,6 +351,7 @@
     });
 
 </script>
+
 <script>
     document.getElementById('add_more').addEventListener('click', function () {
         let container = document.getElementById('subject_id_container');
@@ -358,40 +359,55 @@
         div.classList.add('row', 'mb-2');
 
         div.innerHTML = `
-        <div class="col-md-5">
-            <select name="subject_id[]" class="form-select input-sm select2-modal" required>
-                <option value="">Select Sample Description</option>
-                @foreach ($description as $desc)
-                    <option value="{{ $desc->id }}">({{ $desc->subject_code }}) - {{ $desc->name }}</option>
-                @endforeach
-            </select>
-        </div>
+            <div class="col-md-5">
+                <select name="subject_id[]" class="form-select input-sm select2-modal" required>
+                    <option value="">Select Sample Description</option>
+                    @foreach ($description->sortBy('subject_code') as $desc)
+                        <option value="{{ $desc->id }}">({{ $desc->subject_code }}) - {{ $desc->name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-        <div class="col-md-5">
-            <select name="regulation_id[]" class="form-select input-sm select2-modal" required>
-                <option value="">Select Regulation </option>
-                @foreach ($regulation as $rg)
-                    <option value="{{ $rg->id }}">({{ $rg->regulation_code }}) - {{ $rg->title }}</option>
-                @endforeach
-            </select>
-        </div>
+            <div class="col-md-5">
+                <select name="regulation_id[]" class="form-select input-sm select2-modal" required>
+                    <option value="">Select Regulation</option>
+                    @foreach ($regulation->sortBy('regulation_code') as $rg)
+                        <option value="{{ $rg->id }}">({{ $rg->regulation_code }}) - {{ $rg->title }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-        <div class="col-md-2">
-            <button type="button" class="btn btn-danger remove-row">X</button>
-        </div>
-    `;
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger remove-row">X</button>
+            </div>
+        `;
 
         container.appendChild(div);
+
+        // Re-inisialisasi select2 untuk select baru
+        $(div).find('.select2-modal').select2({
+            placeholder: "Select an option",
+            allowClear: true
+        });
     });
 
+    // Hapus baris
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('remove-row')) {
             e.target.closest('.row').remove();
         }
     });
 
+    // Inisialisasi awal select2
+    $(document).ready(function () {
+        $('.select2-modal').select2({
+            placeholder: "Select an option",
+            allowClear: true
+        });
+    });
 </script>
-<script>
+
+<!-- <script>
     $(document).ready(function () {
         $('#condition_section').hide();
 
@@ -416,5 +432,5 @@
         });
     });
 
-</script>
+</script> -->
 @endsection

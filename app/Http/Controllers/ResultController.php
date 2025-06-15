@@ -225,6 +225,7 @@ class ResultController extends Controller
     //     ));
     // }
 
+
     public function addOdor(Request $request, $id) {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
@@ -378,12 +379,8 @@ class ResultController extends Controller
         $results = collect();
         if ($samplings) {
             $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->flatten()->filter())
                 ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
+                ->groupBy('parameter_id'); // ✅ hanya berdasarkan parameter_id
         }
 
         return view('result.odor.add', compact(
@@ -398,61 +395,70 @@ class ResultController extends Controller
         $institute = Institute::findOrFail($instituteSubject->institute_id);
         $samplingNoiseSubject = InstituteSubject::where('subject_id', 5)->first();
 
-        // Ambil sampling untuk noise (bisa null)
         $samplingNoise = Sampling::where('institute_subject_id', $samplingNoiseSubject->id)
             ->orderBy('id', 'desc')
             ->first();
 
         if ($request->isMethod('POST')) {
+            $action = $request->input('action');
+
             $request->validate([
-                'testing_result.*.*' => 'nullable|string',
+                'testing_result.*' => 'nullable|string',
                 'unit.*' => 'nullable|string',
                 'method.*' => 'nullable|string',
-                'time.*.*' => 'nullable|string',
+                'time.*' => 'nullable|string',
                 'regulatory_standard.*' => 'nullable|string',
                 'location.*' => 'nullable|string'
             ]);
 
             $messages = [];
 
+            // Save per location
             foreach ($request->input('testing_result', []) as $index => $testingResult) {
                 $location = $request->input('location')[$index] ?? null;
                 $parameterId = $request->parameter_id[$index] ?? null;
+
                 if ($location) {
                     $existingResult = Result::where('sampling_id', $samplingNoise->id)
                         ->where('location', $location)
                         ->first();
 
+                    $data = [
+                        'sampling_id' => $samplingNoise->id,
+                        'parameter_id' => $parameterId,
+                        'testing_result' => $testingResult ?? null,
+                        'unit' => $request->unit[$parameterId] ?? null,
+                        'method' => $request->method[$parameterId] ?? null,
+                        'time' => $request->time[$index] ?? null,
+                        'regulatory_standard' => $request->regulatory_standard[$index] ?? null,
+                        'location' => $location,
+                    ];
+
                     if ($existingResult) {
-                        $existingResult->update([
-                            'testing_result' => $request->testing_result[$index] ?? null,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                            'time' => $request->time[$index] ?? null,
-                            'regulatory_standard' => $request->regulatory_standard[$index] ?? null,
-                            'location' => $location,
-                        ]);
+                        $existingResult->update($data);
                         $messages[] = "Data for location $location updated successfully.";
                     } else {
-                        Result::create([
-                            'sampling_id' => $samplingNoise->id,
-                            'parameter_id' => $parameterId,
-                            'testing_result' => $request->testing_result[$index] ?? null,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                            'time' => $request->time[$index] ?? null,
-                            'regulatory_standard' => $request->regulatory_standard[$index] ?? null,
-                            'location' => $location,
-                        ]);
+                        Result::create($data);
                         $messages[] = "Data for location $location created successfully.";
                     }
                 }
             }
 
+            // ✅ Simpan logo jika tombol Save All ditekan
+            if ($action === 'save_all') {
+                Sampling::updateOrCreate(
+                    ['institute_subject_id' => $instituteSubject->id],
+                    ['show_logo' => $request->input('show_logo', false)]
+                );
+
+                return redirect()->route('result.list_result', $institute->id)
+                    ->with('msg', 'Data and Logo saved successfully!');
+            }
+
             return redirect()->back()->with('msg', implode(' ', $messages));
         }
 
-        // Data untuk view
+        // View data
         $subject = Subject::find($instituteSubject->subject_id);
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
@@ -467,12 +473,10 @@ class ResultController extends Controller
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
 
-        // Ambil sampling illumination (bisa null)
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
             ->latest('id')
             ->first();
 
-        // Jika sampling tidak ditemukan, kosongkan results agar tidak error di view
         $results = $samplings
             ? Result::where('sampling_id', $samplings->id)->with('parameter')->get()
             : collect();
@@ -489,17 +493,41 @@ class ResultController extends Controller
         $institute = Institute::findOrFail($instituteSubject->institute_id);
 
         if ($request->isMethod('POST')) {
+            $action = $request->input('action');
+
             $samplingNoiseSubject = InstituteSubject::where('subject_id', 6)->first();
 
             if (!$samplingNoiseSubject) {
-                return redirect()->back()->with('error', 'No noise sampling subject found.');
+                return redirect()->back()->with('error', 'No heat stress sampling subject found.');
             }
 
             $samplingNoise = Sampling::where('institute_subject_id', $samplingNoiseSubject->id)
                 ->orderBy('id', 'desc')
                 ->first();
 
-            // Looping berdasarkan jumlah input
+            // ✅ Simpan Logo terlebih dahulu jika "Save All"
+            if ($action === 'save_all') {
+                Sampling::updateOrCreate(
+                    ['institute_subject_id' => $instituteSubject->id],
+                    ['show_logo' => $request->input('show_logo', false)]
+                );
+
+                return redirect()->route('result.list_result', $institute->id)
+                    ->with('msg', 'Logo saved successfully!');
+            }
+
+            // ✅ Validasi input
+            $request->validate([
+                'sampling_location.*' => 'nullable|string',
+                'time.*' => 'nullable|string',
+                'humidity.*' => 'nullable|numeric',
+                'wet.*' => 'nullable|numeric',
+                'dew.*' => 'nullable|numeric',
+                'globe.*' => 'nullable|numeric',
+                'wbgt_index.*' => 'nullable|numeric',
+                'methods.*' => 'nullable|string',
+            ]);
+
             $heatStressIds = $request->input('heat_stress_id', []);
             $locations = $request->input('sampling_location', []);
             $times = $request->input('time', []);
@@ -512,48 +540,38 @@ class ResultController extends Controller
 
             foreach ($locations as $index => $location) {
                 $time = $times[$index] ?? null;
-
                 if (empty($location) || empty($time)) {
                     continue;
                 }
 
                 $heatStressId = $heatStressIds[$index] ?? null;
 
+                $data = [
+                    'sampling_location' => $location,
+                    'time' => $time,
+                    'humidity' => $humidities[$index] ?? null,
+                    'wet' => $wets[$index] ?? null,
+                    'dew' => $dews[$index] ?? null,
+                    'globe' => $globes[$index] ?? null,
+                    'wbgt_index' => $wbgt_indexes[$index] ?? null,
+                    'methods' => $methods[$index] ?? null,
+                ];
+
                 if ($heatStressId) {
-                    // Update jika ID tersedia
                     $existing = HeatStress::find($heatStressId);
                     if ($existing) {
-                        $existing->update([
-                            'sampling_location' => $location,
-                            'time' => $time,
-                            'humidity' => $humidities[$index] ?? null,
-                            'wet' => $wets[$index] ?? null,
-                            'dew' => $dews[$index] ?? null,
-                            'globe' => $globes[$index] ?? null,
-                            'wbgt_index' => $wbgt_indexes[$index] ?? null,
-                            'methods' => $methods[$index] ?? null,
-                        ]);
+                        $existing->update($data);
                     }
                 } else {
-                    // Jika belum ada ID, buat baru
-                    HeatStress::create([
-                        'sampling_id' => $samplingNoise->id,
-                        'sampling_location' => $location,
-                        'time' => $time,
-                        'humidity' => $humidities[$index] ?? null,
-                        'wet' => $wets[$index] ?? null,
-                        'dew' => $dews[$index] ?? null,
-                        'globe' => $globes[$index] ?? null,
-                        'wbgt_index' => $wbgt_indexes[$index] ?? null,
-                        'methods' => $methods[$index] ?? null,
-                    ]);
+                    $data['sampling_id'] = $samplingNoise->id;
+                    HeatStress::create($data);
                 }
             }
-            // Redirect dengan pesan sukses
+
             return redirect()->back()->with('msg', 'Heat Stress data saved successfully');
         }
 
-        // Ambil data HeatStress yang sudah pernah disimpan untuk form lama
+        // GET method - load view
         $existingHeatStress = [];
         $samplingNoiseSubject = InstituteSubject::where('subject_id', 6)->first();
         if ($samplingNoiseSubject) {
@@ -565,22 +583,21 @@ class ResultController extends Controller
             }
         }
 
-        // Data lain seperti sebelumnya
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
             ->latest('id')
             ->first();
         $subject = Subject::find($instituteSubject->subject_id);
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
+        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)->pluck('regulation_id');
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)->pluck('subject_id');
         $subjects = Subject::whereIn('id', $subjectsIds)->get();
         $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
         $parametersIds = $parameters->pluck('id');
+
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
+
         $results = Result::whereIn('parameter_id', $parametersIds)
             ->get()
             ->keyBy(function ($item) {
@@ -747,15 +764,587 @@ class ResultController extends Controller
         $results = collect();
         if ($samplings) {
             $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->flatten()->filter())
                 ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
+                ->groupBy('parameter_id'); // ✅ hanya berdasarkan parameter_id
         }
 
         return view('result.stationary_stack.add', compact(
+            'institute', 'parameters', 'samplingTimeRegulations', 'results',
+            'regulations', 'subject', 'instituteSubject', 'subjects', 'samplings'
+        ));
+    }
+
+    public function addWasteWater(Request $request, $id)
+    {
+        $instituteSubject = InstituteSubject::findOrFail($id);
+        $institute = Institute::findOrFail($instituteSubject->institute_id);
+
+        if ($request->isMethod('POST')) {
+            $action = $request->input('action');
+
+            // ✅ STEP 1: Handle Add Sample (Gabungan dari add_sample_workplace)
+            if ($action === 'add_sample') {
+                $validatedData = $request->validate([
+                    'no_sample' => ['required'],
+                    'sampling_location' => ['required'],
+                    'sampling_date' => ['required', 'date'],
+                    'sampling_time' => ['required'],
+                    'sampling_method' => ['required'],
+                    'date_received' => ['required', 'date'],
+                    'itd_start' => ['required', 'date'],
+                    'itd_end' => ['required', 'date'],
+                ]);
+
+                $validatedData['institute_id'] = $institute->id;
+                $validatedData['institute_subject_id'] = $instituteSubject->id;
+
+                $samplingId = $request->input('sampling_id');
+
+                if ($samplingId) {
+                    // Mode UPDATE (edit existing sample)
+                    $sample = Sampling::find($samplingId);
+
+                    if ($sample) {
+                        $sample->update($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
+                        $alertType = 'warning';
+                    } else {
+                        $message = "Data tidak ditemukan untuk diedit.";
+                        $alertType = 'danger';
+                    }
+
+                } else {
+                    // Mode CREATE (new sample)
+                    $existingSample = Sampling::where('institute_id', $institute->id)
+                        ->where('institute_subject_id', $instituteSubject->id)
+                        ->where('no_sample', $request->no_sample)
+                        ->first();
+
+                    if ($existingSample) {
+                        $existingSample->update($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
+                        $alertType = 'warning';
+                    } else {
+                        Sampling::create($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) saved successfully!";
+                        $alertType = 'success';
+                    }
+                }
+
+                return back()->with(['msg' => $message, 'alertType' => $alertType]);
+            }
+
+            // ✅ STEP 2: Handle Result Input
+            if ($action === 'save_parameter') {
+                $parameters = $request->input('parameter_id', []);
+
+                foreach ($parameters as $parameterId) {
+                    $regulationStandardId = $request->regulation_standard_id[$parameterId] ?? null;
+                    $testingResult = $request->testing_result[$parameterId] ?? null;
+
+                    if ($regulationStandardId === null || $testingResult === null) {
+                        continue;
+                    }
+
+                    // Temukan sampling ID berdasarkan parameter dan institute_subject
+                    $sampling = Sampling::where('institute_id', $institute->id)
+                        ->where('institute_subject_id', $instituteSubject->id)
+                        ->first(); // Kalau logicnya bisa multiple sampling, sesuaikan di sini
+
+                    if (!$sampling) {
+                        continue; // Lewati jika tidak ada sampling
+                    }
+
+                    Result::updateOrCreate(
+                        [
+                            'sampling_id' => $sampling->id,
+                            'parameter_id' => $parameterId,
+                            'regulation_standard_id' => $regulationStandardId,
+                        ],
+                        [
+                            'testing_result' => $testingResult,
+                            'unit' => $request->unit[$parameterId] ?? null,
+                            'method' => $request->method[$parameterId] ?? null,
+                        ]
+                    );
+                }
+
+                $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+                $parameterNamesList = implode(', ', $parameterNames);
+
+                return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+            }
+
+            // ✅ STEP 3: Save Logo + Field Condition
+            if ($action === 'save_all') {
+                Sampling::updateOrCreate(
+                    [
+                        'institute_subject_id' => $instituteSubject->id,
+                    ],
+                    [
+                        'show_logo' => $request->input('show_logo', false),
+                    ]
+                );
+
+                return redirect()->route('result.list_result', $institute->id)
+                    ->with('msg', 'Data and Logo saved successfully!');
+            }
+        }
+
+        // Bagian GET
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+            ->pluck('regulation_id');
+        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+        $parametersIds = $parameters->pluck('id');
+
+        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+            ->with(['samplingTime', 'regulationStandards'])
+            ->get();
+
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->first();
+
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->get()
+                ->groupBy('parameter_id'); // ✅ hanya berdasarkan parameter_id
+        }
+
+        return view('result.waste_water.add', compact(
+            'institute', 'parameters', 'samplingTimeRegulations', 'results',
+            'regulations', 'subject', 'instituteSubject', 'subjects', 'samplings'
+        ));
+    }
+
+    public function addCleanWater(Request $request, $id)
+    {
+        $instituteSubject = InstituteSubject::findOrFail($id);
+        $institute = Institute::findOrFail($instituteSubject->institute_id);
+
+        if ($request->isMethod('POST')) {
+            $action = $request->input('action');
+
+            // ✅ STEP 1: Handle Add Sample (Gabungan dari add_sample_workplace)
+            if ($action === 'add_sample') {
+                $validatedData = $request->validate([
+                    'no_sample' => ['required'],
+                    'sampling_location' => ['required'],
+                    'sampling_date' => ['required', 'date'],
+                    'sampling_time' => ['required'],
+                    'sampling_method' => ['required'],
+                    'date_received' => ['required', 'date'],
+                    'itd_start' => ['required', 'date'],
+                    'itd_end' => ['required', 'date'],
+                ]);
+
+                $validatedData['institute_id'] = $institute->id;
+                $validatedData['institute_subject_id'] = $instituteSubject->id;
+
+                $samplingId = $request->input('sampling_id');
+
+                if ($samplingId) {
+                    // Mode UPDATE (edit existing sample)
+                    $sample = Sampling::find($samplingId);
+
+                    if ($sample) {
+                        $sample->update($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
+                        $alertType = 'warning';
+                    } else {
+                        $message = "Data tidak ditemukan untuk diedit.";
+                        $alertType = 'danger';
+                    }
+
+                } else {
+                    // Mode CREATE (new sample)
+                    $existingSample = Sampling::where('institute_id', $institute->id)
+                        ->where('institute_subject_id', $instituteSubject->id)
+                        ->where('no_sample', $request->no_sample)
+                        ->first();
+
+                    if ($existingSample) {
+                        $existingSample->update($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
+                        $alertType = 'warning';
+                    } else {
+                        Sampling::create($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) saved successfully!";
+                        $alertType = 'success';
+                    }
+                }
+
+                return back()->with(['msg' => $message, 'alertType' => $alertType]);
+            }
+
+            // ✅ STEP 2: Handle Result Input
+            if ($action === 'save_parameter') {
+                $parameters = $request->input('parameter_id', []);
+
+                foreach ($parameters as $parameterId) {
+                    $regulationStandardId = $request->regulation_standard_id[$parameterId] ?? null;
+                    $testingResult = $request->testing_result[$parameterId] ?? null;
+
+                    if ($regulationStandardId === null || $testingResult === null) {
+                        continue;
+                    }
+
+                    // Temukan sampling ID berdasarkan parameter dan institute_subject
+                    $sampling = Sampling::where('institute_id', $institute->id)
+                        ->where('institute_subject_id', $instituteSubject->id)
+                        ->first(); // Kalau logicnya bisa multiple sampling, sesuaikan di sini
+
+                    if (!$sampling) {
+                        continue; // Lewati jika tidak ada sampling
+                    }
+
+                    Result::updateOrCreate(
+                        [
+                            'sampling_id' => $sampling->id,
+                            'parameter_id' => $parameterId,
+                            'regulation_standard_id' => $regulationStandardId,
+                        ],
+                        [
+                            'testing_result' => $testingResult,
+                            'unit' => $request->unit[$parameterId] ?? null,
+                            'method' => $request->method[$parameterId] ?? null,
+                        ]
+                    );
+                }
+
+                $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+                $parameterNamesList = implode(', ', $parameterNames);
+
+                return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+            }
+
+            // ✅ STEP 3: Save Logo + Field Condition
+            if ($action === 'save_all') {
+                Sampling::updateOrCreate(
+                    [
+                        'institute_subject_id' => $instituteSubject->id,
+                    ],
+                    [
+                        'show_logo' => $request->input('show_logo', false),
+                    ]
+                );
+
+                return redirect()->route('result.list_result', $institute->id)
+                    ->with('msg', 'Data and Logo saved successfully!');
+            }
+        }
+
+        // Bagian GET
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+            ->pluck('regulation_id');
+        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+        $parametersIds = $parameters->pluck('id');
+        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+            ->with(['samplingTime', 'regulationStandards'])
+            ->get();
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->get()
+                ->groupBy('parameter_id'); // ✅ hanya berdasarkan parameter_id
+        }
+        return view('result.clean_water.add', compact(
+            'institute', 'parameters', 'samplingTimeRegulations', 'results',
+            'regulations', 'subject', 'instituteSubject', 'subjects', 'samplings'
+        ));
+    }
+
+    public function addSurfaceWater(Request $request, $id)
+    {
+        $instituteSubject = InstituteSubject::findOrFail($id);
+        $institute = Institute::findOrFail($instituteSubject->institute_id);
+
+        if ($request->isMethod('POST')) {
+            $action = $request->input('action');
+
+            // ✅ STEP 1: Handle Add Sample (Gabungan dari add_sample_workplace)
+            if ($action === 'add_sample') {
+                $validatedData = $request->validate([
+                    'no_sample' => ['required'],
+                    'sampling_location' => ['required'],
+                    'sampling_date' => ['required', 'date'],
+                    'sampling_time' => ['required'],
+                    'sampling_method' => ['required'],
+                    'date_received' => ['required', 'date'],
+                    'itd_start' => ['required', 'date'],
+                    'itd_end' => ['required', 'date'],
+                ]);
+
+                $validatedData['institute_id'] = $institute->id;
+                $validatedData['institute_subject_id'] = $instituteSubject->id;
+
+                $samplingId = $request->input('sampling_id');
+
+                if ($samplingId) {
+                    // Mode UPDATE (edit existing sample)
+                    $sample = Sampling::find($samplingId);
+
+                    if ($sample) {
+                        $sample->update($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
+                        $alertType = 'warning';
+                    } else {
+                        $message = "Data tidak ditemukan untuk diedit.";
+                        $alertType = 'danger';
+                    }
+
+                } else {
+                    // Mode CREATE (new sample)
+                    $existingSample = Sampling::where('institute_id', $institute->id)
+                        ->where('institute_subject_id', $instituteSubject->id)
+                        ->where('no_sample', $request->no_sample)
+                        ->first();
+
+                    if ($existingSample) {
+                        $existingSample->update($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
+                        $alertType = 'warning';
+                    } else {
+                        Sampling::create($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) saved successfully!";
+                        $alertType = 'success';
+                    }
+                }
+
+                return back()->with(['msg' => $message, 'alertType' => $alertType]);
+            }
+
+            // ✅ STEP 2: Handle Result Input
+            if ($action === 'save_parameter') {
+                $parameters = $request->input('parameter_id', []);
+
+                foreach ($parameters as $parameterId) {
+                    $regulationStandardId = $request->regulation_standard_id[$parameterId] ?? null;
+                    $testingResult = $request->testing_result[$parameterId] ?? null;
+
+                    if ($regulationStandardId === null || $testingResult === null) {
+                        continue;
+                    }
+
+                    // Temukan sampling ID berdasarkan parameter dan institute_subject
+                    $sampling = Sampling::where('institute_id', $institute->id)
+                        ->where('institute_subject_id', $instituteSubject->id)
+                        ->first(); // Kalau logicnya bisa multiple sampling, sesuaikan di sini
+
+                    if (!$sampling) {
+                        continue; // Lewati jika tidak ada sampling
+                    }
+
+                    Result::updateOrCreate(
+                        [
+                            'sampling_id' => $sampling->id,
+                            'parameter_id' => $parameterId,
+                            'regulation_standard_id' => $regulationStandardId,
+                        ],
+                        [
+                            'testing_result' => $testingResult,
+                            'unit' => $request->unit[$parameterId] ?? null,
+                            'method' => $request->method[$parameterId] ?? null,
+                        ]
+                    );
+                }
+
+                $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+                $parameterNamesList = implode(', ', $parameterNames);
+
+                return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+            }
+
+            // ✅ STEP 3: Save Logo + Field Condition
+            if ($action === 'save_all') {
+                Sampling::updateOrCreate(
+                    [
+                        'institute_subject_id' => $instituteSubject->id,
+                    ],
+                    [
+                        'show_logo' => $request->input('show_logo', false),
+                    ]
+                );
+
+                return redirect()->route('result.list_result', $institute->id)
+                    ->with('msg', 'Data and Logo saved successfully!');
+            }
+        }
+
+        // Bagian GET
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+            ->pluck('regulation_id');
+        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+        $parametersIds = $parameters->pluck('id');
+        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+            ->with(['samplingTime', 'regulationStandards'])
+            ->get();
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->get()
+                ->groupBy('parameter_id'); // ✅ hanya berdasarkan parameter_id
+        }
+        return view('result.surface_water.add', compact(
+            'institute', 'parameters', 'samplingTimeRegulations', 'results',
+            'regulations', 'subject', 'instituteSubject', 'subjects', 'samplings'
+        ));
+    }
+
+    public function addVibration(Request $request, $id)
+    {
+        $instituteSubject = InstituteSubject::findOrFail($id);
+        $institute = Institute::findOrFail($instituteSubject->institute_id);
+
+        if ($request->isMethod('POST')) {
+            $action = $request->input('action');
+
+            // ✅ STEP 1: Handle Add Sample (Gabungan dari add_sample_workplace)
+            if ($action === 'add_sample') {
+                $validatedData = $request->validate([
+                    'no_sample' => ['required'],
+                    'sampling_location' => ['required'],
+                    'sampling_date' => ['required', 'date'],
+                    'sampling_time' => ['required'],
+                    'sampling_method' => ['required'],
+                    'date_received' => ['required', 'date'],
+                    'itd_start' => ['required', 'date'],
+                    'itd_end' => ['required', 'date'],
+                ]);
+
+                $validatedData['institute_id'] = $institute->id;
+                $validatedData['institute_subject_id'] = $instituteSubject->id;
+
+                $samplingId = $request->input('sampling_id');
+
+                if ($samplingId) {
+                    // Mode UPDATE (edit existing sample)
+                    $sample = Sampling::find($samplingId);
+
+                    if ($sample) {
+                        $sample->update($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
+                        $alertType = 'warning';
+                    } else {
+                        $message = "Data tidak ditemukan untuk diedit.";
+                        $alertType = 'danger';
+                    }
+
+                } else {
+                    // Mode CREATE (new sample)
+                    $existingSample = Sampling::where('institute_id', $institute->id)
+                        ->where('institute_subject_id', $instituteSubject->id)
+                        ->where('no_sample', $request->no_sample)
+                        ->first();
+
+                    if ($existingSample) {
+                        $existingSample->update($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) updated successfully!";
+                        $alertType = 'warning';
+                    } else {
+                        Sampling::create($validatedData);
+                        $message = "Data CoA ({$institute->no_coa}.{$request->no_sample}) saved successfully!";
+                        $alertType = 'success';
+                    }
+                }
+
+                return back()->with(['msg' => $message, 'alertType' => $alertType]);
+            }
+
+            // ✅ STEP 2: Handle Result Input
+            if ($action === 'save_parameter') {
+                $parameters = $request->input('parameter_id', []);
+
+                foreach ($parameters as $parameterId) {
+                    $regulationStandardId = $request->regulation_standard_id[$parameterId] ?? null;
+                    $testingResult = $request->testing_result[$parameterId] ?? null;
+
+                    if ($regulationStandardId === null || $testingResult === null) {
+                        continue;
+                    }
+
+                    // Temukan sampling ID berdasarkan parameter dan institute_subject
+                    $sampling = Sampling::where('institute_id', $institute->id)
+                        ->where('institute_subject_id', $instituteSubject->id)
+                        ->first(); // Kalau logicnya bisa multiple sampling, sesuaikan di sini
+
+                    if (!$sampling) {
+                        continue; // Lewati jika tidak ada sampling
+                    }
+
+                    Result::updateOrCreate(
+                        [
+                            'sampling_id' => $sampling->id,
+                            'parameter_id' => $parameterId,
+                            'regulation_standard_id' => $regulationStandardId,
+                        ],
+                        [
+                            'testing_result' => $testingResult,
+                            'unit' => $request->unit[$parameterId] ?? null,
+                            'method' => $request->method[$parameterId] ?? null,
+                        ]
+                    );
+                }
+
+                $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+                $parameterNamesList = implode(', ', $parameterNames);
+
+                return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+            }
+
+            // ✅ STEP 3: Save Logo + Field Condition
+            if ($action === 'save_all') {
+                Sampling::updateOrCreate(
+                    [
+                        'institute_subject_id' => $instituteSubject->id,
+                    ],
+                    [
+                        'show_logo' => $request->input('show_logo', false),
+                    ]
+                );
+
+                return redirect()->route('result.list_result', $institute->id)
+                    ->with('msg', 'Data and Logo saved successfully!');
+            }
+        }
+
+        // Bagian GET
+        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+            ->pluck('regulation_id');
+        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+        $parametersIds = $parameters->pluck('id');
+        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+            ->with(['samplingTime', 'regulationStandards'])
+            ->get();
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+            ->first();
+        $results = collect();
+        if ($samplings) {
+            $results = Result::where('sampling_id', $samplings->id)
+                ->get()
+                ->groupBy('parameter_id'); // ✅ hanya berdasarkan parameter_id
+        }
+        return view('result.vibration.add', compact(
             'institute', 'parameters', 'samplingTimeRegulations', 'results',
             'regulations', 'subject', 'instituteSubject', 'subjects', 'samplings'
         ));

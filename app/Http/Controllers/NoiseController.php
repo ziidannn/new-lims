@@ -169,6 +169,20 @@ class NoiseController extends Controller
             ->first();
 
         if ($request->isMethod('POST')) {
+            $action = $request->input('action');
+
+            // ✅ Jika hanya ingin simpan logo (save_all), langsung simpan tanpa proses looping data
+            if ($action === 'save_all') {
+                Sampling::updateOrCreate(
+                    ['institute_subject_id' => $instituteSubject->id],
+                    ['show_logo' => $request->input('show_logo', false)]
+                );
+
+                return redirect()->route('result.list_result', $institute->id)
+                    ->with('msg', 'Logo saved successfully!');
+            }
+
+            // ✅ Validasi dan proses data result baru dilakukan jika bukan save_all
             $request->validate([
                 'unit.*' => 'nullable|string',
                 'method.*' => 'nullable|string',
@@ -185,22 +199,15 @@ class NoiseController extends Controller
             $messages = [];
 
             foreach ($request->location as $locIndex => $location) {
-                if (empty($location)) {
-                    continue; // Skip lokasi kosong
-                }
+                if (empty($location)) continue;
 
-                // CEK apakah noise tersedia untuk lokasi ini
-                if (!isset($request->noise[$locIndex]) || !is_array($request->noise[$locIndex])) {
-                    continue; // Skip kalau noise untuk location ini tidak ada
-                }
+                if (!isset($request->noise[$locIndex]) || !is_array($request->noise[$locIndex])) continue;
 
                 foreach ($request->noise[$locIndex] as $i => $noiseValue) {
-                    if (empty($noiseValue)) {
-                        continue; // Skip noise kosong
-                    }
+                    if (empty($noiseValue)) continue;
 
                     $parameterId = $parameters[$locIndex]->id ?? null;
-                    $timeValue = $request->time[$locIndex][$i] ?? null; // optional
+                    $timeValue = $request->time[$locIndex][$i] ?? null;
 
                     $existingResult = Result::where([
                         'sampling_id' => $samplingNoise->id,
@@ -219,6 +226,7 @@ class NoiseController extends Controller
                             'lm' => $request->lm[$locIndex] ?? null,
                             'lsm' => $request->lsm[$locIndex] ?? null,
                             'regulatory_standard' => $request->regulatory_standard[$locIndex] ?? null,
+                            'testing_result' => $request->testing_result[$locIndex][$i] ?? null,
                         ]);
                     } else {
                         Result::create([
@@ -234,6 +242,7 @@ class NoiseController extends Controller
                             'lsm' => $request->lsm[$locIndex] ?? null,
                             'regulatory_standard' => $request->regulatory_standard[$locIndex] ?? null,
                             'location' => $location,
+                            'testing_result' => $request->testing_result[$locIndex][$i] ?? null,
                         ]);
                     }
 
@@ -248,25 +257,39 @@ class NoiseController extends Controller
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
         ->latest('id')
         ->first();
+        // 1. Ambil ID regulasi yang aktif (sudah ada):
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
+        // 2. Ambil data regulasi yang aktif (untuk dapatkan subject_id dan regulation_code):
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+        // 3. Ambil hanya subject_id yang ada pada regulasi aktif:
+        $filteredSubjectIds = $regulations->pluck('subject_id')->unique();
+        // 4. Ambil parameter berdasarkan subject_id hasil filter
+        $parameters = Parameter::whereIn('subject_id', $filteredSubjectIds)->get();
+        // 5. Ambil subject berdasarkan subject_id yang ada pada institute_subject
         $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
             ->pluck('subject_id');
         $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+        // 6. Ambil sampling time regulations berdasarkan parameter_id yang ada pada parameters
+        $parameters = $parameters->filter(function ($parameter) use ($regulations) {
+            return $regulations->contains('subject_id', $parameter->subject_id);
+        });
+        // 7. Ambil sampling time regulations berdasarkan parameter_id yang ada pada parameters
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
         $results = DB::table('results')
             ->select('location', DB::raw('GROUP_CONCAT(leq ORDER BY id) as leq_values'), 'ls', 'lm', 'lsm', 'regulatory_standard')
+            ->where('sampling_id', $samplingNoise->id) // ✅ filter hanya data milik Noise
             ->groupBy('location', 'ls', 'lm', 'lsm', 'regulatory_standard')
             ->get();
-
+        $latestResults = $samplings
+            ? Result::where('sampling_id', $samplings->id)->with('parameter')->get()
+            : collect();
         return view('result.noise.add',compact(
             'institute', 'parameters', 'regulations', 'subjects', 'samplingTimeRegulations',
-            'results', 'subject', 'instituteSubject', 'samplings'
+            'results', 'subject', 'instituteSubject', 'samplings', 'samplingNoise', 'latestResults'
         ));
     }
 
@@ -341,9 +364,30 @@ class NoiseController extends Controller
             ->with(['samplingTime', 'regulationStandards'])
             ->get();
 
-        $results = Result::where('sampling_id', $samplings->id)
-            ->with('parameter') // tambahkan ini
-            ->get();
+        // Jika sampling tidak ditemukan, kosongkan results agar tidak error di view
+        $results = $samplings
+            ? Result::where('sampling_id', $samplings->id)->with('parameter')->get()
+            : collect();
+
+        //     $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+
+    //     // 🔍 Tentukan view berdasarkan regulation_code
+    //     $regulationCodes = $regulations->pluck('regulation_code')->toArray();
+
+    //     if (array_intersect($regulationCodes, ['031', '033'])) {
+    //         return view('result.noise.add', compact(
+    //             'institute', 'parameters', 'regulations', 'subjects',
+    //             'samplingTimeRegulations', 'results', 'subject', 'instituteSubject', 'samplingNoise'
+    //         ));
+    //     } elseif (array_intersect($regulationCodes, ['032', '034'])) {
+    //         return view('result.noise.add_new', compact(
+    //             'institute', 'parameters', 'regulations', 'subjects',
+    //             'samplingTimeRegulations', 'results', 'subject', 'instituteSubject', 'samplings'
+    //         ));
+    //     }
+
+    //     return redirect()->back()->with('error', 'Regulation code tidak dikenali.');
+    // }
         return view('result.noise.add_new',compact(
             'institute', 'parameters', 'regulations', 'subjects',
             'samplingTimeRegulations', 'results', 'subject', 'instituteSubject'

@@ -178,23 +178,26 @@
                                     <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
                                         readonly>
                                 </td>
+                                @php
+                                    $resultObj = optional($results->get($parameter->id))->first();
+                                    $regulationStandard = optional(
+                                        $samplingTimeRegulations->where('parameter_id', $parameter->id)->first()
+                                    )->regulationStandards;
+                                @endphp
+
                                 <td>
-                                    @php
-                                    $regulationStandard = $samplingTimeRegulations->where('parameter_id',
-                                    $parameter->id)->first()->regulationStandards ?? null;
-                                    $resultKey = $parameter->id . '-' . ($regulationStandard->id ?? 'null');
-                                    $testingResult = $results[$resultKey]->testing_result ?? '';
-                                    @endphp
-                                    <input type="text" class="form-control text-center testing-result"
+                                    <input type="text" class="form-control text-center"
                                         name="testing_result[{{ $parameter->id }}]"
-                                        value="{{ old('testing_result.' . $parameter->id, $testingResult) }}" required>
+                                        value="{{ old('testing_result.' . $parameter->id, $resultObj->testing_result ?? '') }}">
+                                    @if ($errors->has('testing_result.' . $parameter->id))
+                                        <span class="text-danger">{{ $errors->first('testing_result.' . $parameter->id) }}</span>
+                                    @endif
                                 </td>
+
                                 <td>
                                     @if ($regulationStandard)
-                                    <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}]"
-                                        value="{{ $regulationStandard->id }}">
-                                    <input type="text" class="form-control text-center"
-                                        value="{{ $regulationStandard->title }}" readonly>
+                                        <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}]" value="{{ $regulationStandard->id }}">
+                                        <input type="text" class="form-control text-center" value="{{ $regulationStandard->title }}" readonly>
                                     @endif
                                 </td>
                                 <td>

@@ -22,34 +22,54 @@ class SubjectSeeder extends Seeder
             ],
             [
                 "id" => "2",
-                "subject_code" => "02", 
+                "subject_code" => "02",
                 "name" => "Workplace Air"
             ],
             [
-                "id" => "3", 
+                "id" => "3",
                 "subject_code" => "03",
                 "name" => "Noise*"
             ],
             [
-                "id" => "4", 
+                "id" => "4",
                 "subject_code" => "04",
                 "name" => "Odor"
             ],
             [
-                "id" => "5", 
+                "id" => "5",
                 "subject_code" => "05",
                 "name" => "Illumination*"
             ],
             [
-                "id" => "6", 
+                "id" => "6",
                 "subject_code" => "06",
                 "name" => "Heat Stress"
             ],
             [
-                "id" => "7", 
+                "id" => "7",
                 "subject_code" => "07",
                 "name" => "Stationary Stack Source Emission"
             ],
+            // [
+            //     "id" => "8",
+            //     "subject_code" => "08",
+            //     "name" => "Wastewater"
+            // ],
+            // [
+            //     "id" => "9",
+            //     "subject_code" => "09",
+            //     "name" => "Clean Water"
+            // ],
+            // [
+            //     "id" => "10",
+            //     "subject_code" => "10",
+            //     "name" => "Surface Water"
+            // ],
+            // [
+            //     "id" => "11",
+            //     "subject_code" => "11",
+            //     "name" => "Vibration"
+            // ]
         ];
 
         foreach ($data as $x) {
