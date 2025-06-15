@@ -196,11 +196,11 @@
 
                                 {{-- Unit --}}
                                 <td><input type="text" class="form-control text-center" name="unit[]"
-                                        value="{{ $parameters[0]->unit ?? '' }}" readonly></td>
+                                        value="{{ $parameters[37]->unit ?? '' }}" readonly></td>
 
                                 {{-- Method --}}
                                 <td><input type="text" class="form-control text-center" name="method[]"
-                                        value="{{ $parameters[0]->method ?? '' }}" readonly></td>
+                                        value="{{ $parameters[37]->method ?? '' }}" readonly></td>
 
                                 <td>
                                     <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit" name="save">Save</button>
