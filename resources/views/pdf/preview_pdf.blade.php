@@ -543,7 +543,7 @@
                 <th style="border: 1px solid;">Unit</th>
                 <th style="border: 1px solid;">Methods</th>
             </tr>
-
+           
             @php
         $rowNumber = 1;
     @endphp
@@ -562,7 +562,7 @@
         @endforeach
     @endforeach
         </table>
-
+            
     </div>
     {{-- End Parameters --}}
     {{-- Start Notes and Regulation --}}

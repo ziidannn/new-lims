@@ -182,6 +182,18 @@
                             } else if (row.institute_subject.subject.id == 7) {
                                 html = `<a class="badge bg-warning badge-icon" title="Add Stationary Stack Source Emission" href="/result/stationary_stack/${instituteSubjectId}">
                                         <i class="bx bx-pencil icon-white"></i></a>`;
+                            } else if (row.institute_subject.subject.id == 8) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Waste Water" href="/result/waste_water/${instituteSubjectId}">
+                                        <i class="bx bx-pencil icon-white"></i></a>`;
+                            } else if (row.institute_subject.subject.id == 9) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Clean Water" href="/result/clean_water/${instituteSubjectId}">
+                                        <i class="bx bx-pencil icon-white"></i></a>`;
+                            } else if (row.institute_subject.subject.id == 10) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Surface Water" href="/result/surface_water/${instituteSubjectId}">
+                                        <i class="bx bx-pencil icon-white"></i></a>`;
+                            } else if (row.institute_subject.subject.id == 11) {
+                                html = `<a class="badge bg-warning badge-icon" title="Add Vibration" href="/result/vibration/${instituteSubjectId}">
+                                        <i class="bx bx-pencil icon-white"></i></a>`;
                             }
                         } else {
                             html = '-';
