@@ -160,7 +160,7 @@
 {{-- ===================== TEMPLATE 1 (031, 033) ===================== --}}
 @if (!empty(array_intersect($regulationCodes, ['031', '033'])))
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.noise.add', $instituteSubject->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
@@ -232,7 +232,7 @@
 {{-- ===================== TEMPLATE 2 (032, 034) ===================== --}}
 @if (!empty(array_intersect($regulationCodes, ['032', '034'])))
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-    <form class="card" action="{{ route('result.noise.add', $institute->id) }}" method="POST">
+    <form class="card" action="{{ route('result.noise.add', $instituteSubject->id) }}" method="POST">
         @csrf
         <div class="col-xl-12">
             <div class="card-body">
@@ -254,6 +254,7 @@
                             @foreach($latestResults as $index => $result)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
+                                <input type="hidden" name="parameter_id[]" value="{{ $result->parameter_id ?? $parameters[0]->id }}">
                                 <td><input type="text" class="form-control text-center" name="location[]" value="{{ old("location.$index", $result->location ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="testing_result[]" value="{{ old("testing_result.$index", $result->testing_result ?? '') }}"></td>
                                 <td><input type="text" class="form-control text-center" name="time[]" value="{{ old("time.$index", $result->time ?? '') }}"></td>
@@ -297,9 +298,8 @@
                             {{ old('show_logo', $samplingData->show_logo ?? false) ? '' : 'checked' }}>
                         <label class="form-check-label" for="showLogoNo"><b>No</b></label>
                     </div>
-                    <hr style="display: block; color: #000;height: 1px;width: 100%;margin: 10urem 0;">
                     <div class="card-footer text-end">
-                        <button class="btn btn-primary me-2" type="submit" name="action" value="save_all"
+                        <button class="btn btn-primary" type="submit" name="action" value="save_all"
                             onclick="confirmSubmit(event)">Save
                             All</button>
                         <input type="hidden" name="action" id="save_all" value="save_all">

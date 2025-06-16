@@ -155,10 +155,14 @@ class NoiseController extends Controller
     //     ));
     // }
 
-    public function addNoise(Request $request, $id) {
+    public function addNoise(Request $request, $id)
+    {
         $instituteSubject = InstituteSubject::findOrFail($id);
         $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $samplingNoise = InstituteSubject::where('subject_id', 3)->first();
+
+        $samplingNoise = InstituteSubject::where('institute_id', $institute->id)
+            ->where('subject_id', 3)
+            ->first();
 
         if (!$samplingNoise) {
             return redirect()->back()->with('error', 'No noise sampling ID found.');
@@ -171,7 +175,7 @@ class NoiseController extends Controller
         if ($request->isMethod('POST')) {
             $action = $request->input('action');
 
-            // ✅ Jika hanya ingin simpan logo (save_all), langsung simpan tanpa proses looping data
+            // ✅ Simpan logo jika pilihannya save_all
             if ($action === 'save_all') {
                 Sampling::updateOrCreate(
                     ['institute_subject_id' => $instituteSubject->id],
@@ -182,112 +186,162 @@ class NoiseController extends Controller
                     ->with('msg', 'Logo saved successfully!');
             }
 
-            // ✅ Validasi dan proses data result baru dilakukan jika bukan save_all
-            $request->validate([
-                'unit.*' => 'nullable|string',
-                'method.*' => 'nullable|string',
-                'noise.*.*' => 'nullable|string',
-                'time.*.*' => 'nullable|string',
-                'leq.*.*' => 'nullable|string',
-                'ls.*' => 'nullable|string',
-                'lm.*' => 'nullable|string',
-                'lsm.*' => 'nullable|string',
-                'regulatory_standard.*' => 'nullable|string',
-                'location.*' => 'nullable|string'
-            ]);
-
             $messages = [];
 
-            foreach ($request->location as $locIndex => $location) {
-                if (empty($location)) continue;
+            // =============================
+            // ✅ TEMPLATE 1: Ada field 'noise'
+            // =============================
+            if ($request->has('noise')) {
+                $request->validate([
+                    'unit.*' => 'nullable|string',
+                    'method.*' => 'nullable|string',
+                    'noise.*.*' => 'nullable|string',
+                    'time.*.*' => 'nullable|string',
+                    'leq.*.*' => 'nullable|string',
+                    'ls.*' => 'nullable|string',
+                    'lm.*' => 'nullable|string',
+                    'lsm.*' => 'nullable|string',
+                    'regulatory_standard.*' => 'nullable|string',
+                    'location.*' => 'nullable|string',
+                    'testing_result.*.*' => 'nullable|string',
+                ]);
 
-                if (!isset($request->noise[$locIndex]) || !is_array($request->noise[$locIndex])) continue;
+                foreach ($request->location as $locIndex => $location) {
+                    if (empty($location)) continue;
+                    if (!isset($request->noise[$locIndex]) || !is_array($request->noise[$locIndex])) continue;
 
-                foreach ($request->noise[$locIndex] as $i => $noiseValue) {
-                    if (empty($noiseValue)) continue;
+                    foreach ($request->noise[$locIndex] as $i => $noiseValue) {
+                        if (empty($noiseValue)) continue;
 
-                    $parameterId = $parameters[$locIndex]->id ?? null;
-                    $timeValue = $request->time[$locIndex][$i] ?? null;
+                        // Ambil parameter dari request (jika ada)
+                        $parameterId = $request->parameter_id[$locIndex] ?? null;
+                        $timeValue = $request->time[$locIndex][$i] ?? null;
 
-                    $existingResult = Result::where([
-                        'sampling_id' => $samplingNoise->id,
-                        'parameter_id' => $parameterId,
-                        'location' => $location,
-                        'noise' => $noiseValue,
-                        'time' => $timeValue
-                    ])->first();
-
-                    if ($existingResult) {
-                        $existingResult->update([
-                            'unit' => $request->unit[$locIndex] ?? null,
-                            'method' => $request->method[$locIndex] ?? null,
-                            'leq' => $request->leq[$locIndex][$i] ?? null,
-                            'ls' => $request->ls[$locIndex] ?? null,
-                            'lm' => $request->lm[$locIndex] ?? null,
-                            'lsm' => $request->lsm[$locIndex] ?? null,
-                            'regulatory_standard' => $request->regulatory_standard[$locIndex] ?? null,
-                            'testing_result' => $request->testing_result[$locIndex][$i] ?? null,
-                        ]);
-                    } else {
-                        Result::create([
+                        $existingResult = Result::where([
                             'sampling_id' => $samplingNoise->id,
                             'parameter_id' => $parameterId,
+                            'location' => $location,
+                            'noise' => $noiseValue,
+                            'time' => $timeValue
+                        ])->first();
+
+                        $data = [
                             'unit' => $request->unit[$locIndex] ?? null,
                             'method' => $request->method[$locIndex] ?? null,
-                            'time' => $timeValue,
-                            'noise' => $noiseValue,
                             'leq' => $request->leq[$locIndex][$i] ?? null,
                             'ls' => $request->ls[$locIndex] ?? null,
                             'lm' => $request->lm[$locIndex] ?? null,
                             'lsm' => $request->lsm[$locIndex] ?? null,
                             'regulatory_standard' => $request->regulatory_standard[$locIndex] ?? null,
                             'location' => $location,
+                            'noise' => $noiseValue,
+                            'time' => $timeValue,
                             'testing_result' => $request->testing_result[$locIndex][$i] ?? null,
-                        ]);
-                    }
+                            'parameter_id' => $parameterId,
+                            'sampling_id' => $samplingNoise->id
+                        ];
 
-                    $messages["$location"] = "Data untuk lokasi $location telah diperbarui/dibuat.";
+                        if ($existingResult) {
+                            $existingResult->update($data);
+                            $messages[] = "Updated: $location (T1)";
+                        } else {
+                            Result::create($data);
+                            $messages[] = "Created: $location (T1)";
+                        }
+                    }
                 }
             }
 
-            return redirect()->back()->with('msg', implode(' ', array_values($messages)));
+            // =============================
+            // ✅ TEMPLATE 2: Hanya testing_result, tanpa noise
+            // =============================
+            elseif ($request->has('testing_result')) {
+                $request->validate([
+                    'testing_result.*.*' => 'nullable|string',
+                    'unit.*' => 'nullable|string',
+                    'method.*' => 'nullable|string',
+                    'time.*.*' => 'nullable|string',
+                    'regulatory_standard.*' => 'nullable|string',
+                    'location.*' => 'nullable|string',
+                ]);
+
+                $testingResults = $request->input('testing_result', []);
+                $locations = $request->input('location', []);
+                $times = $request->input('time', []);
+                $regulatoryStandards = $request->input('regulatory_standard', []);
+                $units = $request->input('unit', []);
+                $methods = $request->input('method', []);
+                $parameterIds = $request->input('parameter_id', []);
+
+                foreach ($testingResults as $index => $value) {
+                    $location = $locations[$index] ?? null;
+                    $parameterId = $parameterIds[$index] ?? null;
+
+                    if (!$location) continue;
+
+                    $existingResult = Result::where('sampling_id', $samplingNoise->id)
+                        ->where('location', $location)
+                        ->first();
+
+                    $data = [
+                        'sampling_id' => $samplingNoise->id,
+                        'parameter_id' => $parameterId,
+                        'testing_result' => $value ?? null,
+                        'unit' => $units[$index] ?? null,
+                        'method' => $methods[$index] ?? null,
+                        'time' => $times[$index] ?? null,
+                        'regulatory_standard' => $regulatoryStandards[$index] ?? null,
+                        'location' => $location,
+                    ];
+
+                    if ($existingResult) {
+                        $existingResult->update($data);
+                        $messages[] = "Updated: $location (T2)";
+                    } else {
+                        Result::create($data);
+                        $messages[] = "Created: $location (T2)";
+                    }
+                }
+            } else {
+                return redirect()->back()->with('error', 'No data submitted.');
+            }
+
+            return redirect()->back()->with('msg', implode(' | ', $messages));
         }
 
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+        // DATA UNTUK FORM
+        $subject = Subject::find($instituteSubject->subject_id);
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-        ->latest('id')
-        ->first();
-        // 1. Ambil ID regulasi yang aktif (sudah ada):
+            ->latest('id')->first();
+
         $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
             ->pluck('regulation_id');
-        // 2. Ambil data regulasi yang aktif (untuk dapatkan subject_id dan regulation_code):
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        // 3. Ambil hanya subject_id yang ada pada regulasi aktif:
         $filteredSubjectIds = $regulations->pluck('subject_id')->unique();
-        // 4. Ambil parameter berdasarkan subject_id hasil filter
+
         $parameters = Parameter::whereIn('subject_id', $filteredSubjectIds)->get();
-        // 5. Ambil subject berdasarkan subject_id yang ada pada institute_subject
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
-        $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        // 6. Ambil sampling time regulations berdasarkan parameter_id yang ada pada parameters
-        $parameters = $parameters->filter(function ($parameter) use ($regulations) {
-            return $regulations->contains('subject_id', $parameter->subject_id);
-        });
-        // 7. Ambil sampling time regulations berdasarkan parameter_id yang ada pada parameters
+        $parameters = $parameters->filter(fn($parameter) => $regulations->contains('subject_id', $parameter->subject_id));
+
         $parametersIds = $parameters->pluck('id');
         $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $results = DB::table('results')
-            ->select('location', DB::raw('GROUP_CONCAT(leq ORDER BY id) as leq_values'), 'ls', 'lm', 'lsm', 'regulatory_standard')
-            ->where('sampling_id', $samplingNoise->id) // ✅ filter hanya data milik Noise
-            ->groupBy('location', 'ls', 'lm', 'lsm', 'regulatory_standard')
-            ->get();
+            ->with(['samplingTime', 'regulationStandards'])->get();
+
+        $results = $samplingNoise
+            ? DB::table('results')
+                ->select('location', DB::raw('GROUP_CONCAT(leq ORDER BY id) as leq_values'), 'ls', 'lm', 'lsm', 'regulatory_standard')
+                ->where('sampling_id', $samplingNoise->id)
+                ->groupBy('location', 'ls', 'lm', 'lsm', 'regulatory_standard')
+                ->get()
+            : collect();
+
         $latestResults = $samplings
             ? Result::where('sampling_id', $samplings->id)->with('parameter')->get()
             : collect();
-        return view('result.noise.add',compact(
+
+        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $subjectsIds)->get();
+
+        return view('result.noise.add', compact(
             'institute', 'parameters', 'regulations', 'subjects', 'samplingTimeRegulations',
             'results', 'subject', 'instituteSubject', 'samplings', 'samplingNoise', 'latestResults'
         ));
