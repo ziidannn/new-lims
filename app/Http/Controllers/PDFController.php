@@ -99,6 +99,16 @@ class PDFController extends Controller
             ->groupBy('sampling_id');
             // dd($ilumiResults->toArray());
 
+            //query  khusus utk HEAT STRESS
+            $htsResults = DB::table('heat_stresses')
+            ->select('sampling_id','sampling_location','time', 'humidity', 'wet', 'dew', 'globe', 'wbgt_index', 'methods')
+            ->whereIn('sampling_id', function ($query) use ($id) {
+                $query->select('id')->from('samplings')->where('institute_id', $id);
+            })
+            ->get()
+            ->groupBy('sampling_id');
+
+
         // Mengambil ID regulation yang terkait dengan InstituteSubject
         $regulationsIds = InstituteRegulation::whereIn('institute_subject_id', $instituteSubjects->pluck('id'))
             ->pluck('regulation_id')
@@ -114,7 +124,7 @@ class PDFController extends Controller
         $fieldCondition = optional($results->flatten()->first())->fieldCondition;
 
         $pdf = Pdf::loadView('pdf.preview_pdf', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results','noiseResults', 'ilumiResults',
+            'institute', 'parameters', 'samplingTimeRegulations', 'results','noiseResults', 'ilumiResults', 'htsResults',
             'instituteSubjects', 'sampling', 'fieldCondition', 'samplings', 'regulations','isNoise', 'groupedByParameter'
         ));
 
