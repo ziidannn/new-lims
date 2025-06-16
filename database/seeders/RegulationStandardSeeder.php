@@ -75,6 +75,7 @@ class RegulationStandardSeeder extends Seeder
             ["id" => "58", "title" => "0.02"],
             ["id" => "59", "title" => "0.01"],
             ["id" => "60", "title" => "0.1"],
+            ["id" => "61", "title" => "0.2"],
         ];
 
         foreach ($data as $x) {

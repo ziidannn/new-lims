@@ -36,7 +36,6 @@ class PDFController extends Controller
         // Cek apakah salah satu subject adalah 'noise' (berdasarkan slug atau name)
        $isNoise = $instituteSubjects->pluck('subject.slug')->contains('Noise*'); // Ganti 'slug' dengan 'name' jika perlu
 
-
         // Mengirim semua data sampling
         $samplings = Sampling::where('institute_id', $id)
         ->with('instituteSubject.subject')
@@ -52,6 +51,8 @@ class PDFController extends Controller
             ->get()
             ->sortBy('parameter.name'); // Mengurutkan berdasarkan nama parameter
 
+        $groupedByParameter = $samplingTimeRegulations->groupBy('parameter_id');
+
             // ✅ Ambil semua result BIASA
             $results = Result::whereNotNull('parameter_id')
             ->whereNotNull('sampling_time_id')
@@ -59,20 +60,44 @@ class PDFController extends Controller
             ->groupBy(function ($item) {
                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->sampling_id}";
             });
+            //  dd($results->toArray());
+
+            // Ambil semua result yang tidak pakai sampling_time_id (misal: untuk air, tanah, dll)
+            $resultsGeneral = Result::whereNotNull('parameter_id')
+            ->whereNull('sampling_time_id')
+            ->whereNotNull('sampling_id')
+            ->get()
+            ->groupBy(function ($item) {
+                $subject = optional($item->sampling)->subject_type ?? 'unknown';
+                return "{$item->sampling_id}|{$subject}|{$item->parameter_id}";
+            });
+            // Gabungkan ke $results utama
+            $results = $results->mergeRecursive($resultsGeneral);
+        // dd($resultsGeneral->toArray());
+
             // ✅ Ambil khusus NOISE pakai query yang kamu mau
             $noiseResults = DB::table('results')
             ->select(
                 'sampling_id',
                 'location',
                 DB::raw('GROUP_CONCAT(leq ORDER BY id) as leq_values'),
-                'ls', 'lm', 'lsm', 'unit', 'method', 'regulatory_standard'
-            )
+                'ls', 'lm', 'lsm', 'unit', 'method', 'regulatory_standard')
             ->whereNull('parameter_id')
             ->whereNull('sampling_time_id')
             ->groupBy('sampling_id', 'location', 'ls', 'lm', 'lsm', 'unit', 'method', 'regulatory_standard')
             ->get()
             ->groupBy('sampling_id');
             // dd($noiseResults->toArray());
+
+            // ✅ Ambil khusus  & ILUMIATION* pakai query yang kamu mau
+            $ilumiResults = DB::table('results')
+            ->select('sampling_id', 'time', 'testing_result', 'location', 'unit', 'method', 'regulatory_standard')
+            ->whereNull('parameter_id')
+            ->whereNull('sampling_time_id')
+            ->groupBy('sampling_id', 'time', 'testing_result', 'location', 'unit', 'method', 'regulatory_standard')
+            ->get()
+            ->groupBy('sampling_id');
+            // dd($ilumiResults->toArray());
 
         // Mengambil ID regulation yang terkait dengan InstituteSubject
         $regulationsIds = InstituteRegulation::whereIn('institute_subject_id', $instituteSubjects->pluck('id'))
@@ -89,8 +114,8 @@ class PDFController extends Controller
         $fieldCondition = optional($results->flatten()->first())->fieldCondition;
 
         $pdf = Pdf::loadView('pdf.preview_pdf', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results','noiseResults',
-            'instituteSubjects', 'sampling', 'fieldCondition', 'samplings', 'regulations','isNoise'
+            'institute', 'parameters', 'samplingTimeRegulations', 'results','noiseResults', 'ilumiResults',
+            'instituteSubjects', 'sampling', 'fieldCondition', 'samplings', 'regulations','isNoise', 'groupedByParameter'
         ));
 
         // Mengaktifkan opsi PHP di dalam tampilan PDF

@@ -37,4 +37,13 @@ class SamplingTimeRegulation extends Model
                     ->whereColumn('parameter_id', 'parameter_id')
                     ->whereColumn('regulation_standard_id', 'regulation_standard_id');
     }
+    public function sampling()
+{
+    return $this->hasOneThrough(Sampling::class,SamplingTime::class,
+        'id',              // Foreign key on SamplingTime table
+        'id',              // Foreign key on Sampling table
+        'sampling_time_id',// Local key on SamplingTimeRegulation table
+        'sampling_id'      // Local key on SamplingTime table
+    );
+}
 }
