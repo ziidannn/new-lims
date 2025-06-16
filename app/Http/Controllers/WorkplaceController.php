@@ -286,1085 +286,1085 @@ class WorkplaceController extends Controller
         ));
     }
 
-    public function addWorkplace_2(Request $request, $id) {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        // Handle POST request
-        if ($request->isMethod('POST')) {
-            $action = $request->input('action');
-
-        if ($action === 'save_parameter') {
-            $parameters = $request->input('parameter_id', []);
-            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->where('no_sample', '02')
-                ->latest()
-                ->first();
-
-            foreach ($parameters as $parameterId) {
-                if (!isset($request->sampling_time_id[$parameterId])) {
-                    continue;
-                }
-
-                foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                    $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                    if ($regulationStandardId === null || $testingResult === null) {
-                        continue;
-                    }
-
-                    Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'sampling_time_id' => $samplingTimeId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $testingResult,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                        ]
-                    );
-                }
-            }
-
-            $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-            $parameterNamesList = implode(', ', $parameterNames);
-
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-        }
-
-        // Cek jika tombol 'save_all' ditekan
-        if ($action === 'save_all') {
-            // Menyimpan data field condition dan show logo
-            Sampling::updateOrCreate(
-                [
-                    'institute_subject_id' => $instituteSubject->id,
-                    'no_sample' => '02',
-                ],
-                [
-                    'show_logo' => $request->input('show_logo', false),
-                ]
-            );
-
-            FieldCondition::updateOrCreate(
-                [
-                    'institute_id' => $institute->id,
-                    'institute_subject_id' => $instituteSubject->id,
-                ],
-                [
-                    'coordinate' => $request->input('coordinate'),
-                    'temperature' => $request->input('temperature'),
-                    'pressure' => $request->input('pressure'),
-                    'humidity' => $request->input('humidity'),
-                    'wind_speed' => $request->input('wind_speed'),
-                    'wind_direction' => $request->input('wind_direction'),
-                    'weather' => $request->input('weather'),
-                    'velocity' => $request->input('velocity'),
-                ]
-            );
-
-
-            return redirect()->route('result.list_result', $institute->id)
-                ->with('msg', 'Data and Logo saved successfully!');
-            }
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
-        $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '02')
-            ->latest()
-            ->first();
-
-            $results = collect();
-        if ($samplings) {
-            $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
-                ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
-        }
-
-        return view('result.workplace.add_2', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
-        ));
-    }
-
-    public function addWorkplace_3(Request $request, $id){
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        // Handle POST request
-        if ($request->isMethod('POST')) {
-            $action = $request->input('action');
-
-        if ($action === 'save_parameter') {
-            $parameters = $request->input('parameter_id', []);
-            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->where('no_sample', '03')
-                ->latest()
-                ->first();
-
-            foreach ($parameters as $parameterId) {
-                if (!isset($request->sampling_time_id[$parameterId])) {
-                    continue;
-                }
-
-                foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                    $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                    if ($regulationStandardId === null || $testingResult === null) {
-                        continue;
-                    }
-
-                    Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'sampling_time_id' => $samplingTimeId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $testingResult,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                        ]
-                    );
-                }
-            }
-
-            $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-            $parameterNamesList = implode(', ', $parameterNames);
-
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-        }
-
-        // Cek jika tombol 'save_all' ditekan
-        if ($action === 'save_all') {
-            // Menyimpan data field condition dan show logo
-            Sampling::updateOrCreate(
-                [
-                    'institute_subject_id' => $instituteSubject->id,
-                    'no_sample' => '03',
-                ],
-                [
-                    'show_logo' => $request->input('show_logo', false),
-                ]
-            );
-
-            FieldCondition::updateOrCreate(
-                [
-                    'institute_id' => $institute->id,
-                    'institute_subject_id' => $instituteSubject->id,
-                ],
-                [
-                    'coordinate' => $request->input('coordinate'),
-                    'temperature' => $request->input('temperature'),
-                    'pressure' => $request->input('pressure'),
-                    'humidity' => $request->input('humidity'),
-                    'wind_speed' => $request->input('wind_speed'),
-                    'wind_direction' => $request->input('wind_direction'),
-                    'weather' => $request->input('weather'),
-                    'velocity' => $request->input('velocity'),
-                ]
-            );
-
-
-            return redirect()->route('result.list_result', $institute->id)
-                ->with('msg', 'Data and Logo saved successfully!');
-            }
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
-        $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '03')
-            ->latest()
-            ->first();
-        $results = collect();
-        if ($samplings) {
-            $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
-                ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
-        }
-
-        return view('result.workplace.add_3', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
-        ));
-    }
-
-    public function addWorkplace_4(Request $request, $id) {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        // Handle POST request
-        if ($request->isMethod('POST')) {
-            $action = $request->input('action');
-
-        if ($action === 'save_parameter') {
-            $parameters = $request->input('parameter_id', []);
-            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->where('no_sample', '04')
-                ->latest()
-                ->first();
-
-            foreach ($parameters as $parameterId) {
-                if (!isset($request->sampling_time_id[$parameterId])) {
-                    continue;
-                }
-
-                foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                    $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                    if ($regulationStandardId === null || $testingResult === null) {
-                        continue;
-                    }
-
-                    Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'sampling_time_id' => $samplingTimeId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $testingResult,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                        ]
-                    );
-                }
-            }
-
-            $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-            $parameterNamesList = implode(', ', $parameterNames);
-
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-        }
-
-        // Cek jika tombol 'save_all' ditekan
-        if ($action === 'save_all') {
-            // Menyimpan data field condition dan show logo
-            Sampling::updateOrCreate(
-                [
-                    'institute_subject_id' => $instituteSubject->id,
-                    'no_sample' => '04',
-                ],
-                [
-                    'show_logo' => $request->input('show_logo', false),
-                ]
-            );
-
-            FieldCondition::updateOrCreate(
-                [
-                    'institute_id' => $institute->id,
-                    'institute_subject_id' => $instituteSubject->id,
-                ],
-                [
-                    'coordinate' => $request->input('coordinate'),
-                    'temperature' => $request->input('temperature'),
-                    'pressure' => $request->input('pressure'),
-                    'humidity' => $request->input('humidity'),
-                    'wind_speed' => $request->input('wind_speed'),
-                    'wind_direction' => $request->input('wind_direction'),
-                    'weather' => $request->input('weather'),
-                    'velocity' => $request->input('velocity'),
-                ]
-            );
-
-
-            return redirect()->route('result.list_result', $institute->id)
-                ->with('msg', 'Data and Logo saved successfully!');
-            }
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
-        $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '04')
-            ->latest()
-            ->first();
-        $results = collect();
-        if ($samplings) {
-            $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
-                ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
-        }
-
-        return view('result.workplace.add_4', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
-        ));
-    }
-
-    public function addWorkplace_5(Request $request, $id) {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        // Handle POST request
-        if ($request->isMethod('POST')) {
-            $action = $request->input('action');
-
-            if ($action === 'save_parameter') {
-                $parameters = $request->input('parameter_id', []);
-                $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                    ->where('no_sample', '05')
-                    ->latest()
-                    ->first();
-
-                foreach ($parameters as $parameterId) {
-                    if (!isset($request->sampling_time_id[$parameterId])) {
-                        continue;
-                    }
-
-                    foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                        $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                        $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                        if ($regulationStandardId === null || $testingResult === null) {
-                            continue;
-                        }
-
-                        Result::updateOrCreate(
-                            [
-                                'sampling_id' => $samplings->id,
-                                'parameter_id' => $parameterId,
-                                'sampling_time_id' => $samplingTimeId,
-                                'regulation_standard_id' => $regulationStandardId
-                            ],
-                            [
-                                'testing_result' => $testingResult,
-                                'unit' => $request->unit[$parameterId] ?? null,
-                                'method' => $request->method[$parameterId] ?? null,
-                            ]
-                        );
-                    }
-                }
-
-                $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-                $parameterNamesList = implode(', ', $parameterNames);
-
-                return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-            }
-
-            // Cek jika tombol 'save_all' ditekan
-            if ($action === 'save_all') {
-                // Menyimpan data field condition dan show logo
-                Sampling::updateOrCreate(
-                    [
-                        'institute_subject_id' => $instituteSubject->id,
-                        'no_sample' => '05',
-                    ],
-                    [
-                        'show_logo' => $request->input('show_logo', false),
-                    ]
-                );
-
-                FieldCondition::updateOrCreate(
-                    [
-                        'institute_id' => $institute->id,
-                        'institute_subject_id' => $instituteSubject->id,
-                    ],
-                    [
-                        'coordinate' => $request->input('coordinate'),
-                        'temperature' => $request->input('temperature'),
-                        'pressure' => $request->input('pressure'),
-                        'humidity' => $request->input('humidity'),
-                        'wind_speed' => $request->input('wind_speed'),
-                        'wind_direction' => $request->input('wind_direction'),
-                        'weather' => $request->input('weather'),
-                        'velocity' => $request->input('velocity'),
-                    ]
-                );
-
-
-                return redirect()->route('result.list_result', $institute->id)
-                    ->with('msg', 'Data and Logo saved successfully!');
-                }
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
-        $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '05')
-            ->latest()
-            ->first();
-        $results = collect();
-        if ($samplings) {
-            $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
-                ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
-        }
-
-        return view('result.workplace.add_5', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
-        ));
-    }
-
-    public function addWorkplace_6(Request $request, $id) {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        // Check if the request has 'save_all' parameter
-        // Handle POST request
-        if ($request->isMethod('POST')) {
-            $action = $request->input('action');
-
-        if ($action === 'save_parameter') {
-            $parameters = $request->input('parameter_id', []);
-            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->where('no_sample', '06')
-                ->latest()
-                ->first();
-
-            foreach ($parameters as $parameterId) {
-                if (!isset($request->sampling_time_id[$parameterId])) {
-                    continue;
-                }
-
-                foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                    $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                    if ($regulationStandardId === null || $testingResult === null) {
-                        continue;
-                    }
-
-                    Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'sampling_time_id' => $samplingTimeId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $testingResult,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                        ]
-                    );
-                }
-            }
-
-            $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-            $parameterNamesList = implode(', ', $parameterNames);
-
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-        }
-
-        // Cek jika tombol 'save_all' ditekan
-        if ($action === 'save_all') {
-            // Menyimpan data field condition dan show logo
-            Sampling::updateOrCreate(
-                [
-                    'institute_subject_id' => $instituteSubject->id,
-                    'no_sample' => '06',
-                ],
-                [
-                    'show_logo' => $request->input('show_logo', false),
-                ]
-            );
-
-            FieldCondition::updateOrCreate(
-                [
-                    'institute_id' => $institute->id,
-                    'institute_subject_id' => $instituteSubject->id,
-                ],
-                [
-                    'coordinate' => $request->input('coordinate'),
-                    'temperature' => $request->input('temperature'),
-                    'pressure' => $request->input('pressure'),
-                    'humidity' => $request->input('humidity'),
-                    'wind_speed' => $request->input('wind_speed'),
-                    'wind_direction' => $request->input('wind_direction'),
-                    'weather' => $request->input('weather'),
-                    'velocity' => $request->input('velocity'),
-                ]
-            );
-
-
-            return redirect()->route('result.list_result', $institute->id)
-                ->with('msg', 'Data and Logo saved successfully!');
-            }
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
-        $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '06')
-            ->latest()
-            ->first();
-        $results = collect();
-        if ($samplings) {
-            $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
-                ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
-        }
-
-        return view('result.workplace.add_6', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
-        ));
-    }
-
-    public function addWorkplace_7(Request $request, $id) {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        // Handle POST request
-        if ($request->isMethod('POST')) {
-            $action = $request->input('action');
-
-        if ($action === 'save_parameter') {
-            $parameters = $request->input('parameter_id', []);
-            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->where('no_sample', '07')
-                ->latest()
-                ->first();
-
-            foreach ($parameters as $parameterId) {
-                if (!isset($request->sampling_time_id[$parameterId])) {
-                    continue;
-                }
-
-                foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                    $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                    if ($regulationStandardId === null || $testingResult === null) {
-                        continue;
-                    }
-
-                    Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'sampling_time_id' => $samplingTimeId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $testingResult,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                        ]
-                    );
-                }
-            }
-
-            $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-            $parameterNamesList = implode(', ', $parameterNames);
-
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-        }
-
-        // Cek jika tombol 'save_all' ditekan
-        if ($action === 'save_all') {
-            // Menyimpan data field condition dan show logo
-            Sampling::updateOrCreate(
-                [
-                    'institute_subject_id' => $instituteSubject->id,
-                    'no_sample' => '07',
-                ],
-                [
-                    'show_logo' => $request->input('show_logo', false),
-                ]
-            );
-
-            FieldCondition::updateOrCreate(
-                [
-                    'institute_id' => $institute->id,
-                    'institute_subject_id' => $instituteSubject->id,
-                ],
-                [
-                    'coordinate' => $request->input('coordinate'),
-                    'temperature' => $request->input('temperature'),
-                    'pressure' => $request->input('pressure'),
-                    'humidity' => $request->input('humidity'),
-                    'wind_speed' => $request->input('wind_speed'),
-                    'wind_direction' => $request->input('wind_direction'),
-                    'weather' => $request->input('weather'),
-                    'velocity' => $request->input('velocity'),
-                ]
-            );
-
-
-            return redirect()->route('result.list_result', $institute->id)
-                ->with('msg', 'Data and Logo saved successfully!');
-            }
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
-        $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '07')
-            ->latest()
-            ->first();
-        $results = collect();
-        if ($samplings) {
-            $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
-                ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
-        }
-
-        return view('result.workplace.add_7', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
-        ));
-    }
-
-    public function addWorkplace_8(Request $request, $id) {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        // Handle POST request
-        if ($request->isMethod('POST')) {
-            $action = $request->input('action');
-
-        if ($action === 'save_parameter') {
-            $parameters = $request->input('parameter_id', []);
-            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->where('no_sample', '08')
-                ->latest()
-                ->first();
-
-            foreach ($parameters as $parameterId) {
-                if (!isset($request->sampling_time_id[$parameterId])) {
-                    continue;
-                }
-
-                foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                    $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                    if ($regulationStandardId === null || $testingResult === null) {
-                        continue;
-                    }
-
-                    Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'sampling_time_id' => $samplingTimeId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $testingResult,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                        ]
-                    );
-                }
-            }
-
-            $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-            $parameterNamesList = implode(', ', $parameterNames);
-
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-        }
-
-        // Cek jika tombol 'save_all' ditekan
-        if ($action === 'save_all') {
-            // Menyimpan data field condition dan show logo
-            Sampling::updateOrCreate(
-                [
-                    'institute_subject_id' => $instituteSubject->id,
-                    'no_sample' => '08',
-                ],
-                [
-                    'show_logo' => $request->input('show_logo', false),
-                ]
-            );
-
-            FieldCondition::updateOrCreate(
-                [
-                    'institute_id' => $institute->id,
-                    'institute_subject_id' => $instituteSubject->id,
-                ],
-                [
-                    'coordinate' => $request->input('coordinate'),
-                    'temperature' => $request->input('temperature'),
-                    'pressure' => $request->input('pressure'),
-                    'humidity' => $request->input('humidity'),
-                    'wind_speed' => $request->input('wind_speed'),
-                    'wind_direction' => $request->input('wind_direction'),
-                    'weather' => $request->input('weather'),
-                    'velocity' => $request->input('velocity'),
-                ]
-            );
-
-
-            return redirect()->route('result.list_result', $institute->id)
-                ->with('msg', 'Data and Logo saved successfully!');
-            }
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
-        $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '08')
-            ->latest()
-            ->first();
-        $results = collect();
-        if ($samplings) {
-            $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
-                ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
-        }
-
-        return view('result.workplace.add_8', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
-        ));
-    }
-
-    public function addWorkplace_9(Request $request, $id) {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        // Handle POST request
-        if ($request->isMethod('POST')) {
-            $action = $request->input('action');
-
-        if ($action === 'save_parameter') {
-            $parameters = $request->input('parameter_id', []);
-            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->where('no_sample', '09')
-                ->latest()
-                ->first();
-
-            foreach ($parameters as $parameterId) {
-                if (!isset($request->sampling_time_id[$parameterId])) {
-                    continue;
-                }
-
-                foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                    $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                    if ($regulationStandardId === null || $testingResult === null) {
-                        continue;
-                    }
-
-                    Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'sampling_time_id' => $samplingTimeId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $testingResult,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                        ]
-                    );
-                }
-            }
-
-            $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-            $parameterNamesList = implode(', ', $parameterNames);
-
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-        }
-
-        // Cek jika tombol 'save_all' ditekan
-        if ($action === 'save_all') {
-            // Menyimpan data field condition dan show logo
-            Sampling::updateOrCreate(
-                [
-                    'institute_subject_id' => $instituteSubject->id,
-                    'no_sample' => '09',
-                ],
-                [
-                    'show_logo' => $request->input('show_logo', false),
-                ]
-            );
-
-            FieldCondition::updateOrCreate(
-                [
-                    'institute_id' => $institute->id,
-                    'institute_subject_id' => $instituteSubject->id,
-                ],
-                [
-                    'coordinate' => $request->input('coordinate'),
-                    'temperature' => $request->input('temperature'),
-                    'pressure' => $request->input('pressure'),
-                    'humidity' => $request->input('humidity'),
-                    'wind_speed' => $request->input('wind_speed'),
-                    'wind_direction' => $request->input('wind_direction'),
-                    'weather' => $request->input('weather'),
-                    'velocity' => $request->input('velocity'),
-                ]
-            );
-
-
-            return redirect()->route('result.list_result', $institute->id)
-                ->with('msg', 'Data and Logo saved successfully!');
-            }
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
-        $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '09')
-            ->latest()
-            ->first();
-        $results = collect();
-        if ($samplings) {
-            $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
-                ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
-        }
-
-        return view('result.workplace.add_9', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
-        ));
-    }
-
-    public function addWorkplace_10(Request $request, $id) {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
-
-        // Handle POST request
-        if ($request->isMethod('POST')) {
-            $action = $request->input('action');
-
-        if ($action === 'save_parameter') {
-            $parameters = $request->input('parameter_id', []);
-            $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-                ->where('no_sample', '010')
-                ->latest()
-                ->first();
-
-            foreach ($parameters as $parameterId) {
-                if (!isset($request->sampling_time_id[$parameterId])) {
-                    continue;
-                }
-
-                foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
-                    $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
-                    $testingResult = $request->testing_result[$parameterId][$index] ?? null;
-
-                    if ($regulationStandardId === null || $testingResult === null) {
-                        continue;
-                    }
-
-                    Result::updateOrCreate(
-                        [
-                            'sampling_id' => $samplings->id,
-                            'parameter_id' => $parameterId,
-                            'sampling_time_id' => $samplingTimeId,
-                            'regulation_standard_id' => $regulationStandardId
-                        ],
-                        [
-                            'testing_result' => $testingResult,
-                            'unit' => $request->unit[$parameterId] ?? null,
-                            'method' => $request->method[$parameterId] ?? null,
-                        ]
-                    );
-                }
-            }
-
-            $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
-            $parameterNamesList = implode(', ', $parameterNames);
-
-            return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
-        }
-
-        // Cek jika tombol 'save_all' ditekan
-        if ($action === 'save_all') {
-            // Menyimpan data field condition dan show logo
-            Sampling::updateOrCreate(
-                [
-                    'institute_subject_id' => $instituteSubject->id,
-                    'no_sample' => '010',
-                ],
-                [
-                    'show_logo' => $request->input('show_logo', false),
-                ]
-            );
-
-            FieldCondition::updateOrCreate(
-                [
-                    'institute_id' => $institute->id,
-                    'institute_subject_id' => $instituteSubject->id,
-                ],
-                [
-                    'coordinate' => $request->input('coordinate'),
-                    'temperature' => $request->input('temperature'),
-                    'pressure' => $request->input('pressure'),
-                    'humidity' => $request->input('humidity'),
-                    'wind_speed' => $request->input('wind_speed'),
-                    'wind_direction' => $request->input('wind_direction'),
-                    'weather' => $request->input('weather'),
-                    'velocity' => $request->input('velocity'),
-                ]
-            );
-
-
-            return redirect()->route('result.list_result', $institute->id)
-                ->with('msg', 'Data and Logo saved successfully!');
-            }
-        }
-
-        $subject = Subject::where('id', $instituteSubject->subject_id)->first();
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
-        $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
-        $parametersIds = $parameters->pluck('id');
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->where('no_sample', '010')
-            ->latest()
-            ->first();
-        $results = collect();
-        if ($samplings) {
-            $results = Result::where('sampling_id', $samplings->id)
-                ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
-                ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
-                ->get()
-                ->groupBy(function ($item) {
-                    return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
-                });
-        }
-
-        return view('result.workplace.add_10', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
-        ));
-    }
+    // public function addWorkplace_2(Request $request, $id) {
+    //     $instituteSubject = InstituteSubject::findOrFail($id);
+    //     $institute = Institute::findOrFail($instituteSubject->institute_id);
+    //     $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
+
+    //     // Handle POST request
+    //     if ($request->isMethod('POST')) {
+    //         $action = $request->input('action');
+
+    //     if ($action === 'save_parameter') {
+    //         $parameters = $request->input('parameter_id', []);
+    //         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //             ->where('no_sample', '02')
+    //             ->latest()
+    //             ->first();
+
+    //         foreach ($parameters as $parameterId) {
+    //             if (!isset($request->sampling_time_id[$parameterId])) {
+    //                 continue;
+    //             }
+
+    //             foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
+    //                 $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
+    //                 $testingResult = $request->testing_result[$parameterId][$index] ?? null;
+
+    //                 if ($regulationStandardId === null || $testingResult === null) {
+    //                     continue;
+    //                 }
+
+    //                 Result::updateOrCreate(
+    //                     [
+    //                         'sampling_id' => $samplings->id,
+    //                         'parameter_id' => $parameterId,
+    //                         'sampling_time_id' => $samplingTimeId,
+    //                         'regulation_standard_id' => $regulationStandardId
+    //                     ],
+    //                     [
+    //                         'testing_result' => $testingResult,
+    //                         'unit' => $request->unit[$parameterId] ?? null,
+    //                         'method' => $request->method[$parameterId] ?? null,
+    //                     ]
+    //                 );
+    //             }
+    //         }
+
+    //         $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+    //         $parameterNamesList = implode(', ', $parameterNames);
+
+    //         return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+    //     }
+
+    //     // Cek jika tombol 'save_all' ditekan
+    //     if ($action === 'save_all') {
+    //         // Menyimpan data field condition dan show logo
+    //         Sampling::updateOrCreate(
+    //             [
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //                 'no_sample' => '02',
+    //             ],
+    //             [
+    //                 'show_logo' => $request->input('show_logo', false),
+    //             ]
+    //         );
+
+    //         FieldCondition::updateOrCreate(
+    //             [
+    //                 'institute_id' => $institute->id,
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //             ],
+    //             [
+    //                 'coordinate' => $request->input('coordinate'),
+    //                 'temperature' => $request->input('temperature'),
+    //                 'pressure' => $request->input('pressure'),
+    //                 'humidity' => $request->input('humidity'),
+    //                 'wind_speed' => $request->input('wind_speed'),
+    //                 'wind_direction' => $request->input('wind_direction'),
+    //                 'weather' => $request->input('weather'),
+    //                 'velocity' => $request->input('velocity'),
+    //             ]
+    //         );
+
+
+    //         return redirect()->route('result.list_result', $institute->id)
+    //             ->with('msg', 'Data and Logo saved successfully!');
+    //         }
+    //     }
+
+    //     $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+    //     $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+    //         ->pluck('regulation_id');
+    //     $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+    //     $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+    //         ->pluck('subject_id');
+    //     $subjects = Subject::whereIn('id', $subjectsIds)->get();
+    //     $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+    //     $parametersIds = $parameters->pluck('id');
+    //     $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+    //         ->with(['samplingTime', 'regulationStandards'])
+    //         ->get();
+    //     $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //         ->where('no_sample', '02')
+    //         ->latest()
+    //         ->first();
+
+    //         $results = collect();
+    //     if ($samplings) {
+    //         $results = Result::where('sampling_id', $samplings->id)
+    //             ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+    //             ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+    //             ->get()
+    //             ->groupBy(function ($item) {
+    //                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+    //             });
+    //     }
+
+    //     return view('result.workplace.add_2', compact(
+    //         'institute', 'parameters', 'samplingTimeRegulations', 'results',
+    //         'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
+    //     ));
+    // }
+
+    // public function addWorkplace_3(Request $request, $id){
+    //     $instituteSubject = InstituteSubject::findOrFail($id);
+    //     $institute = Institute::findOrFail($instituteSubject->institute_id);
+    //     $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
+
+    //     // Handle POST request
+    //     if ($request->isMethod('POST')) {
+    //         $action = $request->input('action');
+
+    //     if ($action === 'save_parameter') {
+    //         $parameters = $request->input('parameter_id', []);
+    //         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //             ->where('no_sample', '03')
+    //             ->latest()
+    //             ->first();
+
+    //         foreach ($parameters as $parameterId) {
+    //             if (!isset($request->sampling_time_id[$parameterId])) {
+    //                 continue;
+    //             }
+
+    //             foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
+    //                 $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
+    //                 $testingResult = $request->testing_result[$parameterId][$index] ?? null;
+
+    //                 if ($regulationStandardId === null || $testingResult === null) {
+    //                     continue;
+    //                 }
+
+    //                 Result::updateOrCreate(
+    //                     [
+    //                         'sampling_id' => $samplings->id,
+    //                         'parameter_id' => $parameterId,
+    //                         'sampling_time_id' => $samplingTimeId,
+    //                         'regulation_standard_id' => $regulationStandardId
+    //                     ],
+    //                     [
+    //                         'testing_result' => $testingResult,
+    //                         'unit' => $request->unit[$parameterId] ?? null,
+    //                         'method' => $request->method[$parameterId] ?? null,
+    //                     ]
+    //                 );
+    //             }
+    //         }
+
+    //         $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+    //         $parameterNamesList = implode(', ', $parameterNames);
+
+    //         return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+    //     }
+
+    //     // Cek jika tombol 'save_all' ditekan
+    //     if ($action === 'save_all') {
+    //         // Menyimpan data field condition dan show logo
+    //         Sampling::updateOrCreate(
+    //             [
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //                 'no_sample' => '03',
+    //             ],
+    //             [
+    //                 'show_logo' => $request->input('show_logo', false),
+    //             ]
+    //         );
+
+    //         FieldCondition::updateOrCreate(
+    //             [
+    //                 'institute_id' => $institute->id,
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //             ],
+    //             [
+    //                 'coordinate' => $request->input('coordinate'),
+    //                 'temperature' => $request->input('temperature'),
+    //                 'pressure' => $request->input('pressure'),
+    //                 'humidity' => $request->input('humidity'),
+    //                 'wind_speed' => $request->input('wind_speed'),
+    //                 'wind_direction' => $request->input('wind_direction'),
+    //                 'weather' => $request->input('weather'),
+    //                 'velocity' => $request->input('velocity'),
+    //             ]
+    //         );
+
+
+    //         return redirect()->route('result.list_result', $institute->id)
+    //             ->with('msg', 'Data and Logo saved successfully!');
+    //         }
+    //     }
+
+    //     $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+    //     $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+    //         ->pluck('regulation_id');
+    //     $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+    //     $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+    //         ->pluck('subject_id');
+    //     $subjects = Subject::whereIn('id', $subjectsIds)->get();
+    //     $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+    //     $parametersIds = $parameters->pluck('id');
+    //     $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+    //         ->with(['samplingTime', 'regulationStandards'])
+    //         ->get();
+    //     $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //         ->where('no_sample', '03')
+    //         ->latest()
+    //         ->first();
+    //     $results = collect();
+    //     if ($samplings) {
+    //         $results = Result::where('sampling_id', $samplings->id)
+    //             ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+    //             ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+    //             ->get()
+    //             ->groupBy(function ($item) {
+    //                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+    //             });
+    //     }
+
+    //     return view('result.workplace.add_3', compact(
+    //         'institute', 'parameters', 'samplingTimeRegulations', 'results',
+    //         'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
+    //     ));
+    // }
+
+    // public function addWorkplace_4(Request $request, $id) {
+    //     $instituteSubject = InstituteSubject::findOrFail($id);
+    //     $institute = Institute::findOrFail($instituteSubject->institute_id);
+    //     $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
+
+    //     // Handle POST request
+    //     if ($request->isMethod('POST')) {
+    //         $action = $request->input('action');
+
+    //     if ($action === 'save_parameter') {
+    //         $parameters = $request->input('parameter_id', []);
+    //         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //             ->where('no_sample', '04')
+    //             ->latest()
+    //             ->first();
+
+    //         foreach ($parameters as $parameterId) {
+    //             if (!isset($request->sampling_time_id[$parameterId])) {
+    //                 continue;
+    //             }
+
+    //             foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
+    //                 $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
+    //                 $testingResult = $request->testing_result[$parameterId][$index] ?? null;
+
+    //                 if ($regulationStandardId === null || $testingResult === null) {
+    //                     continue;
+    //                 }
+
+    //                 Result::updateOrCreate(
+    //                     [
+    //                         'sampling_id' => $samplings->id,
+    //                         'parameter_id' => $parameterId,
+    //                         'sampling_time_id' => $samplingTimeId,
+    //                         'regulation_standard_id' => $regulationStandardId
+    //                     ],
+    //                     [
+    //                         'testing_result' => $testingResult,
+    //                         'unit' => $request->unit[$parameterId] ?? null,
+    //                         'method' => $request->method[$parameterId] ?? null,
+    //                     ]
+    //                 );
+    //             }
+    //         }
+
+    //         $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+    //         $parameterNamesList = implode(', ', $parameterNames);
+
+    //         return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+    //     }
+
+    //     // Cek jika tombol 'save_all' ditekan
+    //     if ($action === 'save_all') {
+    //         // Menyimpan data field condition dan show logo
+    //         Sampling::updateOrCreate(
+    //             [
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //                 'no_sample' => '04',
+    //             ],
+    //             [
+    //                 'show_logo' => $request->input('show_logo', false),
+    //             ]
+    //         );
+
+    //         FieldCondition::updateOrCreate(
+    //             [
+    //                 'institute_id' => $institute->id,
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //             ],
+    //             [
+    //                 'coordinate' => $request->input('coordinate'),
+    //                 'temperature' => $request->input('temperature'),
+    //                 'pressure' => $request->input('pressure'),
+    //                 'humidity' => $request->input('humidity'),
+    //                 'wind_speed' => $request->input('wind_speed'),
+    //                 'wind_direction' => $request->input('wind_direction'),
+    //                 'weather' => $request->input('weather'),
+    //                 'velocity' => $request->input('velocity'),
+    //             ]
+    //         );
+
+
+    //         return redirect()->route('result.list_result', $institute->id)
+    //             ->with('msg', 'Data and Logo saved successfully!');
+    //         }
+    //     }
+
+    //     $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+    //     $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+    //         ->pluck('regulation_id');
+    //     $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+    //     $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+    //         ->pluck('subject_id');
+    //     $subjects = Subject::whereIn('id', $subjectsIds)->get();
+    //     $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+    //     $parametersIds = $parameters->pluck('id');
+    //     $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+    //         ->with(['samplingTime', 'regulationStandards'])
+    //         ->get();
+    //     $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //         ->where('no_sample', '04')
+    //         ->latest()
+    //         ->first();
+    //     $results = collect();
+    //     if ($samplings) {
+    //         $results = Result::where('sampling_id', $samplings->id)
+    //             ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+    //             ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+    //             ->get()
+    //             ->groupBy(function ($item) {
+    //                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+    //             });
+    //     }
+
+    //     return view('result.workplace.add_4', compact(
+    //         'institute', 'parameters', 'samplingTimeRegulations', 'results',
+    //         'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
+    //     ));
+    // }
+
+    // public function addWorkplace_5(Request $request, $id) {
+    //     $instituteSubject = InstituteSubject::findOrFail($id);
+    //     $institute = Institute::findOrFail($instituteSubject->institute_id);
+    //     $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
+
+    //     // Handle POST request
+    //     if ($request->isMethod('POST')) {
+    //         $action = $request->input('action');
+
+    //         if ($action === 'save_parameter') {
+    //             $parameters = $request->input('parameter_id', []);
+    //             $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //                 ->where('no_sample', '05')
+    //                 ->latest()
+    //                 ->first();
+
+    //             foreach ($parameters as $parameterId) {
+    //                 if (!isset($request->sampling_time_id[$parameterId])) {
+    //                     continue;
+    //                 }
+
+    //                 foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
+    //                     $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
+    //                     $testingResult = $request->testing_result[$parameterId][$index] ?? null;
+
+    //                     if ($regulationStandardId === null || $testingResult === null) {
+    //                         continue;
+    //                     }
+
+    //                     Result::updateOrCreate(
+    //                         [
+    //                             'sampling_id' => $samplings->id,
+    //                             'parameter_id' => $parameterId,
+    //                             'sampling_time_id' => $samplingTimeId,
+    //                             'regulation_standard_id' => $regulationStandardId
+    //                         ],
+    //                         [
+    //                             'testing_result' => $testingResult,
+    //                             'unit' => $request->unit[$parameterId] ?? null,
+    //                             'method' => $request->method[$parameterId] ?? null,
+    //                         ]
+    //                     );
+    //                 }
+    //             }
+
+    //             $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+    //             $parameterNamesList = implode(', ', $parameterNames);
+
+    //             return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+    //         }
+
+    //         // Cek jika tombol 'save_all' ditekan
+    //         if ($action === 'save_all') {
+    //             // Menyimpan data field condition dan show logo
+    //             Sampling::updateOrCreate(
+    //                 [
+    //                     'institute_subject_id' => $instituteSubject->id,
+    //                     'no_sample' => '05',
+    //                 ],
+    //                 [
+    //                     'show_logo' => $request->input('show_logo', false),
+    //                 ]
+    //             );
+
+    //             FieldCondition::updateOrCreate(
+    //                 [
+    //                     'institute_id' => $institute->id,
+    //                     'institute_subject_id' => $instituteSubject->id,
+    //                 ],
+    //                 [
+    //                     'coordinate' => $request->input('coordinate'),
+    //                     'temperature' => $request->input('temperature'),
+    //                     'pressure' => $request->input('pressure'),
+    //                     'humidity' => $request->input('humidity'),
+    //                     'wind_speed' => $request->input('wind_speed'),
+    //                     'wind_direction' => $request->input('wind_direction'),
+    //                     'weather' => $request->input('weather'),
+    //                     'velocity' => $request->input('velocity'),
+    //                 ]
+    //             );
+
+
+    //             return redirect()->route('result.list_result', $institute->id)
+    //                 ->with('msg', 'Data and Logo saved successfully!');
+    //             }
+    //     }
+
+    //     $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+    //     $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+    //         ->pluck('regulation_id');
+    //     $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+    //     $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+    //         ->pluck('subject_id');
+    //     $subjects = Subject::whereIn('id', $subjectsIds)->get();
+    //     $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+    //     $parametersIds = $parameters->pluck('id');
+    //     $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+    //         ->with(['samplingTime', 'regulationStandards'])
+    //         ->get();
+    //     $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //         ->where('no_sample', '05')
+    //         ->latest()
+    //         ->first();
+    //     $results = collect();
+    //     if ($samplings) {
+    //         $results = Result::where('sampling_id', $samplings->id)
+    //             ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+    //             ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+    //             ->get()
+    //             ->groupBy(function ($item) {
+    //                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+    //             });
+    //     }
+
+    //     return view('result.workplace.add_5', compact(
+    //         'institute', 'parameters', 'samplingTimeRegulations', 'results',
+    //         'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
+    //     ));
+    // }
+
+    // public function addWorkplace_6(Request $request, $id) {
+    //     $instituteSubject = InstituteSubject::findOrFail($id);
+    //     $institute = Institute::findOrFail($instituteSubject->institute_id);
+    //     $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
+
+    //     // Check if the request has 'save_all' parameter
+    //     // Handle POST request
+    //     if ($request->isMethod('POST')) {
+    //         $action = $request->input('action');
+
+    //     if ($action === 'save_parameter') {
+    //         $parameters = $request->input('parameter_id', []);
+    //         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //             ->where('no_sample', '06')
+    //             ->latest()
+    //             ->first();
+
+    //         foreach ($parameters as $parameterId) {
+    //             if (!isset($request->sampling_time_id[$parameterId])) {
+    //                 continue;
+    //             }
+
+    //             foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
+    //                 $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
+    //                 $testingResult = $request->testing_result[$parameterId][$index] ?? null;
+
+    //                 if ($regulationStandardId === null || $testingResult === null) {
+    //                     continue;
+    //                 }
+
+    //                 Result::updateOrCreate(
+    //                     [
+    //                         'sampling_id' => $samplings->id,
+    //                         'parameter_id' => $parameterId,
+    //                         'sampling_time_id' => $samplingTimeId,
+    //                         'regulation_standard_id' => $regulationStandardId
+    //                     ],
+    //                     [
+    //                         'testing_result' => $testingResult,
+    //                         'unit' => $request->unit[$parameterId] ?? null,
+    //                         'method' => $request->method[$parameterId] ?? null,
+    //                     ]
+    //                 );
+    //             }
+    //         }
+
+    //         $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+    //         $parameterNamesList = implode(', ', $parameterNames);
+
+    //         return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+    //     }
+
+    //     // Cek jika tombol 'save_all' ditekan
+    //     if ($action === 'save_all') {
+    //         // Menyimpan data field condition dan show logo
+    //         Sampling::updateOrCreate(
+    //             [
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //                 'no_sample' => '06',
+    //             ],
+    //             [
+    //                 'show_logo' => $request->input('show_logo', false),
+    //             ]
+    //         );
+
+    //         FieldCondition::updateOrCreate(
+    //             [
+    //                 'institute_id' => $institute->id,
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //             ],
+    //             [
+    //                 'coordinate' => $request->input('coordinate'),
+    //                 'temperature' => $request->input('temperature'),
+    //                 'pressure' => $request->input('pressure'),
+    //                 'humidity' => $request->input('humidity'),
+    //                 'wind_speed' => $request->input('wind_speed'),
+    //                 'wind_direction' => $request->input('wind_direction'),
+    //                 'weather' => $request->input('weather'),
+    //                 'velocity' => $request->input('velocity'),
+    //             ]
+    //         );
+
+
+    //         return redirect()->route('result.list_result', $institute->id)
+    //             ->with('msg', 'Data and Logo saved successfully!');
+    //         }
+    //     }
+
+    //     $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+    //     $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+    //         ->pluck('regulation_id');
+    //     $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+    //     $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+    //         ->pluck('subject_id');
+    //     $subjects = Subject::whereIn('id', $subjectsIds)->get();
+    //     $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+    //     $parametersIds = $parameters->pluck('id');
+    //     $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+    //         ->with(['samplingTime', 'regulationStandards'])
+    //         ->get();
+    //     $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //         ->where('no_sample', '06')
+    //         ->latest()
+    //         ->first();
+    //     $results = collect();
+    //     if ($samplings) {
+    //         $results = Result::where('sampling_id', $samplings->id)
+    //             ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+    //             ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+    //             ->get()
+    //             ->groupBy(function ($item) {
+    //                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+    //             });
+    //     }
+
+    //     return view('result.workplace.add_6', compact(
+    //         'institute', 'parameters', 'samplingTimeRegulations', 'results',
+    //         'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
+    //     ));
+    // }
+
+    // public function addWorkplace_7(Request $request, $id) {
+    //     $instituteSubject = InstituteSubject::findOrFail($id);
+    //     $institute = Institute::findOrFail($instituteSubject->institute_id);
+    //     $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
+
+    //     // Handle POST request
+    //     if ($request->isMethod('POST')) {
+    //         $action = $request->input('action');
+
+    //     if ($action === 'save_parameter') {
+    //         $parameters = $request->input('parameter_id', []);
+    //         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //             ->where('no_sample', '07')
+    //             ->latest()
+    //             ->first();
+
+    //         foreach ($parameters as $parameterId) {
+    //             if (!isset($request->sampling_time_id[$parameterId])) {
+    //                 continue;
+    //             }
+
+    //             foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
+    //                 $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
+    //                 $testingResult = $request->testing_result[$parameterId][$index] ?? null;
+
+    //                 if ($regulationStandardId === null || $testingResult === null) {
+    //                     continue;
+    //                 }
+
+    //                 Result::updateOrCreate(
+    //                     [
+    //                         'sampling_id' => $samplings->id,
+    //                         'parameter_id' => $parameterId,
+    //                         'sampling_time_id' => $samplingTimeId,
+    //                         'regulation_standard_id' => $regulationStandardId
+    //                     ],
+    //                     [
+    //                         'testing_result' => $testingResult,
+    //                         'unit' => $request->unit[$parameterId] ?? null,
+    //                         'method' => $request->method[$parameterId] ?? null,
+    //                     ]
+    //                 );
+    //             }
+    //         }
+
+    //         $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+    //         $parameterNamesList = implode(', ', $parameterNames);
+
+    //         return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+    //     }
+
+    //     // Cek jika tombol 'save_all' ditekan
+    //     if ($action === 'save_all') {
+    //         // Menyimpan data field condition dan show logo
+    //         Sampling::updateOrCreate(
+    //             [
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //                 'no_sample' => '07',
+    //             ],
+    //             [
+    //                 'show_logo' => $request->input('show_logo', false),
+    //             ]
+    //         );
+
+    //         FieldCondition::updateOrCreate(
+    //             [
+    //                 'institute_id' => $institute->id,
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //             ],
+    //             [
+    //                 'coordinate' => $request->input('coordinate'),
+    //                 'temperature' => $request->input('temperature'),
+    //                 'pressure' => $request->input('pressure'),
+    //                 'humidity' => $request->input('humidity'),
+    //                 'wind_speed' => $request->input('wind_speed'),
+    //                 'wind_direction' => $request->input('wind_direction'),
+    //                 'weather' => $request->input('weather'),
+    //                 'velocity' => $request->input('velocity'),
+    //             ]
+    //         );
+
+
+    //         return redirect()->route('result.list_result', $institute->id)
+    //             ->with('msg', 'Data and Logo saved successfully!');
+    //         }
+    //     }
+
+    //     $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+    //     $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+    //         ->pluck('regulation_id');
+    //     $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+    //     $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+    //         ->pluck('subject_id');
+    //     $subjects = Subject::whereIn('id', $subjectsIds)->get();
+    //     $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+    //     $parametersIds = $parameters->pluck('id');
+    //     $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+    //         ->with(['samplingTime', 'regulationStandards'])
+    //         ->get();
+    //     $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //         ->where('no_sample', '07')
+    //         ->latest()
+    //         ->first();
+    //     $results = collect();
+    //     if ($samplings) {
+    //         $results = Result::where('sampling_id', $samplings->id)
+    //             ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+    //             ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+    //             ->get()
+    //             ->groupBy(function ($item) {
+    //                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+    //             });
+    //     }
+
+    //     return view('result.workplace.add_7', compact(
+    //         'institute', 'parameters', 'samplingTimeRegulations', 'results',
+    //         'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
+    //     ));
+    // }
+
+    // public function addWorkplace_8(Request $request, $id) {
+    //     $instituteSubject = InstituteSubject::findOrFail($id);
+    //     $institute = Institute::findOrFail($instituteSubject->institute_id);
+    //     $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
+
+    //     // Handle POST request
+    //     if ($request->isMethod('POST')) {
+    //         $action = $request->input('action');
+
+    //     if ($action === 'save_parameter') {
+    //         $parameters = $request->input('parameter_id', []);
+    //         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //             ->where('no_sample', '08')
+    //             ->latest()
+    //             ->first();
+
+    //         foreach ($parameters as $parameterId) {
+    //             if (!isset($request->sampling_time_id[$parameterId])) {
+    //                 continue;
+    //             }
+
+    //             foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
+    //                 $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
+    //                 $testingResult = $request->testing_result[$parameterId][$index] ?? null;
+
+    //                 if ($regulationStandardId === null || $testingResult === null) {
+    //                     continue;
+    //                 }
+
+    //                 Result::updateOrCreate(
+    //                     [
+    //                         'sampling_id' => $samplings->id,
+    //                         'parameter_id' => $parameterId,
+    //                         'sampling_time_id' => $samplingTimeId,
+    //                         'regulation_standard_id' => $regulationStandardId
+    //                     ],
+    //                     [
+    //                         'testing_result' => $testingResult,
+    //                         'unit' => $request->unit[$parameterId] ?? null,
+    //                         'method' => $request->method[$parameterId] ?? null,
+    //                     ]
+    //                 );
+    //             }
+    //         }
+
+    //         $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+    //         $parameterNamesList = implode(', ', $parameterNames);
+
+    //         return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+    //     }
+
+    //     // Cek jika tombol 'save_all' ditekan
+    //     if ($action === 'save_all') {
+    //         // Menyimpan data field condition dan show logo
+    //         Sampling::updateOrCreate(
+    //             [
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //                 'no_sample' => '08',
+    //             ],
+    //             [
+    //                 'show_logo' => $request->input('show_logo', false),
+    //             ]
+    //         );
+
+    //         FieldCondition::updateOrCreate(
+    //             [
+    //                 'institute_id' => $institute->id,
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //             ],
+    //             [
+    //                 'coordinate' => $request->input('coordinate'),
+    //                 'temperature' => $request->input('temperature'),
+    //                 'pressure' => $request->input('pressure'),
+    //                 'humidity' => $request->input('humidity'),
+    //                 'wind_speed' => $request->input('wind_speed'),
+    //                 'wind_direction' => $request->input('wind_direction'),
+    //                 'weather' => $request->input('weather'),
+    //                 'velocity' => $request->input('velocity'),
+    //             ]
+    //         );
+
+
+    //         return redirect()->route('result.list_result', $institute->id)
+    //             ->with('msg', 'Data and Logo saved successfully!');
+    //         }
+    //     }
+
+    //     $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+    //     $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+    //         ->pluck('regulation_id');
+    //     $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+    //     $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+    //         ->pluck('subject_id');
+    //     $subjects = Subject::whereIn('id', $subjectsIds)->get();
+    //     $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+    //     $parametersIds = $parameters->pluck('id');
+    //     $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+    //         ->with(['samplingTime', 'regulationStandards'])
+    //         ->get();
+    //     $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //         ->where('no_sample', '08')
+    //         ->latest()
+    //         ->first();
+    //     $results = collect();
+    //     if ($samplings) {
+    //         $results = Result::where('sampling_id', $samplings->id)
+    //             ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+    //             ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+    //             ->get()
+    //             ->groupBy(function ($item) {
+    //                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+    //             });
+    //     }
+
+    //     return view('result.workplace.add_8', compact(
+    //         'institute', 'parameters', 'samplingTimeRegulations', 'results',
+    //         'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
+    //     ));
+    // }
+
+    // public function addWorkplace_9(Request $request, $id) {
+    //     $instituteSubject = InstituteSubject::findOrFail($id);
+    //     $institute = Institute::findOrFail($instituteSubject->institute_id);
+    //     $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
+
+    //     // Handle POST request
+    //     if ($request->isMethod('POST')) {
+    //         $action = $request->input('action');
+
+    //     if ($action === 'save_parameter') {
+    //         $parameters = $request->input('parameter_id', []);
+    //         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //             ->where('no_sample', '09')
+    //             ->latest()
+    //             ->first();
+
+    //         foreach ($parameters as $parameterId) {
+    //             if (!isset($request->sampling_time_id[$parameterId])) {
+    //                 continue;
+    //             }
+
+    //             foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
+    //                 $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
+    //                 $testingResult = $request->testing_result[$parameterId][$index] ?? null;
+
+    //                 if ($regulationStandardId === null || $testingResult === null) {
+    //                     continue;
+    //                 }
+
+    //                 Result::updateOrCreate(
+    //                     [
+    //                         'sampling_id' => $samplings->id,
+    //                         'parameter_id' => $parameterId,
+    //                         'sampling_time_id' => $samplingTimeId,
+    //                         'regulation_standard_id' => $regulationStandardId
+    //                     ],
+    //                     [
+    //                         'testing_result' => $testingResult,
+    //                         'unit' => $request->unit[$parameterId] ?? null,
+    //                         'method' => $request->method[$parameterId] ?? null,
+    //                     ]
+    //                 );
+    //             }
+    //         }
+
+    //         $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+    //         $parameterNamesList = implode(', ', $parameterNames);
+
+    //         return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+    //     }
+
+    //     // Cek jika tombol 'save_all' ditekan
+    //     if ($action === 'save_all') {
+    //         // Menyimpan data field condition dan show logo
+    //         Sampling::updateOrCreate(
+    //             [
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //                 'no_sample' => '09',
+    //             ],
+    //             [
+    //                 'show_logo' => $request->input('show_logo', false),
+    //             ]
+    //         );
+
+    //         FieldCondition::updateOrCreate(
+    //             [
+    //                 'institute_id' => $institute->id,
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //             ],
+    //             [
+    //                 'coordinate' => $request->input('coordinate'),
+    //                 'temperature' => $request->input('temperature'),
+    //                 'pressure' => $request->input('pressure'),
+    //                 'humidity' => $request->input('humidity'),
+    //                 'wind_speed' => $request->input('wind_speed'),
+    //                 'wind_direction' => $request->input('wind_direction'),
+    //                 'weather' => $request->input('weather'),
+    //                 'velocity' => $request->input('velocity'),
+    //             ]
+    //         );
+
+
+    //         return redirect()->route('result.list_result', $institute->id)
+    //             ->with('msg', 'Data and Logo saved successfully!');
+    //         }
+    //     }
+
+    //     $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+    //     $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+    //         ->pluck('regulation_id');
+    //     $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+    //     $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+    //         ->pluck('subject_id');
+    //     $subjects = Subject::whereIn('id', $subjectsIds)->get();
+    //     $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+    //     $parametersIds = $parameters->pluck('id');
+    //     $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+    //         ->with(['samplingTime', 'regulationStandards'])
+    //         ->get();
+    //     $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //         ->where('no_sample', '09')
+    //         ->latest()
+    //         ->first();
+    //     $results = collect();
+    //     if ($samplings) {
+    //         $results = Result::where('sampling_id', $samplings->id)
+    //             ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+    //             ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+    //             ->get()
+    //             ->groupBy(function ($item) {
+    //                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+    //             });
+    //     }
+
+    //     return view('result.workplace.add_9', compact(
+    //         'institute', 'parameters', 'samplingTimeRegulations', 'results',
+    //         'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
+    //     ));
+    // }
+
+    // public function addWorkplace_10(Request $request, $id) {
+    //     $instituteSubject = InstituteSubject::findOrFail($id);
+    //     $institute = Institute::findOrFail($instituteSubject->institute_id);
+    //     $sampling = Sampling::where('institute_subject_id', $instituteSubject->id)->get();
+
+    //     // Handle POST request
+    //     if ($request->isMethod('POST')) {
+    //         $action = $request->input('action');
+
+    //     if ($action === 'save_parameter') {
+    //         $parameters = $request->input('parameter_id', []);
+    //         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //             ->where('no_sample', '010')
+    //             ->latest()
+    //             ->first();
+
+    //         foreach ($parameters as $parameterId) {
+    //             if (!isset($request->sampling_time_id[$parameterId])) {
+    //                 continue;
+    //             }
+
+    //             foreach ($request->sampling_time_id[$parameterId] as $index => $samplingTimeId) {
+    //                 $regulationStandardId = $request->regulation_standard_id[$parameterId][$index] ?? null;
+    //                 $testingResult = $request->testing_result[$parameterId][$index] ?? null;
+
+    //                 if ($regulationStandardId === null || $testingResult === null) {
+    //                     continue;
+    //                 }
+
+    //                 Result::updateOrCreate(
+    //                     [
+    //                         'sampling_id' => $samplings->id,
+    //                         'parameter_id' => $parameterId,
+    //                         'sampling_time_id' => $samplingTimeId,
+    //                         'regulation_standard_id' => $regulationStandardId
+    //                     ],
+    //                     [
+    //                         'testing_result' => $testingResult,
+    //                         'unit' => $request->unit[$parameterId] ?? null,
+    //                         'method' => $request->method[$parameterId] ?? null,
+    //                     ]
+    //                 );
+    //             }
+    //         }
+
+    //         $parameterNames = Parameter::whereIn('id', $parameters)->pluck('name')->toArray();
+    //         $parameterNamesList = implode(', ', $parameterNames);
+
+    //         return redirect()->back()->with('msg', "Results saved successfully for Parameters: $parameterNamesList");
+    //     }
+
+    //     // Cek jika tombol 'save_all' ditekan
+    //     if ($action === 'save_all') {
+    //         // Menyimpan data field condition dan show logo
+    //         Sampling::updateOrCreate(
+    //             [
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //                 'no_sample' => '010',
+    //             ],
+    //             [
+    //                 'show_logo' => $request->input('show_logo', false),
+    //             ]
+    //         );
+
+    //         FieldCondition::updateOrCreate(
+    //             [
+    //                 'institute_id' => $institute->id,
+    //                 'institute_subject_id' => $instituteSubject->id,
+    //             ],
+    //             [
+    //                 'coordinate' => $request->input('coordinate'),
+    //                 'temperature' => $request->input('temperature'),
+    //                 'pressure' => $request->input('pressure'),
+    //                 'humidity' => $request->input('humidity'),
+    //                 'wind_speed' => $request->input('wind_speed'),
+    //                 'wind_direction' => $request->input('wind_direction'),
+    //                 'weather' => $request->input('weather'),
+    //                 'velocity' => $request->input('velocity'),
+    //             ]
+    //         );
+
+
+    //         return redirect()->route('result.list_result', $institute->id)
+    //             ->with('msg', 'Data and Logo saved successfully!');
+    //         }
+    //     }
+
+    //     $subject = Subject::where('id', $instituteSubject->subject_id)->first();
+    //     $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
+    //         ->pluck('regulation_id');
+    //     $regulations = Regulation::whereIn('id', $regulationsIds)->get();
+    //     $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
+    //         ->pluck('subject_id');
+    //     $subjects = Subject::whereIn('id', $subjectsIds)->get();
+    //     $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
+    //     $parametersIds = $parameters->pluck('id');
+    //     $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
+    //         ->with(['samplingTime', 'regulationStandards'])
+    //         ->get();
+    //     $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
+    //         ->where('no_sample', '010')
+    //         ->latest()
+    //         ->first();
+    //     $results = collect();
+    //     if ($samplings) {
+    //         $results = Result::where('sampling_id', $samplings->id)
+    //             ->whereIn('sampling_time_id', $samplingTimeRegulations->pluck('samplingTime.id')->filter())
+    //             ->whereIn('regulation_standard_id', $samplingTimeRegulations->pluck('regulationStandards.id')->filter())
+    //             ->get()
+    //             ->groupBy(function ($item) {
+    //                 return "{$item->parameter_id}-{$item->sampling_time_id}-{$item->regulation_standard_id}";
+    //             });
+    //     }
+
+    //     return view('result.workplace.add_10', compact(
+    //         'institute', 'parameters', 'samplingTimeRegulations', 'results',
+    //         'regulations', 'subject', 'instituteSubject', 'sampling', 'subjects'
+    //     ));
+    // }
 }
