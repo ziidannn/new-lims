@@ -241,7 +241,7 @@
                     <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
                 </tr>
                     <tr>
-                        <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
@@ -266,9 +266,7 @@
                     <td style="border: 1px solid; font-weight: bold;">Methods</td>
                 </tr>
 
-                @php
-                $counter = 1;
-                @endphp
+                @php $no = 1; @endphp
 
                 @foreach(collect($samplingTimeRegulations)->pluck('parameter')->unique()->sortBy('id') as $parameter)
                     @php
@@ -287,7 +285,7 @@
                     @if ($resultData->isNotEmpty())
                     <tr>
                         @if ($firstRow)
-                        <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $counter }}</td>
+                        <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $no++ }}</td>
                         <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->name }}</td>
                         @endif
                         <td style="border: 1px solid;">{{ $samplingTime->samplingTime->time }}</td>
@@ -303,9 +301,6 @@
                         @endphp
                     @endif
                 @endforeach
-                @php
-                    $counter++;
-                @endphp
                 @endforeach
             </table>
         </div>
@@ -404,7 +399,7 @@
                     <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
                 </tr>
                 <tr>
-                    <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
@@ -545,7 +540,7 @@
                     <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
                 </tr>
                 <tr>
-                    <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
@@ -630,7 +625,7 @@
                     <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
                 </tr>
                     <tr>
-                        <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
@@ -769,7 +764,7 @@
                     <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
                 </tr>
                     <tr>
-                        <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
@@ -908,7 +903,7 @@
                     <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
                 </tr>
                     <tr>
-                        <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
@@ -1049,7 +1044,7 @@
                     <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
                 </tr>
                     <tr>
-                        <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
@@ -1237,7 +1232,7 @@
                     <td style="border: 1px solid; font-weight: bold;">INTERVAL TESTING DATE</td>
                 </tr>
                     <tr>
-                        <td style="border: 1px solid;">{{ $sampling->no_sample ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>

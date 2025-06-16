@@ -127,7 +127,6 @@ class PDFController extends Controller
             'institute', 'parameters', 'samplingTimeRegulations', 'results','noiseResults', 'ilumiResults', 'htsResults',
             'instituteSubjects', 'sampling', 'fieldCondition', 'samplings', 'regulations','isNoise', 'groupedByParameter'
         ));
-
         // Mengaktifkan opsi PHP di dalam tampilan PDF
         $pdf->set_option("isPhpEnabled", true);
         return $pdf->stream("Preview_Pdf_Report{$id}.pdf");
