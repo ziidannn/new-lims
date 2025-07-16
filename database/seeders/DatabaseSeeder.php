@@ -30,10 +30,12 @@ class DatabaseSeeder extends Seeder
             RegulationSeeder::class,
             SamplingTimeSeeder::class,
             RegulationStandardSeeder::class,
+            ParameterCategorySeeder::class,
             ParameterSeeder::class,
             CustomerSeeder::class,
             SamplingTimeRegulationSeeder::class,
-            DirectorSeeder::class
+            DirectorSeeder::class,
+            RegulationStandardCategorySeeder::class,
         ]);
     }
 }

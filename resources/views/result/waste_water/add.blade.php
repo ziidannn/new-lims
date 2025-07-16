@@ -157,11 +157,143 @@
                         <tr>
                             <th class="text-center"><b>No</b></th>
                             <th class="text-center"><b>Parameters</b></th>
+                            <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Testing Result</b></th>
                             <th class="text-center"><b>Regulatory Standard</b></th>
-                            <th class="text-center"><b>Unit</b></th>
                             <th class="text-center"><b>Methods</b></th>
                             <th class="text-center"><b>Action</b></th>
+                        </tr>
+                        <tr>
+                            <th class="text-center"><b></b></th>
+                            <th colspan="6"><b>Physical Parameters:</b></th>
+                        </tr>
+                        @php $parameterNumber = 1; @endphp
+                        @foreach ($parameters->filter(function($parameter) {
+                        return $parameter->subject_id == 8 || $parameter->code_subject == '08' ||
+                        $parameter->subjects->name == 'Waste Water';
+                        }) as $parameter)
+                        <tr>
+                            <form class="card" action="{{ route('result.waste_water.add', $instituteSubject->id) }}"
+                                method="POST">
+                                @csrf
+                                <td class="text-center">{{ $parameterNumber++ }}</td>
+                                <td>
+                                    <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
+                                    <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
+                                        readonly>
+                                </td>
+                                @php
+                                    $resultObj = optional($results->get($parameter->id))->first();
+                                    $regulationStandard = optional(
+                                        $samplingTimeRegulations->where('parameter_id', $parameter->id)->first()
+                                    )->regulationStandards;
+                                @endphp
+
+                                <td>
+                                    <input type="text" class="form-control text-center"
+                                        name="testing_result[{{ $parameter->id }}]"
+                                        value="{{ old('testing_result.' . $parameter->id, $resultObj->testing_result ?? '') }}">
+                                    @if ($errors->has('testing_result.' . $parameter->id))
+                                        <span class="text-danger">{{ $errors->first('testing_result.' . $parameter->id) }}</span>
+                                    @endif
+                                </td>
+
+                                <td>
+                                    @if ($regulationStandard)
+                                        <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}]" value="{{ $regulationStandard->id }}">
+                                        <input type="text" class="form-control text-center" value="{{ $regulationStandard->title }}" readonly>
+                                    @endif
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center"
+                                        name="unit[{{ $parameter->id }}]" value="{{ $parameter->unit ?? '' }}" readonly>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center"
+                                        name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}"
+                                        readonly>
+                                </td>
+                                <td>
+                                    <div class="button-group">
+                                        <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                            name="action" value="save_parameter">Save</button>
+                                        <button type="button"
+                                            class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
+                                            data-parameter-id="{{ $parameter->id }}">
+                                            Hide
+                                        </button>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                        @endforeach
+                        <tr>
+                            <th class="text-center"><b></b></th>
+                            <th colspan="6"><b>Chemistry Parameters:</b></th>
+                        </tr>
+                        @php $parameterNumber = 1; @endphp
+                        @foreach ($parameters->filter(function($parameter) {
+                        return $parameter->subject_id == 8 || $parameter->code_subject == '08' ||
+                        $parameter->subjects->name == 'Waste Water';
+                        }) as $parameter)
+                        <tr>
+                            <form class="card" action="{{ route('result.waste_water.add', $instituteSubject->id) }}"
+                                method="POST">
+                                @csrf
+                                <td class="text-center">{{ $parameterNumber++ }}</td>
+                                <td>
+                                    <input type="hidden" name="parameter_id[]" value="{{ $parameter->id }}">
+                                    <input type="text" class="form-control text-center" value="{{ $parameter->name }}"
+                                        readonly>
+                                </td>
+                                @php
+                                    $resultObj = optional($results->get($parameter->id))->first();
+                                    $regulationStandard = optional(
+                                        $samplingTimeRegulations->where('parameter_id', $parameter->id)->first()
+                                    )->regulationStandards;
+                                @endphp
+
+                                <td>
+                                    <input type="text" class="form-control text-center"
+                                        name="testing_result[{{ $parameter->id }}]"
+                                        value="{{ old('testing_result.' . $parameter->id, $resultObj->testing_result ?? '') }}">
+                                    @if ($errors->has('testing_result.' . $parameter->id))
+                                        <span class="text-danger">{{ $errors->first('testing_result.' . $parameter->id) }}</span>
+                                    @endif
+                                </td>
+
+                                <td>
+                                    @if ($regulationStandard)
+                                        <input type="hidden" name="regulation_standard_id[{{ $parameter->id }}]" value="{{ $regulationStandard->id }}">
+                                        <input type="text" class="form-control text-center" value="{{ $regulationStandard->title }}" readonly>
+                                    @endif
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center"
+                                        name="unit[{{ $parameter->id }}]" value="{{ $parameter->unit ?? '' }}" readonly>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-center"
+                                        name="method[{{ $parameter->id }}]" value="{{ $parameter->method ?? '' }}"
+                                        readonly>
+                                </td>
+                                <td>
+                                    <div class="button-group">
+                                        <button class="btn btn-info btn-sm mt-1 custom-button custom-blue" type="submit"
+                                            name="action" value="save_parameter">Save</button>
+                                        <button type="button"
+                                            class="btn btn-outline-info btn-sm mt-1 custom-button hide-parameter"
+                                            data-parameter-id="{{ $parameter->id }}">
+                                            Hide
+                                        </button>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                        @endforeach
+                        <tr>
+                            <th class="text-center"><b></b></th>
+                            <th colspan="6"><b>Microbiology Parameters:</b></th>
                         </tr>
                         @php $parameterNumber = 1; @endphp
                         @foreach ($parameters->filter(function($parameter) {
