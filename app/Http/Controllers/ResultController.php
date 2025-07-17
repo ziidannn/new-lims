@@ -1415,7 +1415,7 @@ class ResultController extends Controller
 
         $regStandardsByParameter = [];
         foreach ($regStandards as $paramId => $standards) {
-            $regStandardsByParameter[$paramId] = $standards->pluck('value', 'code');
+            $regStandardsByParameter[$paramId] = $standards->pluck('regulation_standard_id', 'code');
         }
 
         $results = Result::where('sampling_id', $samplings->id)

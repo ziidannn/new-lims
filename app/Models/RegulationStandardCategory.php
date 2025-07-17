@@ -14,6 +14,6 @@ class RegulationStandardCategory extends Model
     protected $fillable = [
         'parameter_id',
         'code',
-        'value',
+        'regulation_standard_id',
     ];
 }

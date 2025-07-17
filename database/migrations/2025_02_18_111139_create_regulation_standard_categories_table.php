@@ -16,7 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('parameter_id')->nullable();
             $table->foreign('parameter_id')->references('id')->on('parameters')->onDelete('cascade');
             $table->string('code')->nullable();
-            $table->string('value')->nullable();
+            $table->unsignedBigInteger('regulation_standard_id')->nullable();
+            $table->foreign('regulation_standard_id')->references('id')->on('regulation_standards')->onDelete('cascade');
             $table->timestamps();
         });
     }
