@@ -28,21 +28,36 @@
 @endsection
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-        <li class="nav-item"><a class="nav-link active" href="{{ route('coa.subject.index') }}">
-            <i class="bx bx-add-to-queue me-1"></i>
-                Subject</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation.index') }}"><i
-                    class="bx bx-add-to-queue me-1"></i>
-                Regulation</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('coa.parameter.index') }}"><i
-                    class="bx bx-chart me-1"></i>
-                Parameter</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('coa.sampling_time.index') }}"><i
-                    class="bx bx-chart me-1"></i>
-                Sampling Time</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation_standard.index') }}"><i
-                    class="bx bx-chart me-1"></i>
-                Regulation Standard</a></li>
+        <li class="nav-item">
+            <a class="nav-link active" href="{{ route('coa.subject.index') }}">
+                <i class='bx bx-vial me-1'></i>
+                Subject
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('coa.regulation.index') }}">
+                <i class='bx bx-paper-plane me-1'></i>
+                Regulation
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('coa.parameter.index') }}">
+                <i class='bx bx-tachometer me-1'></i>
+                Parameter
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('coa.sampling_time.index') }}">
+                <i class='bx bx-time-five me-1'></i>
+                Sampling Time
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('coa.regulation_standard.index') }}">
+                <i class='bx bx-badge-check me-1'></i>
+                Regulation Standard
+            </a>
+        </li>
     </ul>
 </div>
 <div class="card">

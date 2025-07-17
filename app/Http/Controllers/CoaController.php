@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Parameter;
 use App\Models\Regulation;
 use App\Models\RegulationStandard;
+use App\Models\RegulationStandardCategory;
 use App\Models\Sampling;
 use App\Models\Subject;
 use App\Models\SamplingTime;
@@ -190,36 +191,6 @@ class CoaController extends Controller
     // Parameter
     public function parameter(Request $request)
     {
-        if ($request->isMethod('POST')) {
-            $this->validate($request, [
-                'name' => 'required',
-                'sampling_time_id' => 'required|array',
-                'regulation_standard_id' => 'required|array',
-                'unit' => 'required',
-                'method' => 'required',
-                'subject_id' => 'required'
-            ]);
-
-            // Simpan parameter utama
-            $parameter = Parameter::create([
-                'name' => $request->name,
-                'unit' => $request->unit,
-                'method' => $request->method,
-                'subject_id' => $request->subject_id, // Tambahkan subject_id
-            ]);
-
-            // Simpan multiple sampling_time_id dan regulation_standard_id
-            foreach ($request->sampling_time_id as $key => $samplingTimeId) {
-                SamplingTimeRegulation::create([
-                    'parameter_id' => $parameter->id,
-                    'sampling_time_id' => $samplingTimeId,
-                    'regulation_standard_id' => $request->regulation_standard_id[$key]
-                ]);
-            }
-
-            return redirect()->route('coa.parameter.index')->with('msg', 'Data berhasil ditambahkan');
-        }
-
         $data = Parameter::all();
         $subjects = Subject::orderBy('name')->get();
         $samplingTime = SamplingTime::orderBy('time')->get();
@@ -230,25 +201,38 @@ class CoaController extends Controller
         ));
     }
     // Add Parameter
-    public function add_parameter(Request $request)
-    {
+    public function add_parameter(Request $request){
         if ($request->isMethod('POST')) {
-            $this->validate($request, [
-                'unit' => ['required'],
-                'method' => ['required'],
+            // 1. Tentukan aturan validasi dasar
+            $rules = [
                 'subject_id' => ['required'],
-            ]);
+                'name' => ['required', 'string', 'max:175'],
+                'unit' => ['required', 'string'],
+                'method' => ['required', 'string'],
+            ];
 
-            // Cek apakah subject yang dipilih adalah '01' (misalnya Ambient Air)
+            // 2. Tambahkan aturan validasi kondisional
             $subject = Subject::find($request->subject_id);
-
             if ($subject && $subject->subject_code === '01') {
-                $request->validate([
-                    'name' => ['required'],
-                    'sampling_time_id' => ['required', 'array'],
-                    'regulation_standard_id' => ['required', 'array'],
-                ]);
+                $rules['sampling_time_id'] = ['required', 'array'];
+                $rules['regulation_standard_id'] = ['required', 'array'];
             }
+
+            // 3. Jalankan validasi
+            $this->validate($request, $rules);
+
+            // 4. Validasi kustom untuk regulation class (jika diperlukan)
+            $regClasses = $request->input('regulation_class');
+            if ($subject && in_array($subject->subject_code, ['08', '10'])) {
+                // Cek jika semua input regulation_class kosong
+                if (!collect($regClasses)->filter()->count()) {
+                    return redirect()->back()
+                        ->withErrors(['regulation_class' => 'Untuk subject ini, minimal satu isian Regulation Standard Class diperlukan.'])
+                        ->withInput();
+                }
+            }
+
+            // ... sisa logika Anda untuk menyimpan data sudah benar ...
 
             $parameter = Parameter::create([
                 'name' => $request->name,
@@ -259,11 +243,25 @@ class CoaController extends Controller
 
             if ($subject && $subject->subject_code === '01') {
                 foreach ($request->sampling_time_id as $key => $samplingTimeId) {
-                    SamplingTimeRegulation::create([
-                        'parameter_id' => $parameter->id,
-                        'sampling_time_id' => $samplingTimeId,
-                        'regulation_standard_id' => $request->regulation_standard_id[$key],
-                    ]);
+                    if(!empty($samplingTimeId) && !empty($request->regulation_standard_id[$key])) {
+                        SamplingTimeRegulation::create([
+                            'parameter_id' => $parameter->id,
+                            'sampling_time_id' => $samplingTimeId,
+                            'regulation_standard_id' => $request->regulation_standard_id[$key],
+                        ]);
+                    }
+                }
+            }
+
+            if ($request->has('regulation_class')) {
+                foreach ($request->regulation_class as $code => $value) {
+                    if (!empty($value)) {
+                        RegulationStandardCategory::create([
+                            'parameter_id' => $parameter->id,
+                            'code' => $code,
+                            'value' => $value
+                        ]);
+                    }
                 }
             }
 
@@ -271,7 +269,7 @@ class CoaController extends Controller
         }
 
         $data = Parameter::all();
-        $subjects = Subject::orderBy('name')->get();
+        $subjects = Subject::orderBy('subject_code')->get();
         $samplingTime = SamplingTime::orderBy('time')->get();
         $regulationStandards = RegulationStandard::orderBy('title')->get();
 
@@ -279,53 +277,87 @@ class CoaController extends Controller
     }
 
     // Edit Parameter
-    public function edit_parameter(Request $request, $id)
-    {
-        $data = Parameter::findOrFail($id);
+    public function edit_parameter(Request $request, $id){
+        $data = Parameter::with('subjects', 'regulationStandardCategories')->findOrFail($id);
 
         if ($request->isMethod('POST')) {
-            $this->validate($request, [
-                'name' => 'required',
-                'sampling_time_id' => 'required|array',
-                'regulation_standard_id' => 'required|array',
-                'unit' => 'required',
-                'method' => 'required',
-                // 'regulation_id' => 'required'
-            ]);
+            // === VALIDASI KONDISIONAL ===
+            $rules = [
+                'name' => ['required', 'string', 'max:175'],
+                'unit' => ['required', 'string'],
+                'method' => ['required', 'string'],
+                'subject_id' => ['required'],
+            ];
 
-            // Update data utama di tabel `parameters`
-            $data->update([
-                'name' => $request->name,
-                'unit' => $request->unit,
-                'method' => $request->method,
-                // 'regulation_id' => $request->regulation_id
-            ]);
-
-            // Hapus data lama di tabel `sampling_time_regulations`
-            SamplingTimeRegulation::where('parameter_id', $id)->delete();
-
-            // Simpan data baru dari multiple input sampling_time_id dan regulation_standard_id
-            foreach ($request->sampling_time_id as $key => $samplingTimeId) {
-                SamplingTimeRegulation::create([
-                    'parameter_id' => $data->id,
-                    'sampling_time_id' => $samplingTimeId,
-                    'regulation_standard_id' => $request->regulation_standard_id[$key]
-                ]);
+            // Validasi kondisional berdasarkan Subject yang DIPILIH di form
+            $subject = Subject::find($request->subject_id);
+            if ($subject && $subject->subject_code === '01') {
+                $rules['sampling_time_id'] = ['required', 'array', 'min:1'];
+                $rules['regulation_standard_id'] = ['required', 'array', 'min:1'];
             }
 
-            return redirect()->route('coa.parameter.index')->with('msg', 'Parameter updated successfully.');
+            if ($subject && in_array($subject->subject_code, ['08', '10'])) {
+                $regClasses = $request->input('regulation_class');
+                if (!collect($regClasses)->filter()->count()) {
+                    return redirect()->back()
+                        ->withErrors(['regulation_class' => 'Untuk subject ini, minimal satu isian Regulation Standard Class diperlukan.'])
+                        ->withInput();
+                }
+            }
+            $this->validate($request, $rules);
+
+            // === PROSES UPDATE ===
+            $data->update($request->only(['name', 'unit', 'method', 'subject_id']));
+
+            // 1. Update Sampling Time & Regulation Standard (jika subject '01')
+            SamplingTimeRegulation::where('parameter_id', $id)->delete(); // Hapus yang lama dulu
+            if ($subject && $subject->subject_code === '01') {
+                if ($request->has('sampling_time_id')) {
+                    foreach ($request->sampling_time_id as $key => $samplingTimeId) {
+                        if (!empty($samplingTimeId) && !empty($request->regulation_standard_id[$key])) {
+                            SamplingTimeRegulation::create([
+                                'parameter_id' => $data->id,
+                                'sampling_time_id' => $samplingTimeId,
+                                'regulation_standard_id' => $request->regulation_standard_id[$key],
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            // 2. Update Regulation Standard per Class
+            RegulationStandardCategory::where('parameter_id', $id)->delete(); // Hapus yang lama dulu
+            if ($request->has('regulation_class')) {
+                foreach ($request->regulation_class as $code => $value) {
+                    if (!empty($value)) {
+                        RegulationStandardCategory::create([
+                            'parameter_id' => $data->id,
+                            'code' => $code,
+                            'value' => $value
+                        ]);
+                    }
+                }
+            }
+
+            return redirect()->route('coa.parameter.index')->with('msg', 'Parameter (' . $data->name . ') updated successfully.');
         }
 
-        // Ambil semua data terkait untuk dropdown
-        // $regulation = Regulation::orderBy('title')->get();
+        // === MENGIRIM DATA KE VIEW ===
+        $subjects = Subject::orderBy('subject_code')->get();
         $samplingTime = SamplingTime::orderBy('time')->get();
         $regulationStandards = RegulationStandard::orderBy('title')->get();
-
-        // Ambil data yang sudah ada dari tabel `sampling_time_regulations`
         $existingSamplingTimes = SamplingTimeRegulation::where('parameter_id', $id)->get();
 
+        // Ambil data Regulation Class yang sudah ada dan ubah menjadi array asosiatif
+        $existingRegClasses = $data->regulationStandardCategories->pluck('value', 'code')->toArray();
+
         return view('coa.parameter.edit', compact(
-            'data', 'samplingTime', 'regulationStandards', 'existingSamplingTimes'
+            'data',
+            'subjects',
+            'samplingTime',
+            'regulationStandards',
+            'existingSamplingTimes',
+            'existingRegClasses' // Kirim data ini ke view
         ));
     }
 
@@ -347,21 +379,29 @@ class CoaController extends Controller
     }
 
     //data_parameter
-    public function data_parameter(Request $request)
-    {
-        $data = Parameter::with([
+    public function data_parameter(Request $request){
+        // Mulai dengan query dasar
+        $query = Parameter::with([
             'subjects:id,name,subject_code',
             'samplingTimeRegulations.samplingTime:id,time',
             'samplingTimeRegulations.regulationStandards:id,title'
-        ])->select('*')->orderBy("id")->get();
+        ]);
+
+        // Tambahkan filter jika subject dipilih dari dropdown
+        if ($request->filled('select_description')) {
+            $query->where('subject_id', $request->select_description);
+        }
+
+        // Eksekusi query
+        $data = $query->select('*')->orderBy("id")->get();
 
         return DataTables::of($data)
             ->addColumn('samplingTime', function ($row) {
-                $samplingTimes = $row->samplingTimeRegulations->pluck('samplingTime.time')->toArray();
+                $samplingTimes = $row->samplingTimeRegulations->pluck('samplingTime.time')->filter()->unique()->toArray();
                 return !empty($samplingTimes) ? implode(', ', $samplingTimes) : '-';
             })
             ->addColumn('regulationStandards', function ($row) {
-                $regulationStandards = $row->samplingTimeRegulations->pluck('regulationStandards.title')->toArray();
+                $regulationStandards = $row->samplingTimeRegulations->pluck('regulationStandards.title')->filter()->unique()->toArray();
                 return !empty($regulationStandards) ? implode(', ', $regulationStandards) : '-';
             })
             ->rawColumns(['samplingTime', 'regulationStandards'])
@@ -371,8 +411,7 @@ class CoaController extends Controller
     //----------------------------------- S A M P L I N G  T I M E ------------------------------------------//
 
     //sampling_time
-    public function sampling_time(Request $request)
-    {
+    public function sampling_time(Request $request){
         if ($request->isMethod('POST')) {
             $this->validate($request, [
                 'time' => ['required'],

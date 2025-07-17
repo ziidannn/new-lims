@@ -38,8 +38,8 @@ class Parameter extends Model
     {
         return $this->belongsTo(ParameterCategory::class, 'parameter_category_id', 'id');
     }
-    public function regulatoryStandardCategory()
+    public function regulationStandardCategories()
     {
-        return $this->belongsTo(RegulationStandardCategory::class, 'regulation_standard_category_id', 'id');
+        return $this->hasMany(RegulationStandardCategory::class, 'parameter_id');
     }
 }

@@ -32,21 +32,36 @@
 @endsection
 <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-sm-row mb-4">
-        <li class="nav-item"><a class="nav-link" href="{{ route('coa.subject.index') }}">
-            <i class="bx bx-add-to-queue me-1"></i>
-                Subject</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation.index') }}"><i
-                    class="bx bx-add-to-queue me-1"></i>
-                Regulation</a></li>
-        <li class="nav-item"><a class="nav-link active" href="{{ route('coa.parameter.index') }}"><i
-                    class="bx bx-chart me-1"></i>
-                Parameter</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('coa.sampling_time.index') }}"><i
-                    class="bx bx-chart me-1"></i>
-                Sampling Time</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('coa.regulation_standard.index') }}"><i
-                    class="bx bx-chart me-1"></i>
-                Regulation Standard</a></li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('coa.subject.index') }}">
+                <i class='bx bx-vial me-1'></i>
+                Subject
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('coa.regulation.index') }}">
+                <i class='bx bx-paper-plane me-1'></i>
+                Regulation
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="{{ route('coa.parameter.index') }}">
+                <i class='bx bx-tachometer me-1'></i>
+                Parameter
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('coa.sampling_time.index') }}">
+                <i class='bx bx-time-five me-1'></i>
+                Sampling Time
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('coa.regulation_standard.index') }}">
+                <i class='bx bx-badge-check me-1'></i>
+                Regulation Standard
+            </a>
+        </li>
     </ul>
 </div>
 <div class="card">
@@ -54,18 +69,14 @@
         <div class="card-header">
             <div class="row">
                 <div class="col-md-3">
-                    <select id="select_description" class="form-control input-sm select2"
-                        data-placeholder="Description">
-                        <option value="">Select Description</option>
+                    {{-- Ganti id dan isi options dari variabel $subjects --}}
+                    <select id="select_subject" class="form-control input-sm select2" data-placeholder="Subjects">
+                        <option value="">-- Select Subjects --</option>
+                        @foreach($subjects as $subject)
+                            <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                        @endforeach
                     </select>
                 </div>
-                <!-- <div class="col-md d-flex justify-content-center justify-content-md-end">
-                    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#newrecord"
-                        aria-controls="offcanvasEnd" tabindex="0" aria-controls="DataTables_Table_0"
-                        title="Add Standard Criteria" type="button"><span><i class="bx bx-plus me-sm-2"></i>
-                            <span>Add</span></span>
-                    </button>
-                </div> -->
                 <div class="col-md d-flex justify-content-center justify-content-md-end">
                         <a class="btn btn-primary btn-block btn-mail" title="Add new"
                             href="{{ route('parameter.add_parameter')}}">
@@ -246,7 +257,7 @@
                 url: "{{ route('coa.parameter.data_parameter') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
-                        d.select_description = $('#select_description').val()
+                    d.select_description = $('#select_subject').val()
                 },
             },
             columnDefs: [{
@@ -368,7 +379,7 @@
                 }
             ]
         });
-        $('#select_description').change(function () {
+        $('#select_subject').change(function () {
             table.draw();
         });
     });
