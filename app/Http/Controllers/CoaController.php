@@ -15,14 +15,13 @@ use Yajra\DataTables\Facades\DataTables;
 
 class CoaController extends Controller
 {
-
     // Subject
-    public function subject()
-    {
-        $data = Subject::all();
-        return view('coa.subject.index', compact('data'));
+    public function subject(){
+        $subjects = Subject::all();
+        return view('coa.subject.index', compact('subjects'));
     }
 
+    // Create_Subject
     public function create_subject(Request $request)
     {
         if ($request->isMethod('post')) { // 'post' harus dalam lowercase
@@ -72,20 +71,28 @@ class CoaController extends Controller
     }
 
     // Data_Subject
-    public function data_subject(Request $request)
-    {
-        $data = Subject::all();
-        return DataTables::of($data)
-            ->filter(function ($instance) use ($request) {
-                if (!empty($request->get('search'))) {
-                    $search = $request->get('search');
-                    $instance->where(function ($w) use ($search) {
-                        $w->orWhere('subject_code', 'LIKE', "%$search%")
-                            ->orWhere('name', 'LIKE', "%$search%");
-                    });
-                }
-            })
-            ->make(true);
+    public function data_subject(Request $request){
+        // 1. Mulai dengan Query Builder, bukan ->all()
+        $query = Subject::query();
+
+        // 2. Terapkan filter dari dropdown "Select Subjects"
+        if ($request->filled('select_description')) {
+            $query->where('id', $request->input('select_description'));
+        }
+
+        // 3. Terapkan filter dari kotak pencarian utama DataTables
+        if ($request->filled('search.value')) {
+            $search = $request->input('search.value');
+            $query->where(function ($w) use ($search) {
+                $w->orWhere('subject_code', 'LIKE', "%{$search}%")
+                ->orWhere('name', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // 4. Kirim query yang sudah difilter ke DataTables
+        return DataTables::of($query)
+        ->addIndexColumn() // <-- Cukup tambahkan baris ini
+        ->make(true);
     }
 
     //----------------------------------------------- R E G U L A T I O N ----------------------------------------------------//
@@ -158,32 +165,35 @@ class CoaController extends Controller
     }
 
     //data_regulation
-    public function data_regulation(Request $request)
-    {
-        $data = Regulation::with(['subjects' => function ($query) {
-            $query->select('id','name');
-        }])
-        ->select('*')
-        ->orderBy("id")
-        ->get();
-        return DataTables::of($data)
-            ->filter(function ($instance) use ($request) {
-                if (!empty($request->get('select_subjects'))) {
-                    $instance->whereHas('Subjects', function ($q) use ($request) {
-                        $q->where('sample_subjects.id', $request->get('select_subjects'));
-                    });
-                }
-                if (!empty($request->get('search'))) {
-                    $search = $request->get('search');
-                    $instance->where(function ($w) use ($search) {
-                        $w->orWhere('no_sample', 'LIKE', "%$search%")
-                            ->orWhere('date', 'LIKE', "%$search%")
-                            ->orWhereHas('Subjects', function ($q) use ($search) {
-                                $q->where('name', 'LIKE', "%$search%");
-                            });
-                    });
-                }
-            })
+    public function data_regulation(Request $request){
+        // 1. Mulai dengan Query Builder, JANGAN gunakan ->get() dulu
+        $query = Regulation::with(['subjects' => function ($query) {
+            $query->select('subjects.id', 'subjects.name'); // Lebih spesifik untuk menghindari ambiguitas
+        }]);
+
+        // 2. Terapkan filter dari dropdown "Select Subjects"
+        // Menggunakan whereHas untuk memfilter berdasarkan relasi
+        if ($request->filled('select_subjects')) {
+            $query->whereHas('subjects', function ($q) use ($request) {
+                $q->where('subjects.id', $request->input('select_subjects'));
+            });
+        }
+
+        // 3. Terapkan filter dari kotak pencarian utama DataTables
+        if ($request->filled('search.value')) {
+            $search = $request->input('search.value');
+            $query->where(function ($w) use ($search) {
+                $w->orWhere('regulation_code', 'LIKE', "%{$search}%")
+                ->orWhere('title', 'LIKE', "%{$search}%")
+                ->orWhereHas('subjects', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%");
+                });
+            });
+        }
+
+        // 4. Kirim query yang sudah difilter ke DataTables dan tambahkan kolom nomor
+        return DataTables::of($query)
+            ->addIndexColumn() // Menambahkan kolom nomor urut yang konsisten
             ->make(true);
     }
 

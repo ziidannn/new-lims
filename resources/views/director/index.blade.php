@@ -99,44 +99,10 @@
                     </table>
                 </div>
             </div>
-<<<<<<< HEAD
-
-
-            <!-- Card Header Title -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 class="card-title"><b>Manage Directors</b></h3>
-                    <hr>
-                    <form action="{{ route('director.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="name" class="form-label"><b>Director Name:</b></label>
-                            <input type="text" class="form-control p-2" id="name" name="name" required
-                                placeholder="Enter director name" value="{{ old('name', $director->name ?? '') }}">
-                        </div>
-
-                        <div class="mb-3">
-            
-                            <label for="ttd" class="form-label"><b>Upload Signature (Max 15MB):</b></label>
-                            <input type="file" class="form-control p-2" id="ttd" name="ttd" accept="image/png, image/jpeg">
-                            @if(isset($director->ttd))
-                                <br>
-                                <img src="{{ asset($director->ttd) }}" width="120px" class="mt-2" alt="Signature">
-                            @endif
-                        </div>
-
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-=======
->>>>>>> 4a11a7d381dd1a2be647a9306988a86b22236334
         </div>
     </div>
 </div>
+
 @endsection
 <script>
     function openImagePopup(event, imageUrl) {

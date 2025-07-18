@@ -88,7 +88,7 @@ class InstituteController extends Controller
     public function edit(Request $request, $id)
     {
         $data = Institute::with('customer', 'Subjects.instituteRegulations.regulation')->findOrFail($id);
-        $description = Subject::orderBy('name')->get();
+        $description = Subject::orderBy('subject_code')->get();
         $customer = Customer::all();
 
         if ($request->has('subject_id')) {

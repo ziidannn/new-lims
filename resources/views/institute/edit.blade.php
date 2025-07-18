@@ -31,10 +31,6 @@
 
 </style>
 @endsection
-
-@section('breadcrumb-title')
-<!-- <h3>User Profile</h3> -->
-@endsection
 @section('content')
 <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
     <div class="row">
@@ -200,14 +196,16 @@
                         <select name="subject_id[]" class="form-select select2-modal subject-select" required>
                             <option value="">Select Sample Description</option>
                             @foreach ($description as $desc)
-                                <option value="{{ $desc->id }}">{{ $desc->name }}</option>
+                                <option value="{{ $desc->id }}">{{ $desc->subject_code }} - {{ $desc->name }}</option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="col-md-5">
                         <select name="regulations[${index}][]" class="form-select select2-modal regulation-select" multiple required>
-                            <option value="">Select Regulation</option>
+                            @foreach ($regulation as $rg)
+                                <option value="{{ $rg->id }}">{{ $rg->regulation_code }} - {{ $rg->title }}</option>
+                            @endforeach
                         </select>
                     </div>
 

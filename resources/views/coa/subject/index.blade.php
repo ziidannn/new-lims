@@ -65,9 +65,12 @@
         <div class="card-header">
             <div class="row">
                 <div class="col-md-3">
-                    <select id="select_subjects" class="form-control input-sm select2"
-                        data-placeholder="subjects">
-                        <option value="">Select subjects</option>
+                    {{-- Ganti id dan isi options dari variabel $subjects --}}
+                    <select id="select_subject" class="form-control input-sm select2" data-placeholder="Subjects">
+                        <option value="">-- Select Subjects --</option>
+                        @foreach($subjects as $subject)
+                            <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md d-flex justify-content-center justify-content-md-end">
@@ -222,14 +225,15 @@
                 url: "{{ route('coa.subject.data_subject') }}",
                 data: function (d) {
                     d.search = $('input[type="search"]').val(),
-                        d.select_subjects = $('#select_subjects').val()
+                    d.select_description = $('#select_subject').val()
                 },
             },
             columnDefs: [{
                 "defaultContent": "-",
                 "targets": "_all"
             }],
-            columns: [{
+            columns: [
+                {
                     render: function (data, type, row, meta) {
                         var no = (meta.row + meta.settings._iDisplayStart + 1);
                         return no;
@@ -282,7 +286,7 @@
                 // }
             ]
         });
-        $('#select_subjects').change(function () {
+        $('#select_subject').change(function () {
             table.draw();
         });
     });

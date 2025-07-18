@@ -93,13 +93,16 @@
                         @endcan
                     </ul>
                 </li>
+                @endcan
+                @can('setting/manage_coa.read')
                 <li class="menu-item {{ request()->segment(2) == 'manage_coa' ? 'open active' : '' }}">
                     <a href="" class="menu-link menu-toggle">
                         <div>Manage Coa</div>
                     </a>
                     <ul class="menu-sub">
-                        @can('setting/manage_account/users.read')
-                        <li class="menu-item {{ request()->segment(1) == 'coa' ? 'active' : '' }}">
+                        @can('setting/manage_coa/coa.read')
+                        {{-- Ini akan aktif untuk route 'coa.subject.index', 'coa.parameter.index', dll. --}}
+                        <li class="menu-item {{ request()->segment(3) == 'coa' ? 'active' : '' }}">
                             <a href="{{ route('coa.subject.index') }}" class="menu-link">
                                 <div data-i18n="coa">COA</div>
                             </a>
@@ -108,13 +111,14 @@
                     </ul>
                 </li>
                 @endcan
+                @can('setting/manage_director.read')
                 <li class="menu-item {{ request()->segment(2) == 'manage_director' ? 'open active' : '' }}">
                     <a href="" class="menu-link menu-toggle">
                         <div>Manage Director</div>
                     </a>
                     <ul class="menu-sub">
-                        @can('setting/manage_account/users.read')
-                        <li class="menu-item {{ request()->segment(1) == 'director' ? 'active' : '' }}">
+                        @can('setting/manage_director/director.read')
+                        <li class="menu-item {{ request()->segment(3) == 'director' ? 'active' : '' }}">
                             <a href="{{ route('director.index') }}" class="menu-link">
                                 <div data-i18n="director">Director</div>
                             </a>
@@ -122,6 +126,7 @@
                         @endcan
                     </ul>
                 </li>
+                @endcan
             </ul>
         </li>
         @endcan
