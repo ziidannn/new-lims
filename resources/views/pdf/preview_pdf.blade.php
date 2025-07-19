@@ -288,7 +288,7 @@
                         <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $no++ }}</td>
                         <td style="border: 1px solid;" rowspan="{{ $rowspan }}">{{ $parameter->name }}</td>
                         @endif
-                        <td style="border: 1px solid;">{{ $samplingTime->samplingTime->time }}</td>
+                        <td style="border: 1px solid;">{{ $samplingTime->samplingTime->time ?? '-' }}</td>
                         <td style="border: 1px solid;">{{ $resultData->pluck('testing_result')->implode(', ') }}</td>
                         <td style="border: 1px solid;">{{ $regulationStandard ? $regulationStandard->title : '-' }}</td>
                         @if ($firstRow)
@@ -589,7 +589,7 @@
     })->isNotEmpty();
     @endphp
 @if($hasNoiseData)
-@foreach($samplings->whereNotNull('sampling_location') as $sampling)
+@foreach($samplings->whereNotNull('sampling_location') as $sampling)    
     @if($sampling->instituteSubject && $sampling->instituteSubject->subject && $sampling->instituteSubject->subject->name === 'Noise*')
     <div class="page_break"></div>
     <div>

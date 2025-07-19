@@ -77,24 +77,22 @@ class PDFController extends Controller
 
             // ✅ Ambil khusus NOISE pakai query yang kamu mau
             $noiseResults = DB::table('results')
-            ->select(
-                'sampling_id',
-                'location',
+            ->select('sampling_id','location',
                 DB::raw('GROUP_CONCAT(leq ORDER BY id) as leq_values'),
-                'ls', 'lm', 'lsm', 'unit', 'method', 'regulatory_standard')
+                'ls', 'lm', 'lsm', 'regulatory_standard')
             ->whereNull('parameter_id')
             ->whereNull('sampling_time_id')
-            ->groupBy('sampling_id', 'location','ls', 'lm', 'lsm', 'unit', 'method', 'regulatory_standard')
+            ->groupBy('sampling_id', 'location','ls', 'lm', 'lsm', 'regulatory_standard')
             ->get()
             ->groupBy('sampling_id');
             // dd($noiseResults->toArray());
 
             // ✅ Ambil khusus  & ILUMIATION* pakai query yang kamu mau
             $ilumiResults = DB::table('results')
-            ->select('sampling_id', 'time', 'testing_result', 'location', 'unit', 'method', 'regulatory_standard')
+            ->select('sampling_id', 'time', 'testing_result', 'location', 'regulatory_standard')
             ->whereNull('parameter_id')
             ->whereNull('sampling_time_id')
-            ->groupBy('sampling_id', 'time', 'testing_result', 'location', 'unit', 'method', 'regulatory_standard')
+            ->groupBy('sampling_id', 'time', 'testing_result', 'location', 'regulatory_standard')
             ->get()
             ->groupBy('sampling_id');
             // dd($ilumiResults->toArray());

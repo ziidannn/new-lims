@@ -491,7 +491,7 @@ class ResultController extends Controller
 
         // --- BAGIAN METHOD GET (MENYIAPKAN DATA UNTUK VIEW) ---
         $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)->firstOrNew();
-        $noiseParameters = Parameter::where('subject_id', $subject->id)->get();
+        $noiseParameters = Parameter::where('subject_id', $subject->id)->get();//buat ambil unit metode
         $standardParameter = $noiseParameters->where('name', '!=', 'Sulfur Dioxide (SO₂)*')->first();
         $param24h = $noiseParameters->where('name', '!=','Sulfur Dioxide (SO₂)*')->first();
 

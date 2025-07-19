@@ -358,7 +358,7 @@ class ParameterSeeder extends Seeder
                 "id" => "38",
                 "subject_id" => "5",
                 "parameter_category_id" => "4",
-                "name" => "",
+                "name" => "-",
                 "unit" => "Lux",
                 "method" => "SNI 7062:2019"
             ],
@@ -379,6 +379,7 @@ class ParameterSeeder extends Seeder
                 "subject_id" => "7",
                 "parameter_category_id" => "4",
                 "name" => "Sulfur Dioxide (SO₂)*",
+                "unit" => "mg/m3",
                 "method" => "IK-6.4.19 (Direct Reading)"
             ],
             [
@@ -402,6 +403,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "43",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Dioxide (NO2)",
                 "unit" => "mg/m3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -410,6 +412,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "44",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Opacity",
                 "unit" => "%",
                 "method" => "SNI 19-7117.11-2005"
@@ -418,6 +421,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "45",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Carbon Monoxide (CO)*",
                 "unit" => "mg/m3",
                 "method" => "SNI 19.7117.10-2005"
@@ -426,6 +430,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "46",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Particulate",
                 "unit" => "mg/m3",
                 "method" => "SNI 7117.17:2009"
@@ -434,6 +439,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "47",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Sulfur Dioxide (SO2)*",
                 "unit" => "mg/m3",
                 "method" => "IK–6.4.19 (Direct Reading)"
@@ -442,6 +448,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "48",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Dioxide (NO2)",
                 "unit" => "mg/m3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -450,6 +457,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "49",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Opacity",
                 "unit" => "%",
                 "method" => "SNI 19-7117.11-2005"
@@ -458,6 +466,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "50",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Particulate",
                 "unit" => "mg/m3",
                 "method" => "SNI 19-7117.12-2005"
@@ -466,6 +475,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "51",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Sulfur Dioxide (SO2)*",
                 "unit" => "mg/m3",
                 "method" => "IK–6.4.19 (Direct Reading)"
@@ -474,6 +484,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "52",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Dioxide (NO2)",
                 "unit" => "mg/m3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -590,6 +601,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "65",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Sulfur Dioxide (SO2)*",
                 "unit" => "mg/m3",
                 "method" => "IK–6.4.19 (Direct Reading)"
@@ -598,6 +610,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "66",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Dioxide (NO2)",
                 "unit" => "mg/m3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -606,6 +619,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "67",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Particulate*",
                 "unit" => "mg/m3",
                 "method" => "SNI 19-7117.12-2005"
@@ -614,6 +628,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "68",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Ammonia (NH3)*",
                 "unit" => "mg/m3",
                 "method" => "SNI 19-7117.6-2005"
@@ -622,6 +637,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "69",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Chlorine (Cl2)*",
                 "unit" => "mg/m3",
                 "method" => "IK.7.4.25 (Spectrophotometry)"
@@ -630,6 +646,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "70",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Hydrogen Chloride (HCl)*",
                 "unit" => "mg/m3",
                 "method" => "SNI 19-7117.8-2005"
@@ -638,6 +655,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "71",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Hydrogen Fluoride (HF)",
                 "unit" => "mg/m3",
                 "method" => "SNI 19-7117.9-2005"
@@ -646,6 +664,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "72",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Dioxide (NO2)",
                 "unit" => "mg/m3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -654,6 +673,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "73",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Opacity",
                 "unit" => "%",
                 "method" => "SNI 19-7117.11-2005"
@@ -662,6 +682,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "74",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Particulate",
                 "unit" => "mg/m3",
                 "method" => "SNI 19-7117.12-2005"
@@ -670,6 +691,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "75",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Sulfur Dioxide (SO2)*",
                 "unit" => "mg/m3",
                 "method" => "IK–6.4.19 (Direct Reading)"
@@ -678,6 +700,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "76",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Total Lead (Pb)",
                 "unit" => "mg/m3",
                 "method" => "ICP-OES"
@@ -686,6 +709,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "77",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Sulfur Dioxide (SO2)*",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.19 (Direct Reading)"
@@ -694,6 +718,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "78",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Dioxide (NOx)*",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -702,6 +727,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "79",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Carbon Monoxide (CO)*",
                 "unit" => "mg/Nm3",
                 "method" => "SNI 19.7117.10-2005"
@@ -710,6 +736,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "80",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Particulate",
                 "unit" => "mg/Nm3",
                 "method" => "SNI 19-7117.12-2005"
@@ -718,6 +745,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "81",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Opacity",
                 "unit" => "%",
                 "method" => "SNI 19-7117.11-2005"
@@ -726,6 +754,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "82",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Oxides (NOx)*",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -734,6 +763,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "83",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Carbon Monoxide (CO)*",
                 "unit" => "mg/Nm3",
                 "method" => "SNI 19.7117.10-2005"
@@ -742,6 +772,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "84",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Sulfur Dioxide (SO2)*",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.19 (Direct Reading)"
@@ -750,6 +781,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "85",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Particulate",
                 "unit" => "mg/Nm3",
                 "method" => "SNI 19-7117.12-2005"
@@ -758,6 +790,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "86",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Oxygen (O2)*",
                 "unit" => "%",
                 "method" => "SNI 19-7117.10-2005"
@@ -766,6 +799,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "87",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Percent (%) of Isokinetic*",
                 "unit" => "%",
                 "method" => "SNI 7117.17-2009"
@@ -774,6 +808,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "88",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Volumetric Flow Rate*",
                 "unit" => "m3/s",
                 "method" => "SNI 7117.14-2009"
@@ -782,6 +817,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "89",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Number Of Traverse Point*",
                 "unit" => "-",
                 "method" => "SNI 7117.13-2009"
@@ -790,6 +826,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "90",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Oxides (NOx)*",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -798,6 +835,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "91",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Carbon Monoxide (CO)*",
                 "unit" => "mg/Nm3",
                 "method" => "SNI 19.7117.10-2005"
@@ -806,6 +844,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "92",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Sulfur Dioxide (SO2)*",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.19 (Direct Reading)"
@@ -814,6 +853,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "93",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Particulate",
                 "unit" => "mg/Nm3",
                 "method" => "SNI 19-7117.12-2005"
@@ -822,6 +862,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "94",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Particulate",
                 "unit" => "mg/Nm3",
                 "method" => "SNI 19-7117.12-2005"
@@ -830,6 +871,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "95",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Dioxide (NO2)",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -838,6 +880,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "96",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Sulfur Dioxide (SO2)*",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.19 (Direct Reading)"
@@ -846,6 +889,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "97",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Opacity",
                 "unit" => "%",
                 "method" => "SNI 19-7117.11-2005"
@@ -854,6 +898,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "98",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Dioxide (NOx)*",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -862,6 +907,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "99",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Particulate",
                 "unit" => "mg/Nm3",
                 "method" => "SNI 19-7117.12-2005"
@@ -870,6 +916,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "100",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Oxide (NOx)*",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -878,6 +925,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "101",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Carbon Monoxide (CO)*",
                 "unit" => "mg/Nm3",
                 "method" => "SNI 19.7117.10-2005"
@@ -886,6 +934,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "102",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Oxygen (O2)*",
                 "unit" => "%",
                 "method" => "SNI 19.7117.10-2005"
@@ -894,6 +943,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "103",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Nitrogen Oxide (NOx)*",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.18 (Direct Reading)"
@@ -902,6 +952,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "104",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Carbon Monoxide (CO)*",
                 "unit" => "mg/Nm3",
                 "method" => "SNI 19.7117.10-2005"
@@ -910,6 +961,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "105",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Particulate*",
                 "unit" => "mg/Nm3",
                 "method" => "SNI 7117.17:2009"
@@ -918,6 +970,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "106",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Sulfur Dioxide (SO2)*",
                 "unit" => "mg/Nm3",
                 "method" => "IK–6.4.19 (Direct Reading)"
@@ -926,6 +979,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "107",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Particulate*",
                 "unit" => "mg/m3",
                 "method" => "SNI 7117.17:2009"
@@ -934,6 +988,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "108",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Oxygen (O2)*",
                 "unit" => "%",
                 "method" => "SNI 19.7117.10-2005"
@@ -942,6 +997,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "109",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Percent (%) of Isokinetic*",
                 "unit" => "%",
                 "method" => "SNI 7117.17-2009"
@@ -950,6 +1006,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "110",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Volumetric Flow Rate*",
                 "unit" => "m3/s",
                 "method" => "SNI 7117.14-2009"
@@ -958,6 +1015,7 @@ class ParameterSeeder extends Seeder
             [
                 "id" => "111",
                 "subject_id" => "7",
+                "parameter_category_id" => "4",
                 "name" => "Number Of Traverse Point*",
                 "unit" => "-",
                 "method" => "SNI 7117.13-2009"
@@ -1958,7 +2016,7 @@ class ParameterSeeder extends Seeder
             //     "id" => "",
             //     "regulation_id" => "22",
             //     "name" => "",
-            //     "unit" => "",
+            //     "unit" => "-",
             //     "method" => ""
             // ],
         ];
