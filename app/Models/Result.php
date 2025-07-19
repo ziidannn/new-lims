@@ -22,7 +22,6 @@ class Result extends Model
         'unit',
         'method',
         'time',
-        'noise',
         'leq',
         'ls',
         'lm',

@@ -22,6 +22,11 @@ class Sampling extends Model
         'date_received',
         'itd_start',
         'itd_end',
+        'noise_template_type',
+        'leq',
+        'ls',
+        'lm',
+        'lsm',
         'show_logo',
     ];
 

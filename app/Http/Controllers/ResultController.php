@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Models\Sampling;
 use App\Models\Subject;
 use App\Models\SamplingTimeRegulation;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class ResultController extends Controller
@@ -387,6 +388,124 @@ class ResultController extends Controller
         ));
     }
 
+    public function addNoise(Request $request, $id){
+        $instituteSubject = InstituteSubject::with('institute', 'subject')->findOrFail($id);
+        $institute = $instituteSubject->institute;
+        $subject = $instituteSubject->subject;
+
+        // --- BAGIAN METHOD POST (VIA AJAX) ---
+        if ($request->isMethod('POST')) {
+            $action = $request->input('action');
+
+            // Aksi 1: Menyimpan data header DAN pilihan template
+            if ($action === 'save_header') {
+                $validated = $request->validate([
+                    'sampling_location' => 'required|string|max:255',
+                    'sampling_date' => 'required|date',
+                    'sampling_time' => 'required|string|max:255',
+                    'sampling_method' => 'required|string|max:255',
+                    'date_received' => 'required|date',
+                    'itd_start' => 'required|date',
+                    'itd_end' => 'required|date|after_or_equal:itd_start',
+                ]);
+
+                $sampling = Sampling::updateOrCreate(
+                    ['institute_subject_id' => $instituteSubject->id],
+                    $validated + ['institute_id' => $institute->id]
+                );
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Sample data has been saved successfully!',
+                    'sampling_id' => $sampling->id // Kirim kembali ID sampling jika dibutuhkan
+                ]);
+            }
+
+            // Aksi 2: Menyimpan hasil per baris untuk Template Standard
+            if ($action === 'save_standard_result') {
+                // Cari atau buat record Sampling secara otomatis
+                $sampling = Sampling::firstOrCreate(
+                    ['institute_subject_id' => $instituteSubject->id],
+                    ['institute_id' => $institute->id] // Atribut tambahan saat membuat record baru
+                );
+
+                $validated = $request->validate([
+                    'result_id'         => 'nullable|exists:results,id',
+                    'parameter_id'      => 'required|exists:parameters,id',
+                    'location'          => 'required|string',
+                    'testing_result'    => 'nullable|string',
+                    'time'              => 'nullable|string',
+                ]);
+
+                // ... sisa kode penyimpanan (updateOrCreate Result) tidak perlu diubah
+                $result = Result::updateOrCreate(
+                    ['id' => $validated['result_id']],
+                    [
+                        'sampling_id'       => $sampling->id, // Gunakan ID dari record yg dicari/dibuat
+                        'parameter_id'      => $validated['parameter_id'],
+                        'location'          => $validated['location'],
+                        'testing_result'    => $validated['testing_result'],
+                        'time'              => $validated['time']
+                    ]
+                );
+                return response()->json(['success' => true, 'message' => 'Result for location (' . e($validated['location']) . ') saved.', 'new_result_id' => $result->id]);
+            }
+
+            // Aksi 3: Menyimpan hasil Template 24 Jam
+            if ($action === 'save_24h_location_result') {
+                // Cari atau buat record Sampling secara otomatis
+                $sampling = Sampling::firstOrCreate(
+                    ['institute_subject_id' => $instituteSubject->id],
+                    ['institute_id' => $institute->id] // Atribut tambahan saat membuat record baru
+                );
+
+                $validated = $request->validate([
+                    'result_id'    => 'nullable|exists:results,id',
+                    'parameter_id' => 'required|exists:parameters,id',
+                    'location'     => 'required|string',
+                    'leq'          => 'required|array|size:7',
+                    'ls'           => 'nullable|string',
+                    'lm'           => 'nullable|string',
+                    'lsm'          => 'nullable|string',
+                ]);
+
+                // ... sisa kode penyimpanan (updateOrCreate Result) tidak perlu diubah
+                $result = Result::updateOrCreate(
+                    ['id' => $validated['result_id']],
+                    [
+                        'sampling_id'       => $sampling->id, // Gunakan ID dari record yg dicari/dibuat
+                        'parameter_id'      => $validated['parameter_id'],
+                        'location'          => $validated['location'],
+                        'leq'               => implode(',', $validated['leq']),
+                        'ls'                => $validated['ls'],
+                        'lm'                => $validated['lm'],
+                        'lsm'               => $validated['lsm'],
+                    ]
+                );
+
+                return response()->json(['success' => true, 'message' => '24 Hours results for ('.e($validated['location']).') saved.', 'new_result_id' => $result->id]);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Invalid action.'], 400);
+        }
+
+        // --- BAGIAN METHOD GET (MENYIAPKAN DATA UNTUK VIEW) ---
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)->firstOrNew();
+        $noiseParameters = Parameter::where('subject_id', $subject->id)->get();
+        $standardParameter = $noiseParameters->where('name', '!=', 'Sulfur Dioxide (SO₂)*')->first();
+        $param24h = $noiseParameters->where('name', '!=','Sulfur Dioxide (SO₂)*')->first();
+
+        $standardResults = Result::where('sampling_id', $samplings->id)->where('parameter_id', $standardParameter->id ?? null)->get();
+        $results24h = Result::where('sampling_id', $samplings->id)->where('parameter_id', $param24h->id ?? null)->get();
+
+        $regulations = $instituteSubject->regulations;
+
+        return view('result.noise.add', compact(
+            'instituteSubject', 'institute', 'subject', 'samplings',
+            'standardParameter', 'param24h', 'standardResults', 'results24h', 'regulations'
+        ));
+    }
+
     public function addOdor(Request $request, $id) {
         $instituteSubject = InstituteSubject::with('institute', 'subject')->findOrFail($id);
         $institute = $instituteSubject->institute;
@@ -498,101 +617,86 @@ class ResultController extends Controller
         ));
     }
 
-    public function addIllumination(Request $request, $id)
-    {
-        $instituteSubject = InstituteSubject::findOrFail($id);
-        $institute = Institute::findOrFail($instituteSubject->institute_id);
-        $samplingNoiseSubject = InstituteSubject::where('subject_id', 5)->first();
+    public function addIllumination(Request $request, $id){
+        $instituteSubject = InstituteSubject::with('institute', 'subject')->findOrFail($id);
+        $institute = $instituteSubject->institute;
+        $subject = $instituteSubject->subject;
 
-        $samplingNoise = Sampling::where('institute_subject_id', $samplingNoiseSubject->id)
-            ->orderBy('id', 'desc')
-            ->first();
-
+        // --- BAGIAN METHOD POST (VIA AJAX) ---
         if ($request->isMethod('POST')) {
             $action = $request->input('action');
 
-            $request->validate([
-                'testing_result.*' => 'nullable|string',
-                'unit.*' => 'nullable|string',
-                'method.*' => 'nullable|string',
-                'time.*' => 'nullable|string',
-                'regulatory_standard.*' => 'nullable|string',
-                'location.*' => 'nullable|string'
-            ]);
+            // Aksi 1: Menyimpan data header (info sampling)
+            if ($action === 'save_header') {
+                $validated = $request->validate([
+                    'sampling_location' => 'required|string|max:255',
+                    'sampling_date' => 'required|date',
+                    'sampling_time' => 'required|string|max:255',
+                    'sampling_method' => 'required|string|max:255',
+                    'date_received' => 'required|date',
+                    'itd_start' => 'required|date',
+                    'itd_end' => 'required|date|after_or_equal:itd_start',
+                ]);
 
-            $messages = [];
-
-            // Save per location
-            foreach ($request->input('testing_result', []) as $index => $testingResult) {
-                $location = $request->input('location')[$index] ?? null;
-                $parameterId = $request->parameter_id[$index] ?? null;
-
-                if ($location) {
-                    $existingResult = Result::where('sampling_id', $samplingNoise->id)
-                        ->where('location', $location)
-                        ->first();
-
-                    $data = [
-                        'sampling_id' => $samplingNoise->id,
-                        'parameter_id' => $parameterId,
-                        'testing_result' => $testingResult ?? null,
-                        'unit' => $request->unit[$parameterId] ?? null,
-                        'method' => $request->method[$parameterId] ?? null,
-                        'time' => $request->time[$index] ?? null,
-                        'regulatory_standard' => $request->regulatory_standard[$index] ?? null,
-                        'location' => $location,
-                    ];
-
-                    if ($existingResult) {
-                        $existingResult->update($data);
-                        $messages[] = "Data for location $location updated successfully.";
-                    } else {
-                        Result::create($data);
-                        $messages[] = "Data for location $location created successfully.";
-                    }
-                }
-            }
-
-            // ✅ Simpan logo jika tombol Save All ditekan
-            if ($action === 'save_all') {
                 Sampling::updateOrCreate(
                     ['institute_subject_id' => $instituteSubject->id],
-                    ['show_logo' => $request->input('show_logo', false)]
+                    $validated + ['institute_id' => $institute->id, 'no_sample' => $institute->no_coa]
                 );
-
-                return redirect()->route('result.list_result', $institute->id)
-                    ->with('msg', 'Data and Logo saved successfully!');
+                return response()->json(['success' => true, 'message' => 'Sample data has been saved successfully!']);
             }
 
-            return redirect()->back()->with('msg', implode(' ', $messages));
+            // Aksi 2: Menyimpan hasil per baris (parameter + lokasi)
+            if ($action === 'save_illumination_result') {
+                $sampling = Sampling::firstWhere('institute_subject_id', $instituteSubject->id);
+                if (!$sampling) {
+                    return response()->json(['success' => false, 'message' => 'Please save the sample data first.'], 400);
+                }
+
+                $validated = $request->validate([
+                    'result_id' => 'nullable|exists:results,id',
+                    'parameter_id' => 'required|exists:parameters,id',
+                    'location' => 'required|string',
+                    'testing_result' => 'nullable|string',
+                    'time' => 'nullable|string',
+                    'regulatory_standard' => 'nullable|string',
+                ]);
+
+                $result = Result::updateOrCreate(
+                    ['id' => $validated['result_id']],
+                    [
+                        'sampling_id' => $sampling->id,
+                        'parameter_id' => $validated['parameter_id'],
+                        'sampling_location' => $validated['location'],
+                        'testing_result' => $validated['testing_result'],
+                        'time' => $validated['time'],
+                        'regulatory_standard' => $validated['regulatory_standard'],
+                    ]
+                );
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Result for location ' . e($validated['location']) . ' saved.',
+                    'new_result_id' => $result->id // Kirim ID baru untuk baris yang baru dibuat
+                ]);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Invalid action.'], 400);
         }
 
-        // View data
-        $subject = Subject::find($instituteSubject->subject_id);
-        $regulationsIds = InstituteRegulation::where('institute_subject_id', $instituteSubject->id)
-            ->pluck('regulation_id');
-        $regulations = Regulation::whereIn('id', $regulationsIds)->get();
-        $subjectsIds = InstituteSubject::where('institute_id', $institute->id)
-            ->pluck('subject_id');
-        $subjects = Subject::whereIn('id', $subjectsIds)->get();
-        $parameters = Parameter::whereIn('subject_id', $subjectsIds)->get();
-        $parametersIds = $parameters->pluck('id');
+        // --- BAGIAN METHOD GET (SAAT HALAMAN DIBUKA) ---
+        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)->firstOrNew();
 
-        $samplingTimeRegulations = SamplingTimeRegulation::whereIn('parameter_id', $parametersIds)
-            ->with(['samplingTime', 'regulationStandards'])
-            ->get();
+        // Asumsi hanya ada 1 parameter utama untuk Illumination
+        $illuminationParameter = Parameter::where('subject_id', $subject->id)->first();
 
-        $samplings = Sampling::where('institute_subject_id', $instituteSubject->id)
-            ->latest('id')
-            ->first();
+        // Ambil semua baris hasil yang terkait dengan sampling ini
+        $results = Result::where('sampling_id', $samplings->id)->get();
 
-        $results = $samplings
-            ? Result::where('sampling_id', $samplings->id)->with('parameter')->get()
-            : collect();
+        $regulations = $instituteSubject->regulations;
 
         return view('result.illumination.add', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results',
-            'regulations', 'subject', 'instituteSubject', 'samplings'
+            'instituteSubject', 'institute', 'subject', 'samplings',
+            'illuminationParameter', 'results', 'regulations'
         ));
     }
 

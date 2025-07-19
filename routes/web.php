@@ -62,6 +62,7 @@ Route::group(['prefix' => 'result'], function () {
     Route::delete('/delete', [ResultController::class, 'delete'])->name('result.delete');
     Route::any('/ambient_air/{id}', [ResultController::class, 'addAmbientAir'])->name('result.ambient_air.add');
     Route::any('/workplace/{id}', [ResultController::class, 'addWorkplace'])->name('result.workplace.add');
+    // Route::any('/noise/{id}', [ResultController::class, 'addNoise'])->name('result.noise.add');
     Route::any('/odor/{id}', [ResultController::class, 'addOdor'])->name('result.odor.add');
     Route::any('/illumination/{id}', [ResultController::class, 'addIllumination'])->name('result.illumination.add');
     Route::any('/heat_stress/{id}', [ResultController::class, 'addHeatStress'])->name('result.heat_stress.add');
@@ -76,9 +77,9 @@ Route::group(['prefix' => 'result'], function () {
     Route::get('/getDataResult/{id}', [ResultController::class, 'getDataResult'])->name('result.getDataResult');
 
     // ---------------------------------------------------------------------------------------------------------------------------------------
+    Route::any('/noise/{id}', [ResultController::class, 'addNoise'])->name('result.noise.add');
     Route::any('/noise_sample/{id}', [NoiseController::class, 'noise_sample'])->name('result.noise.noise_sample');
     Route::any('/noise_sample_new/{id}', [NoiseController::class, 'noise_sample_new'])->name('result.noise.noise_sample_new');
-    Route::any('/noise/{id}', [NoiseController::class, 'addNoise'])->name('result.noise.add');
     Route::any('/noise_new/{id}', [NoiseController::class, 'addNoiseNew'])->name('result.noise.add_new');
     // ---------------------------------------------------------------------------------------------------------------------------------------
 

@@ -140,7 +140,6 @@
                                     <td>
                                         <button type="button" class="btn btn-primary btn-sm save-result-btn"
                                                 data-parameter-id="{{ $parameter->id }}"
-                                                data-sampling-time-id="{{ $samplingTime->id }}"
                                                 data-regulation-standard-id="{{ $regulationStandards->id }}">
                                             Save
                                         </button>

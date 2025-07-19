@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreign('regulation_standard_id')->references('id')->on('regulation_standards');
             $table->string('testing_result')->nullable();
             $table->string('location')->nullable();
+            $table->string('regulatory_standard')->nullable();
             $table->string('time')->nullable();
             $table->string('leq')->nullable();
             $table->string('ls')->nullable();
