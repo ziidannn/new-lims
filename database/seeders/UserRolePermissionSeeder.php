@@ -30,6 +30,12 @@ class UserRolePermissionSeeder extends Seeder
                 'name' => 'Admin',
                 'username' => 'admin',
             ], $default_user_value));
+            //create user director
+            $director = User::create(array_merge([
+                'email' => 'director@gmail.com',
+                'name' => 'Director',
+                'username' => 'director',
+            ], $default_user_value));
             //create user staff
             $staff = User::create(array_merge([
                 'email' => 'afikri124@gmail.com',
@@ -38,10 +44,12 @@ class UserRolePermissionSeeder extends Seeder
             ], $default_user_value));
             //create role
             $role_admin = Role::create(['name' => 'admin', 'color' => '#000000', 'description' => 'Administrator']);
+            $role_director = Role::create(['name' => 'director', 'color' => '#0000ff', 'description' => 'Director']);
             $role_staff = Role::create(['name' => 'staff', 'color' => '#ff0000', 'description' => 'Staff only']);
             //set default role
             $staff->assignRole('staff');
             $admin->assignRole('admin');
+            $director->assignRole('director'); // Assign admin role to director
             //create permission
             $permission = Permission::create(['name' => 'log-viewers.read']);
             //set direct permissions

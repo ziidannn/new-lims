@@ -2,53 +2,24 @@
 @section('title', 'Analysis Result')
 
 @section('css')
-{{-- CSS Anda yang sudah ada --}}
 <link rel="stylesheet" href="{{asset('assets/vendor/libs/select2/select2.css')}}" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
 <link rel="stylesheet" href="{{asset('assets/vendor/sweetalert2.css')}}">
 @endsection
 
 @section('style')
 <style>
-    .header-row {
-        margin-bottom: 1rem;
-    }
-    .header-row .form-label {
-        font-weight: bold;
-        white-space: nowrap;
-    }
-    .header-row .form-control[readonly] {
-        background-color: #f0f0f0;
-    }
-    .table-bordered th, .table-bordered td {
-        vertical-align: middle;
-        text-align: center;
-    }
-    .parameter-group-header th {
-        background-color: #f8f9fa;
-        text-align: left !important;
-        font-weight: bold;
-    }
-    /* Memberi sedikit ruang antar tombol di kolom Aksi */
-    .action-buttons .btn {
-        margin-right: 5px;
-    }
+    .header-row { margin-bottom: 1rem; }
+    .header-row .form-label { font-weight: bold; white-space: nowrap; }
+    .table-bordered th, .table-bordered td { vertical-align: middle; text-align: center; }
+    .parameter-name-row { background-color: #f8f9fa; font-weight: bold; }
+    .sub-row td { border-top: none !important; padding-top: 0.3rem; padding-bottom: 0.3rem; }
 </style>
 @endsection
 
 @section('content')
-
-{{--
-======================================================================
-    FORM UTAMA
-    Hanya ada satu form yang membungkus semuanya.
-    Diberi ID agar mudah ditarget oleh JavaScript.
-======================================================================
---}}
-<form class="card" id="main-analysis-form" action="{{ route('result.surface_water.add', $instituteSubject->id) }}" method="POST" onsubmit="return false;">
+<form class="card" id="main-analysis-form" action="{{ route('result.ambient_air.add', $instituteSubject->id) }}" method="POST" onsubmit="return false;">
     @csrf
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-        {{-- Info Judul dan Regulasi --}}
         <div>
             <h4 class="card-title mb-1">
                 @yield('title') - <span class="fw-bold">{{ $subject->name ?? 'N/A' }}</span>
@@ -59,20 +30,10 @@
                 @endforeach
             @endif
         </div>
-        {{-- Tombol untuk menyimpan data header --}}
-        <div class="mt-2 mt-md-0">
-            <button type="button" id="save-header-btn" class="btn btn-info">
-                <i class="bx bx-save me-1"></i> Save Sample Data
-            </button>
-        </div>
     </div>
 
     <div class="card-body">
-        {{--
-        ======================================================================
-            BAGIAN 1: HEADER INFORMASI SAMPEL (Sesuai Template Word)
-        ======================================================================
-        --}}
+        {{-- BAGIAN 1: HEADER INFORMASI SAMPEL --}}
         <div class="row">
             <div class="col-md-6">
                 <div class="row header-row">
@@ -129,112 +90,166 @@
                 </div>
             </div>
         </div>
-
+        <div class="text-end">
+            <button type="button" id="save-header-btn" class="btn btn-info">
+                <i class="bx bx-save me-1"></i> Save Sample
+            </button>
+        </div>
         <hr>
 
-        {{--
-        ======================================================================
-            BAGIAN 2: TABEL HASIL ANALISIS (Sesuai Template Word)
-        ======================================================================
-        --}}
+        {{-- BAGIAN 2: TABEL HASIL ANALISIS --}}
         <div class="table-responsive">
             <table class="table table-bordered mt-3" id="parameterTable">
                 <thead class="table-light">
                     <tr>
-                        <th rowspan="2" style="width: 5%;">No</th>
-                        <th rowspan="2">Parameters</th>
-                        <th rowspan="2" style="width: 8%;">Unit</th>
-                        <th rowspan="2" style="width: 15%;">Testing Result</th>
-                        <th colspan="4">Regulatory Standard</th>
-                        <th rowspan="2">Methods</th>
-                        <th rowspan="2" style="width: 12%;">Action</th> {{-- Kolom Aksi Baru --}}
-                    </tr>
-                    <tr>
-                        <th>I</th>
-                        <th>II</th>
-                        <th>III</th>
-                        <th>IV</th>
+                        <th style="width: 5%;">No</th>
+                        <th>Parameters</th>
+                        <th style="width: 15%;">Sampling Time</th>
+                        <th style="width: 15%;">Testing Result</th>
+                        <th style="width: 20%;">Regulatory Standard</th>
+                        <th style="width: 8%;">Unit</th>
+                        <th>Methods</th>
+                        <th style="width: 8%;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($groupedParameters as $groupName => $parameters)
-                        @if ($parameters->isNotEmpty())
-                            <tr class="parameter-group-header">
-                                <th colspan="11">{{ $groupName }}</th> {{-- Sesuaikan colspan menjadi 11 --}}
-                            </tr>
-                            @php $parameterNumber = 1; @endphp
-                            @foreach ($parameters as $parameter)
-                                @php $result = $results->get($parameter->id); @endphp
-                                <tr data-row-id="{{ $parameter->id }}"> {{-- Tambahkan ID untuk target hide/show --}}
-                                    <td>{{ $parameterNumber++ }}</td>
-                                    <td class="text-start">{{ $parameter->name }}</td>
-                                    <td>{{ $parameter->unit }}</td>
+                    @php $parameterNumber = 1; @endphp
+                    @foreach ($parameters as $parameter)
+                        @php $subRows = $samplingTimeRegulations->get($parameter->id); @endphp
+                        <tr class="parameter-name-row">
+                            <td>{{ $parameterNumber++ }}</td>
+                            <td class="text-start" colspan="7">{{ $parameter->name }}</td>
+                        </tr>
+                        @if ($subRows)
+                            @foreach ($subRows as $subRow)
+                                @php
+                                    $samplingTime = $subRow->samplingTime;
+                                    // ✅ Panggil relasi dengan nama TUNGGAL yang benar
+                                    $regulationStandards = $subRow->regulationStandards;
+                                    $resultKey = "{$parameter->id}-{$samplingTime->id}";
+                                    $result = $results->get($resultKey);
+                                @endphp
+                                <tr class="sub-row">
+                                    <td></td><td></td>
+                                    <td>{{ $samplingTime->time }}</td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm text-center" name="results[{{ $parameter->id }}][testing_result]" value="{{ old('results.'.$parameter->id.'.testing_result', $result->testing_result ?? '') }}">
+                                        <input type="text" class="form-control form-control-sm text-center"
+                                               value="{{ old('results.'.$resultKey, $result->testing_result ?? '') }}">
                                     </td>
-                                    @php $standards = $regStandardsByParameter[$parameter->id] ?? null; @endphp
-                                    <td>{{ $standards['I'] ?? '-' }}</td>
-                                    <td>{{ $standards['II'] ?? '-' }}</td>
-                                    <td>{{ $standards['III'] ?? '-' }}</td>
-                                    <td>{{ $standards['IV'] ?? '-' }}</td>
+                                    <td>{{ $regulationStandards->title ?? '-' }}</td>
+                                    <td>{{ $parameter->unit }}</td>
                                     <td>{{ $parameter->method }}</td>
                                     <td>
-                                        <div class="d-flex justify-content-center action-buttons">
-                                            <button type="button" class="btn btn-primary btn-sm save-parameter-btn" data-parameter-id="{{ $parameter->id }}">Save</button>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm hide-parameter" data-parameter-id="{{ $parameter->id }}">Hide</button>
-                                        </div>
+                                        <button type="button" class="btn btn-primary btn-sm save-result-btn"
+                                                data-parameter-id="{{ $parameter->id }}"
+                                                data-sampling-time-id="{{ $samplingTime->id }}"
+                                                data-regulation-standard-id="{{ $regulationStandards->id }}">
+                                            Save
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
+                        @else
+                             <tr class="sub-row">
+                                <td colspan="8" class="text-center text-muted">No sampling time set for this parameter.</td>
+                             </tr>
                         @endif
                     @endforeach
                 </tbody>
             </table>
         </div>
-        <div class="text-end mt-3">
-             <button id="btn-undo" class="btn btn-warning me-1" style="display: none;">Undo Hide</button>
-        </div>
-    </div>
 
-    {{-- BAGIAN OPSI LOGO & FOOTER --}}
-    <div class="px-4 pb-3">
         <hr>
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <label class="form-label d-block fw-bold">Display logo on the report?</label>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" id="showLogoYes" name="show_logo" value="1"
-                           {{ old('show_logo', $samplings->show_logo) == 1 ? 'checked' : '' }}>
-                    <label class="form-check-label" for="showLogoYes">Yes</label>
+
+        {{-- BAGIAN 3: FIELD CONDITIONS --}}
+        <div class="row mt-4">
+            <h4 class="mb-3">Environmental Condition</h4>
+            {{-- ... Letakkan input untuk field conditions (coordinate, temperature, dll) di sini ... --}}
+            <div class="row">
+                <div class="col-lg-6 col-md-6 field-condition" id="coordinate">
+                    <label class="form-label">Coordinate</label>
+                    <input type="text" class="form-control" name="coordinate" placeholder="Input Coordinate"
+                        value="{{ old('coordinate', $fieldCondition->coordinate ?? '') }}">
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" id="showLogoNo" name="show_logo" value="0"
-                           {{ old('show_logo', $samplings->show_logo) != 1 ? 'checked' : '' }}>
-                    <label class="form-check-label" for="showLogoNo">No</label>
+                <div class="col-lg-6 col-md-6 field-condition" id="temperature">
+                    <label class="form-label">Temperature</label>
+                    <input type="text" class="form-control" name="temperature" placeholder="Input Temperature"
+                        value="{{ old('temperature', $fieldCondition->temperature ?? '') }}">
                 </div>
             </div>
-            <div>
-                {{-- ✅ Tombol Baru Khusus untuk Simpan Logo --}}
-                <button type="button" id="save-logo-btn" class="btn btn-success">Save Logo Preference</button>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-6 field-condition" id="pressure">
+                    <label class="form-label">Pressure</label>
+                    <input type="text" class="form-control" name="pressure" placeholder="Input Pressure"
+                        value="{{ old('pressure', $fieldCondition->pressure ?? '') }}">
+                </div>
+                <div class="col-lg-6 col-md-6 field-condition" id="humidity">
+                    <label class="form-label">Humidity</label>
+                    <input type="text" class="form-control" name="humidity" placeholder="Input Humidity"
+                        value="{{ old('humidity', $fieldCondition->humidity ?? '') }}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-6 field-condition" id="wind_speed">
+                    <label class="form-label">Wind Speed</label>
+                    <input type="text" class="form-control" name="wind_speed" placeholder="Input Wind Speed"
+                        value="{{ old('wind_speed', $fieldCondition->wind_speed ?? '') }}">
+                </div>
+                <div class="col-lg-6 col-md-6 field-condition" id="wind_direction">
+                    <label class="form-label">Wind Direction</label>
+                    <input type="text" class="form-control" name="wind_direction"
+                        placeholder="Input Wind Direction"
+                        value="{{ old('wind_direction', $fieldCondition->wind_direction ?? '') }}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-6 field-condition" id="weather">
+                    <label class="form-label">Weather</label>
+                    <input type="text" class="form-control" name="weather" placeholder="Input Weather"
+                        value="{{ old('weather', $fieldCondition->weather ?? '') }}">
+                </div>
+            </div>
+            <div class="col-12 d-flex justify-content-between align-items-center mt-3">
+                <button type="button" id="save-field-btn" class="btn btn-info">Save Conditions</button>
             </div>
         </div>
-    </div>
-
-    <div class="card-footer text-end">
-        <a href="{{ route('result.list_result', $institute->id) }}" class="btn btn-outline-secondary">Back</a>
+        {{-- BAGIAN OPSI LOGO & FOOTER --}}
+        <div class="px-4 pb-3">
+            <hr>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <label class="form-label d-block fw-bold">Display logo on the report?</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" id="showLogoYes" name="show_logo" value="1"
+                            {{ old('show_logo', $samplings->show_logo) == 1 ? 'checked' : '' }}>
+                        <label class="form-check-label" for="showLogoYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" id="showLogoNo" name="show_logo" value="0"
+                            {{ old('show_logo', $samplings->show_logo) != 1 ? 'checked' : '' }}>
+                        <label class="form-check-label" for="showLogoNo">No</label>
+                    </div>
+                </div>
+                <div>
+                    {{-- ✅ Tombol Baru Khusus untuk Simpan Logo --}}
+                    <button type="button" id="save-logo-btn" class="btn btn-info">Save Logo</button>
+                    <a href="{{ route('result.list_result', $institute->id) }}" class="btn btn-outline-secondary">Back</a>
+                </div>
+            </div>
+        </div>
     </div>
 </form>
 @endsection
 
 @section('script')
-{{-- Load semua library JS yang dibutuhkan --}}
 <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-<script src="{{asset('assets/vendor/libs/select2/select2.js')}}"></script>
 <script src="{{asset('assets/js/sweetalert.min.js')}}"></script>
 
 <script>
 $(document).ready(function() {
-    // Ambil CSRF token untuk semua request AJAX
     const csrfToken = $('meta[name="csrf-token"]').attr('content') || '{{ csrf_token() }}';
     const formUrl = $('#main-analysis-form').attr('action');
 
@@ -281,27 +296,47 @@ $(document).ready(function() {
         });
     });
 
-    // ======================================================
-    // AJAX UNTUK TOMBOL "Save" PER BARIS PARAMETER
-    // ======================================================
-    $('#parameterTable').on('click', '.save-parameter-btn', function() {
+    // SCRIPT AJAX UNTUK SAVE FIELD CONDITIONS
+    $('#save-field-btn').on('click', function() {
         const button = $(this);
-        button.prop('disabled', true).text('...');
+        button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Saving...');
 
-        const parameterId = button.data('parameter-id');
-        const testingResult = button.closest('tr').find('input[name*="testing_result"]').val();
-
-        const parameterData = {
+        const fieldData = {
             _token: csrfToken,
-            action: 'save_single_parameter',
-            parameter_id: parameterId,
-            testing_result: testingResult
+            action: 'save_field_conditions',
+            coordinate: $('input[name="coordinate"]').val(),
+            temperature: $('input[name="temperature"]').val(),
+            pressure: $('input[name="pressure"]').val(),
+            humidity: $('input[name="humidity"]').val(),
+            wind_speed: $('input[name="wind_speed"]').val(),
+            wind_direction: $('input[name="wind_direction"]').val(),
+            weather: $('input[name="weather"]').val(),
         };
 
         $.ajax({
-            url: formUrl,
-            type: 'POST',
-            data: parameterData,
+            url: formUrl, type: 'POST', data: fieldData,
+            success: function(response) { swal("Success!", response.message, "success"); },
+            error: function(xhr) { swal("Error!", "Could not save field conditions.", "error"); },
+            complete: function() { button.prop('disabled', false).text('Save Field Conditions'); }
+        });
+    });
+
+    // SCRIPT AJAX UNTUK SAVE PER HASIL TES
+    $('#parameterTable').on('click', '.save-result-btn', function() {
+        const button = $(this);
+        button.prop('disabled', true).text('...');
+
+        const resultData = {
+            _token: csrfToken,
+            action: 'save_single_result',
+            parameter_id: button.data('parameter-id'),
+            sampling_time_id: button.data('sampling-time-id'),
+            regulation_standard_id: button.data('regulation-standard-id'),
+            testing_result: button.closest('tr').find('input[type="text"]').val()
+        };
+
+        $.ajax({
+            url: formUrl, type: 'POST', data: resultData,
             success: function(response) {
                 if(response.success){
                     // Animasi hijau (sudah ada)
@@ -314,12 +349,8 @@ $(document).ready(function() {
                     swal("Error!", response.message, "error");
                 }
             },
-            error: function(xhr) {
-                swal("Error!", xhr.responseJSON.message || "Could not save the result.", "error");
-            },
-            complete: function() {
-                button.prop('disabled', false).text('Save');
-            }
+            error: function(xhr) { swal("Error!", xhr.responseJSON.message || "Could not save.", "error"); },
+            complete: function() { button.prop('disabled', false).text('Save'); }
         });
     });
 
@@ -347,7 +378,7 @@ $(document).ready(function() {
                 swal("Error!", xhr.responseJSON.message || "Could not save preference.", "error");
             },
             complete: function() {
-                button.prop('disabled', false).text('Save Logo Preference');
+                button.prop('disabled', false).text('Save Logo');
             }
         });
     });

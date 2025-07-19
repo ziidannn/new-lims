@@ -28,7 +28,7 @@ class Institute extends Model
     {
         return $this->belongsToMany(Regulation::class, 'institute_regulations', 'institute_id', 'regulation_id');
     }
-    public function institute_subjects()
+    public function instituteSubjects()
     {
         return $this->hasMany(InstituteSubject::class, 'institute_id');
     }

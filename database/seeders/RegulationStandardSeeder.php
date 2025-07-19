@@ -98,6 +98,18 @@ class RegulationStandardSeeder extends Seeder
             ["id" => "82", "title" => "120"],
             ["id" => "83", "title" => "95"],
             ["id" => "84", "title" => "90-110"],
+            ["id" => "62", "title" => "0.5"],
+            ["id" => "63", "title" => "0.3"],
+            ["id" => "64", "title" => "0.4"],
+            ["id" => "65", "title" => "0.6"],
+            ["id" => "66", "title" => "0.7"],
+            ["id" => "67", "title" => "0.8"],
+            ["id" => "68", "title" => "0.9"],
+            ["id" => "69", "title" => "1.0"],
+            ["id" => "70", "title" => "1.1"],
+            ["id" => "71", "title" => "1.2"],
+            ["id" => "72", "title" => "1.3"],
+            ["id" => "73", "title" => "1.4"],
         ];
 
         foreach ($data as $x) {

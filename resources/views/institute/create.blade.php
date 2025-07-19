@@ -181,6 +181,7 @@
                             </div>
                             <button type="button" class="btn btn-primary mt-2 mb-3" id="add_more">+ Add More</button>
                         </div>
+                        <span>Noted: <i>Pemilihan Subject dan Regulation ini menentukan jumlah lokasi yang akan di Analysis</i></span>
                         <!-- <hr style="color: #333;">
                         <div id="condition_section">
                             <h4 class="mb-3">Ambient Environmental Condition</h4>

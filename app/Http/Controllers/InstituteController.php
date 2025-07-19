@@ -43,18 +43,12 @@ class InstituteController extends Controller
                 'report_date' => $request->report_date,
             ]);
 
-            $insertedSubjects = []; // Pastikan array kosong sudah diinisialisasi
-
+            // Setiap subject_id boleh masuk meskipun duplikat
             foreach ($request->subject_id as $key => $subjectId) {
-                if (!isset($insertedSubjects[$subjectId])) { // Gunakan isset untuk menghindari error
-                    $instituteSubject = InstituteSubject::create([
-                        'institute_id' => $Institute->id,
-                        'subject_id' => $subjectId,
-                    ]);
-                    $insertedSubjects[$subjectId] = $instituteSubject->id;
-                } else {
-                    $instituteSubject = InstituteSubject::find($insertedSubjects[$subjectId]);
-                }
+                $instituteSubject = InstituteSubject::create([
+                    'institute_id' => $Institute->id,
+                    'subject_id' => $subjectId,
+                ]);
 
                 if (!empty($request->regulation_id[$key])) {
                     $regulationId = $request->regulation_id[$key];
@@ -63,7 +57,7 @@ class InstituteController extends Controller
                         ->exists();
 
                     if ($isValidRegulation) {
-                        $instituteRegulation = InstituteRegulation::create([
+                        InstituteRegulation::create([
                             'institute_subject_id' => $instituteSubject->id,
                             'regulation_id' => $regulationId,
                         ]);
@@ -94,17 +88,17 @@ class InstituteController extends Controller
     public function edit(Request $request, $id)
     {
         $data = Institute::with('customer', 'Subjects.instituteRegulations.regulation')->findOrFail($id);
-        $description = Subject::orderBy('name')->get();
+        $description = Subject::orderBy('subject_code')->get();
         $customer = Customer::all();
 
         if ($request->has('subject_id')) {
             // Ambil data subject lama dari DB
             $existingSubjects = InstituteSubject::where('institute_id', $data->id)->get()->keyBy('subject_id');
 
-            // Loop berdasarkan urutan subject dari form
             foreach ($request->subject_id as $index => $subjectId) {
                 if ($existingSubjects->has($subjectId)) {
                     $instituteSubject = $existingSubjects[$subjectId];
+                    // Hapus regulasi lama
                     InstituteRegulation::where('institute_subject_id', $instituteSubject->id)->delete();
                 } else {
                     $instituteSubject = InstituteSubject::create([
@@ -114,13 +108,17 @@ class InstituteController extends Controller
                 }
 
                 // Ambil regulation_id berdasarkan index
-                $regulationIds = $request->input("regulations")[$index] ?? [];
-
+                $regulationIds = $request->input('regulations')[$index] ?? [];
+                if (!is_array($regulationIds)) {
+                    $regulationIds = [$regulationIds];
+                }
                 foreach ($regulationIds as $regulationId) {
-                    InstituteRegulation::create([
-                        'institute_subject_id' => $instituteSubject->id,
-                        'regulation_id' => $regulationId,
-                    ]);
+                    if (!empty($regulationId)) {
+                        InstituteRegulation::create([
+                            'institute_subject_id' => $instituteSubject->id,
+                            'regulation_id' => $regulationId,
+                        ]);
+                    }
                 }
             }
 
@@ -140,15 +138,15 @@ class InstituteController extends Controller
         $data = Institute::findOrFail($request->id);
 
         if ($data) {
-            // **Hapus data terkait terlebih dahulu**
-            foreach ($data->instituteSubjects as $subject) {
+            // Hapus data terkait pada setiap institute_subjects
+            foreach ($data->institute_subjects as $subject) {
                 // Hapus institute_regulations terkait
                 $subject->instituteRegulations()->delete();
+                // Hapus sampling terkait
+                $subject->samplings()->delete();
             }
-
-            // Hapus institute_subjects setelah regulations terhapus
-            $data->instituteSubjects()->delete();
-
+            // Hapus institute_subjects setelah data terkait terhapus
+            $data->institute_subjects()->delete();
             // Hapus institute
             $data->delete();
 

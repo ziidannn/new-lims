@@ -30,8 +30,14 @@ class Subject extends Model
     {
         return $this->hasMany(InstituteSubject::class, 'subject_id');
     }
-    // In the Subject model (app/Models/Subject.php)
-
+    public function instituteSubjects()
+    {
+        return $this->hasMany(InstituteSubject::class, 'subject_id');
+    }
+    public function regulations()
+    {
+        return $this->hasMany(\App\Models\Regulation::class, 'subject_id');
+    }
     public function instituteRegulations()
     {
         return $this->hasManyThrough(

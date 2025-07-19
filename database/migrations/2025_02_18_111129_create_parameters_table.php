@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('subject_id');
             $table->foreign('subject_id')->references('id')->on('subjects');
+            $table->unsignedBigInteger('parameter_category_id')->nullable();
+            $table->foreign('parameter_category_id')->references('id')->on('parameter_categories')->onDelete('cascade');
             $table->string('name')->nullable();
             $table->string('unit')->nullable();
             $table->string('method')->nullable();

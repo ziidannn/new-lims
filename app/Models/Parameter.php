@@ -15,7 +15,8 @@ class Parameter extends Model
         'name',
         'unit',
         'method',
-        'subject_id'
+        'subject_id',
+        'parameter_category_id',
     ];
     public function subjects()
     {
@@ -32,5 +33,13 @@ class Parameter extends Model
     public function regulationStandards()
     {
         return $this->belongsToMany(RegulationStandard::class, 'regulation_standard_id');
+    }
+    public function parameterCategory()
+    {
+        return $this->belongsTo(ParameterCategory::class, 'parameter_category_id', 'id');
+    }
+    public function regulationStandardCategories()
+    {
+        return $this->hasMany(RegulationStandardCategory::class, 'parameter_id');
     }
 }
