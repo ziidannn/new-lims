@@ -84,7 +84,7 @@ class PDFController extends Controller
                 'ls', 'lm', 'lsm', 'unit', 'method', 'regulatory_standard')
             ->whereNull('parameter_id')
             ->whereNull('sampling_time_id')
-            ->groupBy('sampling_id', 'location', 'ls', 'lm', 'lsm', 'unit', 'method', 'regulatory_standard')
+            ->groupBy('sampling_id', 'location','ls', 'lm', 'lsm', 'unit', 'method', 'regulatory_standard')
             ->get()
             ->groupBy('sampling_id');
             // dd($noiseResults->toArray());
@@ -116,16 +116,17 @@ class PDFController extends Controller
         // Mengambil data regulasi berdasarkan regulation_id yang telah difilter
         $regulations = Regulation::whereIn('id', $regulationsIds)->get();
 
-         // Mengambil kondisi lapangan berdasarkan institute_id dan institute_subject_id
+         // Ambil kondisi lapangan berdasarkan institute_id dan institute_subject_id
         $fieldCondition = FieldCondition::where('institute_id', $id)
         ->whereIn('institute_subject_id', $instituteSubjects->pluck('id'))
-        ->first();
-        // Mengambil kondisi lapangan dari hasil pertama jika ada
-        $fieldCondition = optional($results->flatten()->first())->fieldCondition;
+        ->get();
+        // dd($fieldCondition->toArray());
 
         $pdf = Pdf::loadView('pdf.preview_pdf', compact(
-            'institute', 'parameters', 'samplingTimeRegulations', 'results','noiseResults', 'ilumiResults', 'htsResults',
-            'instituteSubjects', 'sampling', 'fieldCondition', 'samplings', 'regulations','isNoise', 'groupedByParameter'
+            'institute', 'parameters', 'samplingTimeRegulations',
+             'results','noiseResults', 'ilumiResults', 'htsResults',
+            'instituteSubjects', 'sampling', 'fieldCondition',
+            'samplings', 'regulations','isNoise', 'groupedByParameter'
         ));
         // Mengaktifkan opsi PHP di dalam tampilan PDF
         $pdf->set_option("isPhpEnabled", true);

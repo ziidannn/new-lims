@@ -247,7 +247,7 @@
                     $fieldCondition = \App\Models\FieldCondition::where('institute_subject_id',
                     $instituteSubject->id)->first();
                     @endphp
-                    <h4 class="mb-3">Environmental Condition</h4>
+                    <h4 class="mb-3">Workplace Environment Condition</h4>
                     <div class="row">
                         <div class="col-lg-6 col-md-6 field-condition" id="coordinate">
                             <label class="form-label">Coordinate</label>

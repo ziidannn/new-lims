@@ -185,17 +185,17 @@
         <tr>
             <td>Sample Receive Date</td>
             <td>:</td>
-            <td colspan="2">{{ \Carbon\Carbon::parse($institute->sample_receive_date)->format('F d, Y') ?? 'N/A' }}</td>
+            <td colspan="2">{{ \Carbon\Carbon::parse($institute->sample_receive_date)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td style="padding-right: 50px;">Sample Analysis Date</td>
             <td style="padding-right: 10px;">:</td>
-            <td colspan="2">{{ \Carbon\Carbon::parse($institute->sample_analysis_date)->format('F d, Y') ?? 'N/A' }}</td>
+            <td colspan="2">{{ \Carbon\Carbon::parse($institute->sample_analysis_date)->translatedFormat('d F, Y') ?? 'N/A' }} to {{ \Carbon\Carbon::parse($institute->report_date)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
         </tr>
         <tr>
             <td>Report Date</td>
             <td>:</td>
-            <td colspan="2">{{ \Carbon\Carbon::parse($institute->report_date)->format('F d, Y') ?? 'N/A' }}</td>
+            <td colspan="2">{{ \Carbon\Carbon::parse($institute->report_date)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
         </tr>
     </table>
 </div>
@@ -244,12 +244,12 @@
                         <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
-                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->translatedFormat('d F, Y') ?? 'N/A' }} <br> to
+                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                     </tr>
             </table>
         </div>
@@ -306,44 +306,71 @@
         </div>
         {{-- End Parameters --}}
         {{-- Start Condition  --}}
-        @if ($resultData->isNotEmpty())
         <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+            @php
+                $ambientFieldCondition = $fieldCondition->firstWhere('institute_subject_id', optional($instituteSubjects->firstWhere('subject.name', 'Ambient Air'))->id);
+            @endphp
+            @if($ambientFieldCondition)
             <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: left; width: 100%;">
                 <tr style="line-height: 1;">
-                    <td style="width: 30%;">Ambient Environmental Condition</td>
+                    <td style="width: 30%;">Ambient Environmental Condition <br></td>
+                    <td style="width: 70%;">:</td>
+                </tr>
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;"></td>
                     <td style="width: 70%;"></td>
                 </tr>
+                @if ($ambientFieldCondition?->coordinate)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Coordinate</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['coordinate'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $ambientFieldCondition->coordinate }}</td>
                 </tr>
+                @endif
+
+                @if ($ambientFieldCondition?->temperature)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Temperature</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['temperature'] ?? 'N/A' }} °C</td>
+                    <td style="width: 70%;">: {{ $ambientFieldCondition->temperature }} °C</td>
                 </tr>
+                @endif
+
+                @if ($ambientFieldCondition?->pressure)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Pressure</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['pressure'] ?? 'N/A' }} mmHg</td>
+                    <td style="width: 70%;">: {{ $ambientFieldCondition->pressure }} mmHg</td>
                 </tr>
+                @endif
+
+                @if ($ambientFieldCondition?->humidity)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Humidity</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['humidity'] ?? 'N/A' }} %RH</td>
+                    <td style="width: 70%;">: {{ $ambientFieldCondition->humidity }} %RH</td>
                 </tr>
+                @endif
+
+                @if ($ambientFieldCondition?->wind_speed)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Wind Speed</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['wind_speed'] ?? 'N/A' }} m/s</td>
+                    <td style="width: 70%;">: {{ $ambientFieldCondition->wind_speed }} m/s</td>
                 </tr>
+                @endif
+
+                @if ($ambientFieldCondition?->wind_direction)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Wind Direction</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['wind_direction'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $ambientFieldCondition->wind_direction }}</td>
                 </tr>
+                @endif
+
+                @if ($ambientFieldCondition?->weather)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Weather</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['weather'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $ambientFieldCondition->weather }}</td>
                 </tr>
+                @endif
             </table>
+            @endif
         </div>
-        @endif
         {{-- End Condition  --}}
         {{-- Start Notes and Regulation --}}
         <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
@@ -380,6 +407,44 @@
 {{-------------------------------------------- Template Noise 1 ---------------------------------------------------}}
 @foreach($samplings->whereNotNull('sampling_location') as $sampling)
     @if($sampling->instituteSubject && $sampling->instituteSubject->subject && $sampling->instituteSubject->subject->name === 'Noise*')
+    
+    @php
+        // Deteksi apakah ada satupun data valid
+        $hasValidNoiseData = false;
+
+        foreach ($noiseResults as $samplingId => $locations) {
+            $relatedSampling = $samplings->firstWhere('id', $samplingId);
+            if (is_null($relatedSampling)) {
+                continue;
+            }
+
+            $subjectName = strtolower(optional($relatedSampling?->instituteSubject?->subject)->name ?? '');
+            if (!Str::contains($subjectName, 'noise')) {
+                continue;
+            }
+
+            foreach ($locations as $locationData) {
+                $leqArray = explode(',', $locationData->leq_values);
+                $validLeq = collect($leqArray)->filter(function ($val) {
+                    return trim($val) !== '';
+                });
+
+                if (
+                    !empty($locationData->ls) &&
+                    !empty($locationData->lm) &&
+                    !empty($locationData->lsm) &&
+                    !empty($locationData->regulatory_standard) &&
+                    !empty($locationData->unit) &&
+                    !empty($locationData->method) &&
+                    $validLeq->isNotEmpty()
+                ) {
+                    $hasValidNoiseData = true;
+                    break 2; // cukup temukan satu saja, langsung keluar loop
+                }
+            }
+        }
+    @endphp
+    @if ($hasValidNoiseData)
     <div class="page_break"></div>
     <div>
         <div class="text-center certificate-container" style="margin-top: 20px;">
@@ -442,43 +507,47 @@
                 @endphp
 
                 @foreach ($noiseResults as $samplingId => $locations)
-                @php
-                    // Cari sampling berdasarkan sampling_id yang sedang diproses
-                    $relatedSampling = $samplings->firstWhere('id', $samplingId);
-                    $subjectName = strtolower(optional($relatedSampling->instituteSubject->subject)->name ?? '');
-                @endphp
-                {{-- Filter hanya jika subject-nya mengandung kata "noise" --}}
-                @if (Str::contains($subjectName, 'noise'))
-                    @foreach ($locations as $locationData)
-                        @php
-                            $leqArray = explode(',', $locationData->leq_values);
-                        @endphp
+                    @php
+                        $relatedSampling = $samplings->firstWhere('id', $samplingId);
+                    @endphp
 
-                        @foreach ($noises as $i => $noise)
-                            <tr>
-                                @if ($i === 0)
-                                    <td style="border: 1px solid;" rowspan="7">{{ $rowNumber++ }}</td>
-                                    <td style="border: 1px solid;" rowspan="7">{{ $locationData->location }}</td>
-                                @endif
+                    @if (is_null($relatedSampling))
+                        @continue
+                    @endif
 
-                                <td style="border: 1px solid;">{{ $noise[0] }}</td>
-                                <td style="border: 1px solid;">{{ $noise[1] }}</td>
-                                <td style="border: 1px solid;">
-                                    {{ isset($leqArray[$i]) && trim($leqArray[$i]) !== '' ? $leqArray[$i] : '-' }}
-                                </td>
+                    @php
+                        $subjectName = strtolower(optional($relatedSampling?->instituteSubject?->subject)->name ?? '');
+                    @endphp
 
-                                @if ($i === 0)
-                                    <td style="border: 1px solid;" rowspan="7">{{ $locationData->ls ?? '-' }}</td>
-                                    <td style="border: 1px solid;" rowspan="7">{{ $locationData->lm ?? '-' }}</td>
-                                    <td style="border: 1px solid;" rowspan="7">{{ $locationData->lsm ?? '-' }}</td>
-                                    <td style="border: 1px solid;" rowspan="7">{{ $locationData->regulatory_standard ?? '-' }}</td>
-                                    <td style="border: 1px solid;" rowspan="7">{{ $locationData->unit ?? '-' }}</td>
-                                    <td style="border: 1px solid;" rowspan="7">{{ $locationData->method ?? '-' }}</td>
-                                @endif
-                            </tr>
+                    @if (Str::contains($subjectName, 'noise'))
+                        @foreach ($locations as $locationData)
+
+                            @foreach ($noises as $i => $noise)
+                                @php
+                                    $leq = isset($leqArray[$i]) && trim($leqArray[$i]) !== '' ? $leqArray[$i] : '-';
+                                @endphp
+                                <tr>
+                                    @if ($i === 0)
+                                        <td style="border: 1px solid;" rowspan="7">{{ $rowNumber++ }}</td>
+                                        <td style="border: 1px solid;" rowspan="7">{{ $locationData->location }}</td>
+                                    @endif
+
+                                    <td style="border: 1px solid;">{{ $noise[0] }}</td>
+                                    <td style="border: 1px solid;">{{ $noise[1] }}</td>
+                                    <td style="border: 1px solid;">{{ $leq }}</td>
+
+                                    @if ($i === 0)
+                                        <td style="border: 1px solid;" rowspan="7">{{ $locationData->ls }}</td>
+                                        <td style="border: 1px solid;" rowspan="7">{{ $locationData->lm }}</td>
+                                        <td style="border: 1px solid;" rowspan="7">{{ $locationData->lsm }}</td>
+                                        <td style="border: 1px solid;" rowspan="7">{{ $locationData->regulatory_standard }}</td>
+                                        <td style="border: 1px solid;" rowspan="7">{{ $locationData->unit }}</td>
+                                        <td style="border: 1px solid;" rowspan="7">{{ $locationData->method }}</td>
+                                    @endif
+                                </tr>
+                            @endforeach
                         @endforeach
-                    @endforeach
-                @endif
+                    @endif
                 @endforeach
             </table>
         </div>
@@ -506,6 +575,7 @@
         </div>
         {{-- End Notes and Regulation --}}
     </div>
+    @endif
     @endif
 @endforeach
 {{-------------------------------------------- End Template Noise 1 ---------------------------------------------------}}
@@ -543,36 +613,45 @@
                     <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
-                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
                     <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
-                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
-                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
-                                                <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
+                    <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->translatedFormat('d F, Y') ?? 'N/A' }} <br> to
+                                                <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                 </tr>
             </table>
         </div>
         {{-- Start Parameters --}}
-        <div style="margin-top: 20px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+        <div style="margin-top: 20px;">
             <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: center; width: 100%;">
                 <tr>
                     <th style="border: 1px solid;">No</th>
-                    <th style="border: 1px solid;">Parameters</th>
+                    <th style="border: 1px solid;">Sampling<br>Location</th>
                     <th style="border: 1px solid;">Testing Result</th>
+                    <th style="border: 1px solid;">Time</th>
                     <th style="border: 1px solid;">Regulatory<br>Standard**</th>
                     <th style="border: 1px solid;">Unit</th>
                     <th style="border: 1px solid;">Methods</th>
                 </tr>
-                    <tr>
-                        <td style="border: 1px solid;"></td>
-                        <td style="border: 1px solid;"></td>
-                        <td style="border: 1px solid;"></td>
-                        <td style="border: 1px solid;"></td>
-                        <td style="border: 1px solid;"></td>
-                        <td style="border: 1px solid;"></td>
-                    </tr>
+        
+                @php $rowNumber = 1; @endphp
+                @foreach ($parameterResults as $samplingId => $items)
+                    @foreach ($items as $result)
+                        <tr>
+                            <td style="border: 1px solid;">{{ $rowNumber++ }}</td>
+                            <td style="border: 1px solid;">{{ $result->location }}</td>
+                            <td style="border: 1px solid;">{{ $result->testing_result ?? '-' }}</td>
+                            <td style="border: 1px solid;">{{ $result->time ?? '-' }}</td>
+                            <td style="border: 1px solid;">{{ $result->regulatory_standard ?? '-' }}</td>
+                            <td style="border: 1px solid;">{{ $result->unit ?? '-' }}</td>
+                            <td style="border: 1px solid;">{{ $result->method ?? '-' }}</td>
+                        </tr>
+                    @endforeach
+                @endforeach
             </table>
         </div>
+        
         {{-- End Parameters --}}
         {{-- Start Notes and Regulation --}}
         <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
@@ -628,12 +707,12 @@
                         <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
-                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->translatedFormat('d F, Y') ?? 'N/A' }} <br> to
+                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                     </tr>
             </table>
         </div>
@@ -676,44 +755,71 @@
         </div>
         {{-- End Parameters --}}
         {{-- Start Condition  --}}
-        @if ($resultData->isNotEmpty())
         <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+            @php
+                $workplaceFieldCondition = $fieldCondition->firstWhere('institute_subject_id', optional($instituteSubjects->firstWhere('subject.name', 'Workplace Air'))->id);
+            @endphp
+            @if($workplaceFieldCondition)
             <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: left; width: 100%;">
                 <tr style="line-height: 1;">
-                    <td style="width: 30%;">Workplace Environment Condition :</td>
-                    <td style="width: 70%;"></td>
+                    <td style="width: 30%;">Workplace Air Environment Condition </td>
+                    <td style="width: 70%;">:</td>
                 </tr>
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;"></td>
+                    <td style="width: 70%;">:</td>
+                </tr>
+                @if ($workplaceFieldCondition?->coordinate)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Coordinate</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['coordinate'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $workplaceFieldCondition->coordinate }}</td>
                 </tr>
+                @endif
+
+                @if ($workplaceFieldCondition?->temperature)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Temperature</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['temperature'] ?? 'N/A' }} °C</td>
+                    <td style="width: 70%;">: {{ $workplaceFieldCondition->temperature }} °C</td>
                 </tr>
+                @endif
+
+                @if ($workplaceFieldCondition?->pressure)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Pressure</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['pressure'] ?? 'N/A' }} mmHg</td>
+                    <td style="width: 70%;">: {{ $workplaceFieldCondition->pressure }} mmHg</td>
                 </tr>
+                @endif
+
+                @if ($workplaceFieldCondition?->humidity)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Humidity</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['humidity'] ?? 'N/A' }} %RH</td>
+                    <td style="width: 70%;">: {{ $workplaceFieldCondition->humidity }} %RH</td>
                 </tr>
+                @endif
+
+                @if ($workplaceFieldCondition?->wind_speed)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Wind Speed</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['wind_speed'] ?? 'N/A' }} m/s</td>
+                    <td style="width: 70%;">: {{ $workplaceFieldCondition->wind_speed }} m/s</td>
                 </tr>
+                @endif
+
+                @if ($workplaceFieldCondition?->wind_direction)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Wind Direction</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['wind_direction'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $workplaceFieldCondition->wind_direction }}</td>
                 </tr>
+                @endif
+
+                @if ($workplaceFieldCondition?->weather)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Weather</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['weather'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $workplaceFieldCondition->weather }}</td>
                 </tr>
+                @endif
             </table>
+            @endif
         </div>
-        @endif
         {{-- End Condition  --}}
         {{-- Start Notes and Regulation --}}
         <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
@@ -767,12 +873,12 @@
                         <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
-                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->translatedFormat('d F, Y') ?? 'N/A' }} <br> to
+                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                     </tr>
             </table>
         </div>
@@ -815,44 +921,71 @@
         </div>
         {{-- End Parameters --}}
         {{-- Start Condition  --}}
-        @if ($resultData->isNotEmpty())
         <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+            @php
+                $odorFieldCondition = $fieldCondition->firstWhere('institute_subject_id', optional($instituteSubjects->firstWhere('subject.name', 'Odor'))->id);
+            @endphp
+            @if($odorFieldCondition)
             <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: left; width: 100%;">
                 <tr style="line-height: 1;">
-                    <td style="width: 30%;">Workplace Environment Condition :</td>
-                    <td style="width: 70%;"></td>
+                    <td style="width: 30%;">Odor Environment Condition </td>
+                    <td style="width: 70%;">:</td>
                 </tr>
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;"></td>
+                    <td style="width: 70%;">:</td>
+                </tr>
+                @if ($odorFieldCondition?->coordinate)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Coordinate</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['coordinate'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $odorFieldCondition->coordinate }}</td>
                 </tr>
+                @endif
+
+                @if ($odorFieldCondition?->temperature)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Temperature</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['temperature'] ?? 'N/A' }} °C</td>
+                    <td style="width: 70%;">: {{ $odorFieldCondition->temperature }} °C</td>
                 </tr>
+                @endif
+
+                @if ($odorFieldCondition?->pressure)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Pressure</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['pressure'] ?? 'N/A' }} mmHg</td>
+                    <td style="width: 70%;">: {{ $odorFieldCondition->pressure }} mmHg</td>
                 </tr>
+                @endif
+
+                @if ($odorFieldCondition?->humidity)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Humidity</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['humidity'] ?? 'N/A' }} %RH</td>
+                    <td style="width: 70%;">: {{ $odorFieldCondition->humidity }} %RH</td>
                 </tr>
+                @endif
+
+                @if ($odorFieldCondition?->wind_speed)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Wind Speed</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['wind_speed'] ?? 'N/A' }} m/s</td>
+                    <td style="width: 70%;">: {{ $odorFieldCondition->wind_speed }} m/s</td>
                 </tr>
+                @endif
+
+                @if ($odorFieldCondition?->wind_direction)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Wind Direction</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['wind_direction'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $odorFieldCondition->wind_direction }}</td>
                 </tr>
+                @endif
+
+                @if ($odorFieldCondition?->weather)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Weather</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['weather'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $odorFieldCondition->weather }}</td>
                 </tr>
+                @endif
             </table>
+            @endif
         </div>
-        @endif
         {{-- End Condition  --}}
         {{-- Start Notes and Regulation --}}
         <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
@@ -906,12 +1039,12 @@
                         <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
-                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->translatedFormat('d F, Y') ?? 'N/A' }} <br> to
+                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                     </tr>
             </table>
         </div>
@@ -952,7 +1085,6 @@
                     @endif
                 @endforeach
             </table>
-            
         </div>
         {{-- End Parameters --}}
         {{-- Start Condition  --}}
@@ -1047,12 +1179,12 @@
                         <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
-                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->translatedFormat('d F, Y') ?? 'N/A' }} <br> to
+                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                     </tr>
             </table>
         </div>
@@ -1144,44 +1276,71 @@
         </div>
         {{-- End Parameters --}}
         {{-- Start Condition  --}}
-        @if ($resultData->isNotEmpty())
         <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+            @php
+                $heatFieldCondition = $fieldCondition->firstWhere('institute_subject_id', optional($instituteSubjects->firstWhere('subject.name', 'Heat Stress'))->id);
+            @endphp
+            @if($heatFieldCondition)
             <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: left; width: 100%;">
                 <tr style="line-height: 1;">
-                    <td style="width: 30%;">Workplace Environment Condition :</td>
-                    <td style="width: 70%;"></td>
+                    <td style="width: 30%;">Heat Stress Environment Condition </td>
+                    <td style="width: 70%;">:</td>
                 </tr>
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;"></td>
+                    <td style="width: 70%;">:</td>
+                </tr>
+                @if ($heatFieldCondition?->coordinate)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Coordinate</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['coordinate'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $heatFieldCondition->coordinate }}</td>
                 </tr>
+                @endif
+
+                @if ($heatFieldCondition?->temperature)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Temperature</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['temperature'] ?? 'N/A' }} °C</td>
+                    <td style="width: 70%;">: {{ $heatFieldCondition->temperature }} °C</td>
                 </tr>
+                @endif
+
+                @if ($heatFieldCondition?->pressure)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Pressure</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['pressure'] ?? 'N/A' }} mmHg</td>
+                    <td style="width: 70%;">: {{ $heatFieldCondition->pressure }} mmHg</td>
                 </tr>
+                @endif
+
+                @if ($heatFieldCondition?->humidity)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Humidity</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['humidity'] ?? 'N/A' }} %RH</td>
+                    <td style="width: 70%;">: {{ $heatFieldCondition->humidity }} %RH</td>
                 </tr>
+                @endif
+
+                @if ($heatFieldCondition?->wind_speed)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Wind Speed</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['wind_speed'] ?? 'N/A' }} m/s</td>
+                    <td style="width: 70%;">: {{ $heatFieldCondition->wind_speed }} m/s</td>
                 </tr>
+                @endif
+
+                @if ($heatFieldCondition?->wind_direction)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Wind Direction</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['wind_direction'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $heatFieldCondition->wind_direction }}</td>
                 </tr>
+                @endif
+
+                @if ($heatFieldCondition?->weather)
                 <tr style="line-height: 1;">
                     <td style="width: 30%;">Weather</td>
-                    <td style="width: 70%;">: {{ $fieldCondition['weather'] ?? 'N/A' }}</td>
+                    <td style="width: 70%;">: {{ $heatFieldCondition->weather }}</td>
                 </tr>
+                @endif
             </table>
+            @endif
         </div>
-        @endif
         {{-- End Condition  --}}
         {{-- Start Notes and Regulation --}}
         <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
@@ -1235,12 +1394,12 @@
                         <td style="border: 1px solid;">{{ $institute->no_coa ?? 'N/A' }}.{{ $sampling->no_sample ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_location ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $instituteSubjects->where('id', $sampling->institute_subject_id)->first()->subject->name ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->format('F d, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->sampling_date)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_time ?? 'N/A' }}</td>
                         <td style="border: 1px solid;">{{ $sampling->sampling_method ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->format('F d, Y') ?? 'N/A' }}</td>
-                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->format('F d, Y') ?? 'N/A' }} <br> to
-                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->format('F d, Y')  ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->date_received)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
+                        <td style="border: 1px solid;">{{ \Carbon\Carbon::parse($sampling->itd_start)->translatedFormat('d F, Y') ?? 'N/A' }} <br> to
+                                                    <br>{{ \Carbon\Carbon::parse($sampling->itd_end)->translatedFormat('d F, Y') ?? 'N/A' }}</td>
                     </tr>
             </table>
         </div>
@@ -1294,6 +1453,73 @@
             </table>                    
         </div>
         {{-- End Parameters --}}
+        {{-- Start Condition  --}}
+        <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
+            @php
+                $stationaryFieldCondition = $fieldCondition->firstWhere('institute_subject_id', optional($instituteSubjects->firstWhere('subject.name', 'Stationary Stack Source Emission'))->id);
+            @endphp
+            @if($stationaryFieldCondition)
+            <table style="font-size: 10px; margin: 0 auto; border: 1px solid black; border-collapse: collapse; text-align: left; width: 100%;">
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;">Heat Stress Environment Condition </td>
+                    <td style="width: 70%;">:</td>
+                </tr>
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;"></td>
+                    <td style="width: 70%;"></td>
+                </tr>
+                @if ($stationaryFieldCondition?->coordinate)
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;">Coordinate</td>
+                    <td style="width: 70%;">: {{ $stationaryFieldCondition->coordinate }}</td>
+                </tr>
+                @endif
+
+                @if ($stationaryFieldCondition?->temperature)
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;">Temperature</td>
+                    <td style="width: 70%;">: {{ $stationaryFieldCondition->temperature }} °C</td>
+                </tr>
+                @endif
+
+                @if ($stationaryFieldCondition?->pressure)
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;">Pressure</td>
+                    <td style="width: 70%;">: {{ $stationaryFieldCondition->pressure }} mmHg</td>
+                </tr>
+                @endif
+
+                @if ($stationaryFieldCondition?->humidity)
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;">Humidity</td>
+                    <td style="width: 70%;">: {{ $stationaryFieldCondition->humidity }} %RH</td>
+                </tr>
+                @endif
+
+                @if ($stationaryFieldCondition?->wind_speed)
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;">Wind Speed</td>
+                    <td style="width: 70%;">: {{ $stationaryFieldCondition->wind_speed }} m/s</td>
+                </tr>
+                @endif
+
+                @if ($stationaryFieldCondition?->wind_direction)
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;">Wind Direction</td>
+                    <td style="width: 70%;">: {{ $stationaryFieldCondition->wind_direction }}</td>
+                </tr>
+                @endif
+
+                @if ($stationaryFieldCondition?->weather)
+                <tr style="line-height: 1;">
+                    <td style="width: 30%;">Weather</td>
+                    <td style="width: 70%;">: {{ $stationaryFieldCondition->weather }}</td>
+                </tr>
+                @endif
+            </table>
+            @endif
+        </div>
+        {{-- End Condition  --}}
         {{-- Start Notes and Regulation --}}
         <div class="" style="margin-top: 3px;"> <!-- Adjusted margin-top to add space between the title and the table -->
             <table style="font-size: 10px; margin: 0 auto;  border-collapse: collapse; text-align: left; width: 100%;">

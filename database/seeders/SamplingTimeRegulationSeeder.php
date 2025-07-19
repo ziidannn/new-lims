@@ -359,15 +359,37 @@ class SamplingTimeRegulationSeeder extends Seeder
                 "id" => "50",
                 "parameter_id" => "40",
                 "sampling_time_id" => "7",
-                "regulation_standard_id" => "17",
+                "regulation_standard_id" => "14",
             ],
             // parameter 41
             [
                 "id" => "51",
                 "parameter_id" => "41",
                 "sampling_time_id" => "7",
+                "regulation_standard_id" => "62",
+            ],
+            // parameter 42
+            [
+                "id" => "52",
+                "parameter_id" => "42",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "63",
+            ],
+            // parameter 43
+            [
+                "id" => "53",
+                "parameter_id" => "43",
+                "sampling_time_id" => "7",
+                "regulation_standard_id" => "55",
+            ],
+            // parameter 44
+            [
+                "id" => "54",
+                "parameter_id" => "44",
+                "sampling_time_id" => "7",
                 "regulation_standard_id" => "17",
             ],
+            
         ];
         foreach ($data as $x) {
             if(!SamplingTimeRegulation::where('id', $x['id'])->first()){
